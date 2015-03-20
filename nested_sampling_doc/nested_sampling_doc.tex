@@ -1,0 +1,117 @@
+\documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4-1}
+
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{xspace}
+\usepackage{cleveref}
+
+\newcommand{\ee}[1]{\!\times\!10^{#1}}
+\newcommand{\gws}{gravitational waves\xspace}
+\newcommand{\gw}{gravitational wave\xspace}
+\newcommand{\lalinf}{\texttt{LALInference}\xspace}
+
+\bibliographystyle{aipauth4-1}
+
+\begin{document}
+
+\title{A nested sampling code for targeted searches for continuous \gws from pulsars}
+
+\author{M.~Pitkin}\affiliation{SUPA, School of Physics \& Astronomy, University of Glasgow, Glasgow, G12 8QQ, United Kingdom}
+\author{G.~Woan}\affiliation{SUPA, School of Physics \& Astronomy, University of Glasgow, Glasgow, G12 8QQ, United Kingdom}
+
+\email{matthew.pitkin@glasgow.ac.uk}
+
+\date{\today}
+
+\begin{abstract}
+This document will detail a code to perform parameter estimation and model selection in targeted searches for
+continuous \gws from known pulsars. We will describe the general workings of the code along with characterising
+it on simulated data and real LIGO S5 data. We will also show how it performs compared to a previous MCMC and
+grid-based approach to signal parameter estimation. An appendix will detail how to run the code in a variety of cases.
+\end{abstract}
+
+\pacs{01.50.ht, 02.50.Tt, 04.80.Nn}
+\preprint{}
+
+\maketitle
+
+\section{Overview}
+
+One of the primary methods used in searches for \gws from known pulsars is based on two stages: a
+heterodyne stage that pre-processes the calibrated \gw detector data by removing a signal's expected
+intrinsic phase evolution, low-pass filtering and down-sampling (via averaging) \cite{2005PhRvD..72j2002D};
+and, a parameter estimation stage that takes the processed data and uses it to estimate posterior
+probability distributions of the unknown signal parameters (e.g.\ using a Markov chain Monte Carlo
+\cite{2010ApJ...713..671A}). This method has been variously called the {\it Time Domain Method},
+the {\it Heterodyne Method}, the {\it Bayesian Method}, the {\it Glasgow Method}, or some combination
+of these names. The method used up to now has only been used to set upper limits on signal amplitudes,
+but has had no explicit criteria for deciding on signal detection. The MCMC method used also was not
+designed to be efficient and required tuning. It also did not straighforwardly have the ability to
+perform a search on the data over small ranges in the phase evolution parameters (e.g.\ required if
+the \gw signal does not well match the known pulsar's phase evolution). For these reasons the parameter
+estimation code has been re-written to use the nested sampling algorithm \cite{Skilling:2006}. This allows us to
+evaluate the {\it evidence} or {\it marginal likelihood} for the signal model and compare it to other
+model evidences (i.e.\ the data is just Gaussian noise), whilst also giving posterior probabilty
+distributions for the signal parameters.
+
+This code makes use of the nested sampling algorithm provided within the \lalinf software library
+\citep{2015PhRvD..91d2003V}. As such this document will not give a detailed description of how that
+algorithm works, but will provide some information on the specific proposals that can be used within
+the algorithm. This method has previously been briefly described in \cite{2012JPhCS.363a2041P}.
+
+The code can also be used to perform parameter estimation and model selection for signals for any generic
+metric theory of gravity, however its use for this will be discussed in detail in a separate paper. When
+searching over parameters that vary the phase evolution there is potential to speed up the code through
+efficient likelihood evaluation via the {\it reduced order quadrature} method, but again that will be
+discussed in more detail in a future paper.
+
+\section{Core functions}
+
+Here we will describe the core parts of the code defining the signal model and the probability functions
+used for the inference.
+
+\subsection{The signal model}
+
+\subsection{The likelihood functions}
+
+\subsection{The prior functions}
+
+\subsection{Splitting the data}
+
+The above likelihood function require us to have an idea about the timescales on which the data is
+stationary, i.e.\ periods when the noise in the data is best described as being drawn from a single
+Gaussian distribution.
+
+\section{Evaluating the parameter estimation}
+
+\section{Evaluating the evidence calculation}
+
+\subsection{Simulated Gaussian noise}
+
+\subsection{LIGO S5 data}
+
+\subsubsection{Evaluating coherent signals}
+
+We can run the code such that it provides the joint evidence for a signal in multiple detectors, but
+we can also run it for individual detectors. This allows us to compare the model that there is a
+coherent signal between detectors (as would be expected for a real signal) to the model that the
+signal is incoherent between detectors (as you might expect from a detector line artefact). This can
+be done by comparing the joint analysis evidence to the sum of the individual detector evidences
+(i.e.\ the logical {\it or} between detectors)
+\begin{equation}
+\mathcal{O}_{\rm coherent} = \frac{\mathcal{Z}_{\rm Joint}}{\sum_{i=1}^{N_{\rm det}} \mathcal{Z}_{{\rm det}_i}}
+\end{equation}
+
+\appendix
+
+\section{Derivation of the Students-{\it t} likelihood function}
+
+\section{Code usage}
+
+Here we document the various command line options for the code and its use in a variety of situations.
+
+\bibliography{nested_sampling_doc}
+
+\end{document}

@@ -51,10 +51,11 @@ down-sampling (via averaging) \cite{2005PhRvD..72j2002D}; and, a parameter estim
 processed data and uses it to estimate posterior probability distributions of the unknown signal parameters
 (e.g.\ using a Markov chain Monte Carlo (MCMC) \cite{2010ApJ...713..671A}). This method has been variously
 called the {\it Time Domain Method}, the {\it Heterodyne Method}, the {\it Bayesian Method}, the {\it Glasgow
-Method}, or some combination of these names. The method used up to now has only been used to set upper limits
-on signal amplitudes, but has had no explicit criteria for deciding on signal detection. The MCMC method used
-also was not designed to be efficient and required tuning. It also did not straighforwardly have the ability
-to perform a search on the data over small ranges in the phase evolution parameters (e.g.\ required if the
+Method}, or some combination of these names. Up to now this method has only been used to set upper limits
+on signal amplitudes, but has had no explicit criteria for deciding on signal detection/significance. A further
+limitation has been that the MCMC method used was not designed to be efficient and required tuning. It also
+did not straighforwardly have the ability to perform a search on the data over small ranges in the phase
+evolution parameters (e.g.\ required if the
 \gw signal does not well match the known pulsar's phase evolution). For these reasons the parameter
 estimation code has been re-written to use the nested sampling algorithm \cite{Skilling:2006}, in particular
 a method based on that described in \cite{Veitch:2010}. This allows us to evaluate the {\it evidence} or {\it

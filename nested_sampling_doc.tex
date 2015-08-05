@@ -3,9 +3,9 @@
 One of the primary methods used in searches for \gws from known pulsars is based on two stages: a heterodyne
 stage that pre-processes the calibrated \gw detector data by removing a signal's expected intrinsic phase
 evolution (based on the observed solution from electromagnetic observations), low-pass filtering and
-down-sampling (via averaging) \cite{2005PhRvD..72j2002D}; and, a parameter estimation stage that takes the
+down-sampling (via averaging) \citep{2005PhRvD..72j2002D}; and, a parameter estimation stage that takes the
 processed data and uses it to estimate posterior probability distributions of the unknown signal parameters
-(e.g.\ using a Markov chain Monte Carlo (MCMC) \cite{2010ApJ...713..671A}). This method has been variously
+\citep[e.g.\ using a Markov chain Monte Carlo (MCMC)][]{2010ApJ...713..671A}. This method has been variously
 called the {\it Time Domain Method}, the {\it Heterodyne Method}, the {\it Bayesian Method}, the {\it Glasgow
 Method}, or some combination of these names. Up to now this method has only been used to set upper limits
 on signal amplitudes, but has had no explicit criteria for deciding on signal detection/significance. A further
@@ -21,7 +21,7 @@ Gaussian noise), whilst also giving posterior probabilty distributions for the s
 This code makes use of the nested sampling algorithm provided within the \lalinf software library
 \citep{2015PhRvD..91d2003V}. As such this document will not give a detailed description of how that algorithm
 works, but will provide some information on the specific proposals that can be used within the algorithm.
-This method has previously been briefly described in \cite{2012JPhCS.363a2041P}.
+This method has previously been briefly described in \citet{2012JPhCS.363a2041P}.
 
 The code can also be used to perform parameter estimation and model selection for signals for any generic
 metric theory of gravity, however its use for this will be discussed in detail in a separate paper. When
@@ -103,7 +103,7 @@ where $\Phi_{i,\rm het}(t)$ is the phase evolution for a given data stream $i$, 
 low-pass filtering and averaging values of $B'(t)$.
 
 Under the standard assumption that the general theory of relativity (GR) is correct the code uses the form of
-the signal model defined in \cite{2015arXiv150105832J} that, when heterodyned and asumming low-pass
+the signal model defined in \citet{2015arXiv150105832J} that, when heterodyned and asumming low-pass
 filtered, gives a signal at a pulsar's rotation frequency (where $\Phi_{1,{\rm het}}(t) = \phi(t)$) of
 \begin{widetext}
 \begin{equation}\label{eq:hf}
@@ -129,7 +129,7 @@ By default the code assumes emission just from the $l=m=2$ mode, i.e.\ there is 
 rotation frequency. In this case $C_{22}$ and $\Phi_{22}^C$ can be related to the more familiar physical
 $h_0$ and $\phi_0$ values via $h_0 = 2C_{22}$ and $\phi_0 = \Phi_{22}^C/2$. For the more general case the
 relations between the waveform amplitude and phase parameters and physical source parameters are given in
-\cite{2015arXiv150105832J}. In general for previous searches we have often assumed that we track the true
+\citet{2015arXiv150105832J}. In general for previous searches we have often assumed that we track the true
 signal phase perfectly with the heterodyne and as such $\Delta\phi_i(t) = 0$. In such cases the only time
 varying components of the signal are the antenna pattern functions, which allows great speed increases in the
 signal generation and likelihood calculations.
@@ -140,14 +140,14 @@ Our code can make use of two different likelihood functions. The default likelih
 Students-{\it t} likelihood function in which it is assumed that the standard deviation of the noise in the
 data is unknown, and can therefore be marginalised over. A Gaussian likelihood function can also be used, for
 which the code can either take in estimates of the noise standard deviation at each data point, or calculates
-these internally based on stationary stretches of data. For the Students-{\it t} likelihood function, and if
+these internally based on stationary stretches of data. For the Student's {\it t}-likelihood function, and if
 calculated noise standard deviations for the Gaussian likelihood function internally the code needs to break
 up the data into chunks that have (roughly) the same distribution. The method for doing this is given in
 Section~\ref{sec:splitting}.
 
-\subsubsection{Students-{\it t} likelihood}
+\subsubsection{Student's {\it t}-likelihood}
 
-A full derivative of the Students-{\it t} likelihood function (see e.g.~\cite{2005PhRvD..72j2002D}) is given
+A full derivative of the Student's {\it t}-likelihood function \citep[see e.g.][]{2005PhRvD..72j2002D} is given
 in Appendix~\ref{app:likelihood}, but the final form of the joint likelihood (and its natural logarithm,
 which is actually used within the code to maintain precision) for multiple detectors and data streams is
 given by
@@ -218,7 +218,7 @@ from each detector then we would need these factors to still be present.
 
 In cases when the only time varying components of the model are the antenna pattern functions the likelihood
 evaluation can be greatly sped-up by precalculated the components in the internal summations. For a given sky
-position and detector the antenna patterns can be defined by \cite{1998PhRvD..58f3001J}
+position and detector the antenna patterns can be defined by \citep{1998PhRvD..58f3001J}
 \begin{align}
 F_+(t,\psi) &= \sin{\zeta}\left[a(t)\cos{2\psi} + b(t)\sin{2\psi}\right], \nonumber \\
 F_{\times}(t,\psi) &= \sin{\zeta}\left[b(t)\cos{2\psi} - b(t)\sin{2\psi}\right],
@@ -253,8 +253,8 @@ assuming GR emission just from the $l=m=2$ mode, it is just the four different $
 to be calculated during the sampling process within the code.
 
 In the case where we want to search over parameters that mean that $\Delta\phi_i(t) \ne 0$ in the model then
-we can not perform this pre-summing. However, {\it reduced order quadrature} methods (e.g.\
-\cite{2014PhRvX...4c1006F, 2015PhRvL.114g1104C}) may help in these cases. Such a method is implemented in our
+we can not perform this pre-summing. However, {\it reduced order quadrature} methods
+\citep[e.g.][]{2014PhRvX...4c1006F, 2015PhRvL.114g1104C} may help in these cases. Such a method is implemented in our
 code, but will be discussed in a separate paper.
 
 \subsection{The prior functions}
@@ -264,7 +264,7 @@ code, but will be discussed in a separate paper.
 The above likelihood functions require us to have an idea about the timescales on which the data is
 stationary, i.e.\ periods when the noise in the data is best described as being drawn from a single
 Gaussian distribution. We therefore use a scheme similar to the BayesianBlocks change point algorithm
-\cite{1998ApJ...504..405S} to find points at which the statistics of the noise changes.
+\citep{1998ApJ...504..405S} to find points at which the statistics of the noise changes.
 
 \section{Evaluating the parameter estimation}
 
@@ -288,10 +288,10 @@ detectors)
 
 \appendix
 
-\section{Derivation of the Students-{\it t} likelihood function}\label{app:likelihood}
+\section{Derivation of the Student's {\it t}-likelihood function}\label{app:likelihood}
 
-Here we derive in detail the form of the Students-{\it t} likelihood given in Section~\ref{sec:likelihood}.
-This derivation can in part be found in \cite{Dupuisthesis} and \cite{2005PhRvD..72j2002D}, but we correct a
+Here we derive in detail the form of the Student's {\it t}-likelihood given in Section~\ref{sec:likelihood}.
+This derivation can in part be found in \citet{Dupuisthesis} and \citet{2005PhRvD..72j2002D}, but we correct a
 slight error from those references. If a stretch of data of length $m$ is assumed to consist of a signal
 defined by a set of parameter $\vec{\theta}$ and Gaussian noise with zero mean and standard deviation
 $\sigma$, then the standard deviation can be included as an unknown parameter in the likelihood function and
@@ -361,7 +361,7 @@ likelihood becomes
 p(\mathbf{B}|\vec{\theta}) = \frac{(m-1)!}{2\pi^m} \left(\sum_{k=1}^m
 |B_k-y(\vec{\theta})_k|^2\right)^{-m}.
 \end{equation}
-Note that, again, this differs from Eqn.~2.31 in \cite{Dupuisthesis} by some constant factors.
+Note that, again, this differs from Eqn.~2.31 in \citet{Dupuisthesis} by some constant factors.
 
 For our analysis the data is split into chunks for each of which the assumption of noise stationarity is
 thought to be valid, but between chunks is thought to be invalid. The joint likelihood of all data can be

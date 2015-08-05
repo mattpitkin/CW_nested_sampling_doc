@@ -1,5 +1,4 @@
 \usepackage{natbib}
-\usepackage{widetext}
 
 \newcommand{\ee}[1]{\!\times\!10^{#1}}
 \newcommand{\gws}{gravitational waves\xspace}
@@ -8,6 +7,9 @@
 
 \bibliographystyle{aipauth4-1}
 
-  
-  
-  
+\iflatexml  
+\renewenvironment{widetext}{\begin{center}}{%
+\end{center}\ignorespaceafterend%
+}
+\fi 
+

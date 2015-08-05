@@ -5,7 +5,12 @@
 
 \bibliographystyle{aipauth4-1}
 
-\iflatexml  
+\iflatexml
+  % define things that are only required for rendering on authorea
+  
+  % call natbib so LaTeXML can use citet and citep commands
   \usepackage{natbib}
-  \newenvironment{widetext}{}{\ignorespaceafterend}
+
+  % define the widetext environment as empty otherwise tags show up on authorea
+  \newenvironment{widetext}{}{}
 \fi

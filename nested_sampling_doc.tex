@@ -73,7 +73,7 @@ for a detector, or set of detectors, each giving a single data stream or two dat
 whether the heterodyne was performed at one of both potential signal frequencies near the rotation frequency
 and/or twice the rotation frequency. Here we will use $\mathbf{B}$ to represent a vector of these heterodyned
 data values, for which a single time sample is often refered to as $B_k$ (``{\it B of k}''), although we will
-not consistly use $k$ as the time index for the data.
+not consistently use $k$ as the time index for the data.
 
 \section{Core functions}
 
@@ -81,7 +81,7 @@ Here we will describe the core parts of the code defining the signal model and t
 for the inference. These assume that the data consists of calibrated narrow-band complex heteroyned time
 series'. These time series data streams can be from different detectors, and/or different heterodyne
 frequencies. For example you could have a pair times series from both the LIGO Hanford (H1) and LIGO
-Livingston (L1) detectors, with one produced with a heterodyne at twice the rotatation frequency of a known
+Livingston (L1) detectors, with one produced with a heterodyne at twice the rotation frequency of a known
 pulsar and the other produced with a heterodyne at the rotation frequency.
 
 \subsection{The signal model}
@@ -137,9 +137,9 @@ signal generation and likelihood calculations.
 \subsection{The likelihood functions}\label{sec:likelihood}
 
 Our code can make use of two different likelihood functions. The default likelihood function is a
-Students-{\it t} likelihood function in which it is assumed that the standard devaition of the noise in the
+Students-{\it t} likelihood function in which it is assumed that the standard deviation of the noise in the
 data is unknown, and can therefore be marginalised over. A Gaussian likelihood function can also be used, for
-which the code can either take in estimates of the noise standard devaition at each data point, or calculates
+which the code can either take in estimates of the noise standard deviation at each data point, or calculates
 these internally based on stationary stretches of data. For the Students-{\it t} likelihood function, and if
 calculated noise standard deviations for the Gaussian likelihood function internally the code needs to break
 up the data into chunks that have (roughly) the same distribution. The method for doing this is given in
@@ -217,7 +217,7 @@ from each detector then we would need these factors to still be present.
 \subsubsection{Fast likelihood evaluations}
 
 In cases when the only time varying components of the model are the antenna pattern functions the likelihood
-evalution can be greatly sped-up by precalculated the components in the internal summations. For a given sky
+evaluation can be greatly sped-up by precalculated the components in the internal summations. For a given sky
 position and detector the antenna patterns can be defined by \cite{1998PhRvD..58f3001J}
 \begin{align}
 F_+(t,\psi) &= \sin{\zeta}\left[a(t)\cos{2\psi} + b(t)\sin{2\psi}\right], \nonumber \\
@@ -247,7 +247,7 @@ a(t_i)b(t_i) - \nonumber \\
 \end{widetext}
 where $\mathcal{C}$ represents the imaginary component of waveform amplitude for a given set of parameters.
 It can be seen that all the summation terms can be pre-computed. If using the Gaussian likelihood this
-pre-computation of the summation terms can also be done, but with the substitions $B_i \rightarrow
+pre-computation of the summation terms can also be done, but with the substitutions $B_i \rightarrow
 B_i/\sigma_i$, $a(t_i) \rightarrow a(t_i)/\sigma_i$ and $b(t_i) \rightarrow b(t_i)/\sigma_i$. For the model,
 assuming GR emission just from the $l=m=2$ mode, it is just the four different $\mathcal{C}$ terms that need
 to be calculated during the sampling process within the code.

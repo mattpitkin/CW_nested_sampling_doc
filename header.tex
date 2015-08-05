@@ -1,16 +1,25 @@
-\newcommand{\ee}[1]{\!\times\!10^{#1}}
-\newcommand{\gws}{gravitational waves\xspace}
-\newcommand{\gw}{gravitational wave\xspace}
-\newcommand{\lalinf}{\texttt{LALInference}\xspace}
-
-\bibliographystyle{aipauth4-1}
-
 \iflatexml
+  \documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4}
+
   % define things that are only required for rendering on authorea
   
   % call natbib so LaTeXML can use citet and citep commands
   \usepackage{natbib}
+\else
+  \documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4-1}
 
-  % define the widetext environment as empty otherwise tags show up on authorea
-  \newenvironment{widetext}{}{}
+  \usepackage{cleveref}
+  \usepackage{xspace}
+  
+  \bibliographystyle{aipauth4-1}
 \fi
+
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\newcommand{\ee}[1]{\!\times\!10^{#1}}
+\newcommand{\gws}{gravitational waves\xspace}
+\newcommand{\gw}{gravitational wave\xspace}
+\newcommand{\lalinf}{\texttt{LALInference}\xspace}

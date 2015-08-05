@@ -1,0 +1,76 @@
+\section{Overview}
+
+One of the primary methods used in searches for \gws from known pulsars is based on two stages: a heterodyne
+stage that pre-processes the calibrated \gw detector data by removing a signal's expected intrinsic phase
+evolution (based on the observed solution from electromagnetic observations), low-pass filtering and
+down-sampling (via averaging) \citep{2005PhRvD..72j2002D}; and, a parameter estimation stage that takes the
+processed data and uses it to estimate posterior probability distributions of the unknown signal parameters
+\citep[e.g.\ using a Markov chain Monte Carlo (MCMC)][]{2010ApJ...713..671A}. This method has been variously
+called the {\it Time Domain Method}, the {\it Heterodyne Method}, the {\it Bayesian Method}, the {\it Glasgow
+Method}, or some combination of these names. Up to now this method has only been used to set upper limits
+on signal amplitudes, but has had no explicit criteria for deciding on signal detection/significance. A further
+limitation has been that the MCMC method used was not designed to be efficient and required tuning. It also
+did not straightforwardly have the ability to perform a search on the data over small ranges in the phase
+evolution parameters (e.g.\ required if the
+\gw signal does not well match the known pulsar's phase evolution). For these reasons the parameter
+estimation code has been re-written to use the nested sampling algorithm \cite{Skilling:2006}, in particular
+a method based on that described in \citet{Veitch:2010}. This allows us to evaluate the {\it evidence} or {\it
+marginal likelihood} for the signal model and compare it to other model evidences (i.e.\ the data is just
+Gaussian noise), whilst also giving posterior probabilty distributions for the signal parameters.
+
+This code makes use of the nested sampling algorithm provided within the \lalinf software library
+\citep{2015PhRvD..91d2003V}. As such this document will not give a detailed description of how that algorithm
+works, but will provide some information on the specific proposals that can be used within the algorithm.
+This method has previously been briefly described in \citet{2012JPhCS.363a2041P}.
+
+The code can also be used to perform parameter estimation and model selection for signals for any generic
+metric theory of gravity, however its use for this will be discussed in detail in a separate paper. When
+searching over parameters that vary the phase evolution there is potential to speed up the code through
+efficient likelihood evaluation via the {\it reduced order quadrature} method, but again that will be
+discussed in more detail in a future paper.
+
+\subsection{General knowledge}
+
+The code calculates the Bayesian evidence, or {\it marginal likelihood} for a particular signal model. The
+evidence, $\mathcal{Z}$, for a given model, $M$, defined by a set of parameters, $\vec{\theta}$ is given by
+\begin{equation}\label{eq:evidence}
+\mathcal{Z}_M = p(d|M,I) = \int^{\vec{\theta}} p(d|\vec{\theta},M,I)p(\vec{\theta}|M,I) {\rm d}\vec{\theta},
+\end{equation}
+where $p(d|\vec{\theta},M)$ is the likelihood function for the data $d$ given the
+model and its set of defining parameters and $p(\vec{\theta}|M,I)$ is the prior probability distribution on
+$\vec{\theta}$. During nested sampling this integral is evaluated by transforming it into the one dimensional
+sum
+\begin{equation}\label{eq:nestedsampev}
+\mathcal{Z}_M = \sum_i^N L_i w_i,
+\end{equation}
+where $L_i$ is the likelihood and $w_i = p(\vec{\theta}|M,I) \Delta\vec{\theta}$ is the ``prior weight''
+(i.e.\ inverse prior volume occupied by point $i$).
+
+As a default the signal model evidence is compared to the
+evidence that the data consists of Gaussian noise to form an odds ratio for the two models
+\begin{equation}\label{eq:oddsratio}
+\mathcal{O} = \frac{p(d|M,I)}{p(d|\text{noise},I)}\frac{p(M|I)}{p(\text{noise}|I)} =
+\frac{\mathcal{Z}_M}{\mathcal{Z}_{\text{noise}}},
+\end{equation}
+where on the right hand side we have explicitly set the prior odds for the two models to
+$p(M|I)/p(\text{noise}|I) = 1$.
+
+Other than this evidence value and odds ratio the code will also output all of the samples accumlated during
+the nested sampling process. These samples will not be drawn from the posterior probability distribution as in
+an MCMC method, but they can be resampled to generate a subset of samples that are drawn from the posteior
+distribution. This resampling (performed using the {\tt lalapps\_nest2pos} {\tt python} script within
+{\tt lalapps}\footnote{\url{https://www.lsc-group.phys.uwm.edu/daswg/projects/lalsuite.html}}) uses the
+value of $L_i w_i$ for each point, normalised by $(L_iw_i)_{\rm max}$ to give values proportional to the
+posterior probability, and the accepts a point with a probability given by its value, i.e.\ \ point is
+accepted with the probability
+\begin{equation}
+P_{\text{accept}} = \frac{L_i w_i}{(L_iw_i)_{\rm max}}.
+\end{equation}
+
+
+In our case the data $d$ in the above equations is heterodyned, low-pass filtered and down-sampled data
+for a detector, or set of detectors, each giving a single data stream or two data streams depending on
+whether the heterodyne was performed at one of both potential signal frequencies near the rotation frequency
+and/or twice the rotation frequency. Here we will use $\mathbf{B}$ to represent a vector of these heterodyned
+data values, for which a single time sample is often refered to as $B_k$ (``{\it B of k}''), although we will
+not consistently use $k$ as the time index for the data.

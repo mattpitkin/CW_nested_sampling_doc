@@ -1,0 +1,17 @@
+\section{Evaluating the evidence calculation}
+
+\subsection{Simulated Gaussian noise}
+
+\subsection{LIGO S5 data}
+
+\subsubsection{Evaluating coherent signals}
+
+We can run the code such that it provides the joint evidence for a signal in multiple detectors, but we can
+also run it for individual detectors. This allows us to compare the model that there is a coherent signal
+between detectors (as would be expected for a real signal) to the model that the signal is incoherent between
+detectors (as you might expect from a detector line artefact). This can be done by comparing the joint
+analysis evidence to the sum of the individual detector evidences (i.e.\ the logical {\it or} between
+detectors)
+\begin{equation}
+\mathcal{O}_{\rm coherent} = \frac{\mathcal{Z}_{\rm Joint}}{\sum_{i=1}^{N_{\rm det}} \mathcal{Z}_{{\rm det}_i}}
+\end{equation}

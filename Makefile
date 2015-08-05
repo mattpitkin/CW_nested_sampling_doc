@@ -2,10 +2,10 @@
 
 default: pdf
 
-pdf: nested_sampling_doc.tex bibliography/biblio.bib layout.md
+pdf: *.tex bibliography/biblio.bib layout.md
 	local_build.py --latex pdflatex --filename main.tex --build-dir .
 
-ps: nested_sampling_doc.tex bibliography/biblio.bib layout.md
+ps: *.tex bibliography/biblio.bib layout.md
 	local_build.py --latex latex --filename main.tex --build-dir .
 	dvips main
 

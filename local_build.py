@@ -137,7 +137,7 @@ def build_authorea_latex(localdir, builddir, latex_exec, bibtex_exec, outname,
             ls = l.strip()
             if ls == '':
                 pass
-            elif ls in ('posttitle.tex', 'title.tex', 'preamble.tex', 'header.tex'):
+            elif ls in ('posttitle.tex', 'title.tex', 'preamble.tex', 'header.tex', 'abstract.tex'):
                 pass # skip any that have been processed above
             elif ls.endswith('.html') or ls.endswith('.htm'):
                 pass  # html files aren't latex-able

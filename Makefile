@@ -2,19 +2,12 @@
 
 default: pdf
 
-pdf: nested_sampling_doc.tex nested_sampling_doc.bib
-	pdflatex nested_sampling_doc
-	bibtex nested_sampling_doc
-	pdflatex nested_sampling_doc
-	pdflatex nested_sampling_doc
+pdf: nested_sampling_doc.tex bibliography/biblio.bib layout.md
+	local_build.py --latex pdflatex --filename main.tex --build-dir .
 
-ps: nested_sampling_doc.tex nested_sampling_doc.bib
-	latex nested_sampling_doc
-	bibtex nested_sampling_doc
-	latex nested_sampling_doc
-	latex nested_sampling_doc
-	dvips nested_sampling_doc
-	ps2pdf nested_sampling_doc.ps
+ps: nested_sampling_doc.tex bibliography/biblio.bib layout.md
+	local_build.py --latex latex --filename main.tex --build-dir .
+	dvips main
 
 clean:
 	@echo "Cleaning directory of backups and logs"

@@ -1,1 +1,1 @@
-untitled.tex
+nested_sampling_doc.tex

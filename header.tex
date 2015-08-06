@@ -1,33 +1,27 @@
-% check if using pdflatex
-\RequirePackage{ifpdf}
-\ifpdf
-  \documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnum    bers,altaffilletter]{revtex4-1}
-    
+% check if compiling with latexml on authorea
+\RequirePackage{latexml}
+\iflatexml
+  \documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4}
+
+  \usepackage{natbib}
+  \usepackage{aas_support}
+
+  \newcommand{\gws}{gravitational waves}
+  \newcommand{\gw}{gravitational wave}
+  \newcommand{\lalinf}{\texttt{LALInference}}
+\else
+  \documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4-1}
+ 
   \bibliographystyle{aipauth4-1}
-   
+ 
   % add style files not included in latexml
   \usepackage{cleveref}
   \usepackage{xspace}
-\else
-  % check if compiling with latexml on authorea
-  \RequirePackage{latexml}
-  \iflatexml
-    \documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4}
 
-    \usepackage{natbib}
-    \usepackage{aas_support}
-  \else
-    \documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4-1}
-
-    \bibliographystyle{aipauth4-1}
-  
-    % add style files not included in latexml
-    \usepackage{cleveref}
-    \usepackage{xspace}
-  \fi
-
-
-\bibliographystyle{aipauth4-1}
+  \newcommand{\gws}{gravitational waves\xspace}
+  \newcommand{\gw}{gravitational wave\xspace}
+  \newcommand{\lalinf}{\texttt{LALInference}\xspace}  
+\fi
 
 \usepackage{graphicx}
 \usepackage{hyperref}
@@ -35,6 +29,3 @@
 \usepackage{amsmath}
 
 \newcommand{\ee}[1]{\!\times\!10^{#1}}
-\newcommand{\gws}{gravitational waves\xspace}
-\newcommand{\gw}{gravitational wave\xspace}
-\newcommand{\lalinf}{\texttt{LALInference}\xspace}

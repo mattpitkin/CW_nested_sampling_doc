@@ -82,8 +82,9 @@ obtained from the product of the likelihood for each chunk given by
 p(\mathbf{B}|\vec{\theta}) = \prod_{j=1}^M \frac{(m_j-1)!}{2\pi^{m_j}}
 \left(\sum_{k=k_0}^{k_0+(m_j-1)} |B_k-y(\vec{\theta})_k|^2\right)^{-m_j},
 \end{equation}
-where $M$ is the total number of independent data chunks with lengths $m_j$ and $k_0 = \sum_{i=1}^{j}
-1+m_{i-1}$ (with $m_0 = 0$) is the index of the first data point in each chunk.
+where $M$ is the total number of independent data chunks with lengths $m_j$ and $k_0 = 1+\sum_{i=1}^{j}
+m_{i-1}$ (with $m_0 = 0$) is the index of the first data point in each chunk.
 
+  
   
   

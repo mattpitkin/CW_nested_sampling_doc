@@ -62,7 +62,7 @@ def get_input_string(filename, localdir, quotepath=True):
         quote_chr = '"'
     else:
         quote_chr = ''
-    return r'\input{' + quote_chr + os.path.join(os.path.abspath(localdir), filename) + quote_chr + '}'
+    return r'\input{' + quote_chr + os.path.join(localdir, filename) + quote_chr + '}'
 
 
 def get_figure_string(filename, localdir):
@@ -84,11 +84,9 @@ def get_figure_string(filename, localdir):
     if pdffn or epsfn:
         figfn = os.path.join(figdir, figfnbase)
 
-    figfn = os.path.abspath(figfn)
-
     capfn = os.path.join(figdir, 'caption.tex')
     if os.path.exists(capfn):
-        caption = r'\caption{ \protect\input{' + os.path.abspath(capfn) + '}}'
+        caption = r'\caption{ \protect\input{' + capfn + '}}'
     else:
         caption = ''
 
@@ -104,32 +102,37 @@ def build_authorea_latex(localdir, builddir, latex_exec, bibtex_exec, outname,
         raise IOError('Requested build directory {0} is a file, not a '
                       'directory'.format(builddir))
 
+    # if builddir and local dir are the same set the output paths to be relative paths
+    # (this helps if sharing the created tex file with collaborator who cannot run this
+    # script) otherwise use absolute paths
+    if builddir == localdir:
+        pathfcn = os.path.relpath
+    else:
+        pathfcn = os.path.abspath
+
     # generate the main tex file as a string
     if os.path.exists('preamble.tex'):
-        preamblein = get_input_string('preamble', localdir)
+        preamblein = get_input_string('preamble', pathfcn(localdir))
     else:
         preamblein = ''
     if os.path.exists('header.tex'):
-        headerin = get_input_string('header', localdir)
+        headerin = get_input_string('header', pathfcn(localdir))
     else:
         headerin = ''
 
     if not headerin and not preamblein:
         print("Neither preable nor header found!  Proceeding, but that's rather weird")
 
-    bibloc = os.path.join(os.path.abspath(localdir), 'bibliography', 'biblio')
+    bibloc = os.path.join(pathfcn(localdir), 'bibliography', 'biblio')
 
     titlecontent = []
     if usetitle:
         if titleinput:
-            titlestr = get_input_string('title', localdir)
+            titlestr = get_input_string('title', pathfcn(localdir))
         else:
-            with open(os.path.join(os.path.abspath(localdir), 'title.tex')) as f:
+            with open(os.path.join(pathfcn(localdir), 'title.tex')) as f:
                 titlestr = f.read()
         titlecontent.append(r'\title{' + titlestr + '}')
-    if os.path.exists(os.path.join(os.path.abspath(localdir), 'posttitle.tex')):
-        titlecontent.append(get_input_string('posttitle', localdir))
-    titlecontent = '\n'.join(titlecontent)
 
     sectioninputs = []
     with open(os.path.join(localdir, 'layout.md')) as f:
@@ -137,15 +140,22 @@ def build_authorea_latex(localdir, builddir, latex_exec, bibtex_exec, outname,
             ls = l.strip()
             if ls == '':
                 pass
-            elif ls in ('posttitle.tex', 'title.tex', 'preamble.tex', 'header.tex', 'abstract.tex'):
+            elif ls in ('posttitle.tex', 'title.tex', 'preamble.tex', 'header.tex'):
                 pass # skip any that have been processed above
+            elif ls in ('abstract.tex'):
+                # add abstract to title content
+                titlecontent.append(r'\begin{abstract}' + get_input_string('abstract', pathfcn(localdir))  + '\end{abstract}')
             elif ls.endswith('.html') or ls.endswith('.htm'):
                 pass  # html files aren't latex-able
             elif ls.startswith('figures'):
-                sectioninputs.append(get_figure_string(ls, localdir))
+                sectioninputs.append(get_figure_string(ls, pathfcn(localdir)))
             else:
-                sectioninputs.append(get_input_string(ls, localdir))
+                sectioninputs.append(get_input_string(ls, pathfcn(localdir)))
     sectioninputs = '\n'.join(sectioninputs)
+
+    if os.path.exists(os.path.join(pathfcn(localdir), 'posttitle.tex')):
+        titlecontent.append(get_input_string('posttitle', pathfcn(localdir)))
+    titlecontent = '\n'.join(titlecontent)
 
     maintexstr = MAIN_TEMPLATE.format(**locals())
 

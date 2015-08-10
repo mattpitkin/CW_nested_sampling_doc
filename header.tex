@@ -2,12 +2,6 @@
 \RequirePackage{latexml}
 \iflatexml
   \documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4}
-
-  \usepackage{natbib}
-
-  \newcommand{\gws}{gravitational waves}
-  \newcommand{\gw}{gravitational wave}
-  \newcommand{\lalinf}{\texttt{LALInference}}
 \else
   \documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4-1}
  
@@ -15,16 +9,16 @@
  
   % add style files not included in latexml
   \usepackage{cleveref}
-  \usepackage{xspace}
-
-  \newcommand{\gws}{gravitational waves\xspace}
-  \newcommand{\gw}{gravitational wave\xspace}
-  \newcommand{\lalinf}{\texttt{LALInference}\xspace}  
 \fi
 
+\usepackage{natbib}
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{xspace}
 
+\newcommand{\gws}{gravitational waves\xspace}
+\newcommand{\gw}{gravitational wave\xspace}
+\newcommand{\lalinf}{\texttt{LALInference}\xspace}
 \newcommand{\ee}[1]{\!\times\!10^{#1}}

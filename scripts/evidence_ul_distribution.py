@@ -22,6 +22,7 @@ import json
 from lalapps import pulsarpputils as pppu
 
 from scipy.interpolate import interp1d
+from scipy.integrate import cumtrapz
 
 # the base directory
 basedir = '/home/sismp2/projects/code_testing/evidence_ul_distribution'
@@ -143,7 +144,7 @@ for n in nlives:
     if not os.path.isdir(likedir):
       os.mkdir(likedir)
  
-    for i in range(n):
+    for i in range(Nruns):
       # create output file
       outfile = os.path.join(likedir, 'nest_%04d.txt' % i)
     
@@ -193,7 +194,7 @@ for l in likelihoods:
   sigmas = None
   if l == 'gaussian':
     sigmas = {}
-    sigmsa[dets] = fakedatasigma[:,3]
+    sigmas[dets] = fakedatasigma[:,3]
 
 
   L, h0pdf, phi0pdf, psipdf, cosiotapdf, grid, evrat = pppu.pulsar_posterior_grid(dets, ts, data, ra, dec, \
@@ -203,8 +204,11 @@ for l in likelihoods:
   # scale evidence ratio
   evrat *= (2.*sigma/h0max)
 
+  # get cumulative distribution of h0
+  ct = cumtrapz(h0pdf, grid['h0'])
+
   # get 95% amplitude upper limits
-  ctu, ui = np.unique(h0pdf, return_index=True)
+  ctu, ui = np.unique(ct, return_index=True)
   intf = interp1d(ctu, grid['h0'][ui], kind='linear')
   h95ul = intf(0.95)
   

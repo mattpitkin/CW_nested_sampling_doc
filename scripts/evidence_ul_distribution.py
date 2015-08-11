@@ -69,7 +69,7 @@ Nruns = 250
 
 # create log directory if it doesn't exist
 logdir = os.path.join(basedir, 'log')
-if not os.path.isdir(lodir):
+if not os.path.isdir(logdir):
   os.mkdir(logdir)
 
 # setup Condor sub file for runs
@@ -88,7 +88,7 @@ output = %s
 notification = never
 accouting_group = ligo.dev.s6.cw.targeted.bayesian
 queue 1
-""" $ (execu, priorfile, parfile, datafile, os.path.join(logdir, '$(cluster).log'), \
+""" % (execu, priorfile, parfile, datafile, os.path.join(logdir, '$(cluster).log'), \
        os.path.join(logdir,'$(cluster).err'), os.path.join(logdir,'$(cluster).out'))
 fp.write(subfiletxt)
 fp.close()
@@ -100,7 +100,7 @@ fp = open(dagfile, 'w')
 for n in nlives:
   # create output directory
   livedir = os.path.join(basedir, '%d' % n)
-  if not os.path.isdir(livedir)
+  if not os.path.isdir(livedir):
     os.mkdir(livedir)
     
   for i in range(n):

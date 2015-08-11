@@ -97,7 +97,7 @@ log = %s
 error = %s
 output = %s
 notification = never
-accouting_group = ligo.dev.s6.cw.targeted.bayesian
+accounting_group = ligo.dev.s6.cw.targeted.bayesian
 queue 1
 """ % (execu, priorfile, parfile, os.path.join(logdir, '$(cluster).log'), \
        os.path.join(logdir,'$(cluster).err'), os.path.join(logdir,'$(cluster).out'))

@@ -202,7 +202,7 @@ for l in likelihoods:
                                                                                   paramranges=paramranges)
 
   # scale evidence ratio
-  evrat *= (2.*sigma/h0max)
+  evrat += np.log(2.*sigma/h0max)
 
   # get cumulative distribution of h0
   ct = cumtrapz(h0pdf, grid['h0'])

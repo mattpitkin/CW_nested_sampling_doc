@@ -43,8 +43,8 @@ fakedatasigma = np.zeros((1440, 4))
 fakedatasigma[:,:3] = fakedata
 fakedatasigma[:,-1] = sigma*np.ones(1440)
 
-datafilesigma = os.basedir, 'datasigma.txt.gz')
-np.savetxt(datafilesigma, fakedatasigma, fmt='%.1f\t%.7e\t%.7e')
+datafilesigma = os.path.join(basedir, 'datasigma.txt.gz')
+np.savetxt(datafilesigma, fakedatasigma, fmt='%.1f\t%.7e\t%.7e\t%.7e')
 
 # create a prior file
 priorfile = os.path.join(basedir, 'prior.txt')
@@ -104,6 +104,26 @@ queue 1
 fp.write(subfiletxt)
 fp.close()
 
+# setup sub file for lalapps_nest2pos jobs
+n2psubfile = os.path.join(basedir, 'n2p.sub')
+n2pexec = os.path.join(os.environ['LSCSOFT_LOCATION'], 'bin/lalapps_nest2pos')
+fp = open(n2psubfile, 'w')
+subfiletxt = """
+universe = vanilla
+executable = %s
+arguments = " -N $(macronlive2) -p $(macropost) -H $(macroheader) -z $(macronest) "
+getenv = True
+log = %s
+error = %s
+output = %s
+notification = never
+accounting_group = ligo.dev.s6.cw.targeted.bayesian
+queue 1
+""" % (n2pexec, os.path.join(logdir, '$(cluster).log'), \
+       os.path.join(logdir,'$(cluster).err'), os.path.join(logdir,'$(cluster).out'))
+fp.write(subfiletxt)
+fp.close()
+
 # create dag for all the jobs
 dagfile = os.path.join(basedir, 'run.dag')
 fp = open(dagfile, 'w')
@@ -135,28 +155,35 @@ for n in nlives:
     
       # unique ID
       ui = uuid.uuid4().hex
-      dagstr = 'JOB %s %s\nRETRY %s 0\nVARS %s macrooutfile=\"%s\" macronlive=\"%d\" macroinput=\"%s\" \ 
-macrolike=\"%d\"\n' % (ui, subfile, ui, ui, outfile, n, infile, lval)
+      dagstr = 'JOB %s %s\nRETRY %s 0\nVARS %s macrooutfile=\"%s\" macronlive=\"%d\" macroinput=\"%s\" macrolike=\"%s\"\n' % (ui, subfile, ui, ui, outfile, n, infile, lval)
       fp.write(dagstr)
-    
+
+      # add nest2pos
+      ui2 = uuid.uuid4().hex
+      postfile = os.path.join(likedir, 'post_%04d.txt' % i)
+      dagstr = 'JOB %s %s\nRETRY %s 0\nVARS %s macronlive2=\"%d\" macronest=\"%s\" macropost=\"%s\" macroheader=\"%s\"\n' % (ui2, n2psubfile, ui2, ui2, n, outfile+'.gz', postfile, outfile+'_params.txt')
+      fp.write(dagstr)
+
+      dagstr = 'PARENT %s CHILD %s\n' % (ui, ui2)
+      fp.write(dagstr)
+
 fp.close()
 
 # run the grid-based posterior function to get UL and evidence ratio for comparison
 
 # setup grid
 paramranges = {}
-paramranges['h0'] = (0., 2.sigma, 100)
-paramranges['psi'] = (0., np.pi/2., 75)
-paramranges['phi0'] = (0., np.pi, 75)
-paramranges['cosiota'] = (-1., 1., 75)
+paramranges['h0'] = (0., 2.*sigma, 100)
+paramranges['psi'] = (0., np.pi/2., 50)
+paramranges['phi0'] = (0., np.pi, 50)
+paramranges['cosiota'] = (-1., 1., 50)
 ra = 0.0
 dec = 0.0
 dets = 'H1'
 ts = {}
 ts[dets] = fakedata[:, 0]
 data = {}
-data[dets] = fakedata[:,1:3]
-
+data[dets] = fakedata[:,1] + 1j*fakedata[:,2]
 
 outdict = {}
 outdict['Odds ratios'] = {}
@@ -169,9 +196,9 @@ for l in likelihoods:
     sigmsa[dets] = fakedatasigma[:,3]
 
 
-  L, h0pdf, phi0pdf, psipdf, cosiotapdf, grid, evrat = pulsar_posterior_grid(dets, ts, data, ra, dec, \
-                                                                             sigmas=sigmas \
-                                                                             paramranges=paramranges)
+  L, h0pdf, phi0pdf, psipdf, cosiotapdf, grid, evrat = pppu.pulsar_posterior_grid(dets, ts, data, ra, dec, \
+                                                                                  sigmas=sigmas, \
+                                                                                  paramranges=paramranges)
 
   # scale evidence ratio
   evrat *= (2.*sigma/h0max)

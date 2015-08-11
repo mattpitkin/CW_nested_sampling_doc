@@ -16,9 +16,12 @@ import os
 import subprocess
 import numpy as np
 import uuid
+import json
 
 # import some pulsar utilities
 from lalapps import pulsarpputils as pppu
+
+from scipy.interpolate import interp1d
 
 # the base directory
 basedir = '/home/sismp2/projects/code_testing/evidence_ul_distribution'
@@ -34,6 +37,14 @@ fakedata[:,1:] = mu + sigma*np.random.randn(1440, 2)  # real and imaginary data
 # output the data
 datafile = os.path.join(basedir, 'data.txt.gz')
 np.savetxt(datafile, fakedata, fmt='%.1f\t%.7e\t%.7e')
+
+# include the standard deviation in the file
+fakedatasigma = np.zeros((1440, 4))
+fakedatasigma[:,:3] = fakedata
+fakedatasigma[:,-1] = sigma*np.ones(1440)
+
+datafilesigma = os.basedir, 'datasigma.txt.gz')
+np.savetxt(datafilesigma, fakedatasigma, fmt='%.1f\t%.7e\t%.7e')
 
 # create a prior file
 priorfile = os.path.join(basedir, 'prior.txt')
@@ -65,7 +76,7 @@ fp.close()
 nlives = [128, 256, 512, 1024, 2048, 4096]
 
 # set the number of runs with each case
-Nruns = 250
+Nruns = 125
 
 # create log directory if it doesn't exist
 logdir = os.path.join(basedir, 'log')
@@ -80,7 +91,7 @@ subfiletxt = """
 universe = vanilla
 executable = %s
 arguments = " --prior-file %s --detectors H1 --par-file %s --Nmcmcinitial 200 --outfile $(macrooutfile) \
---Nlive $(macronlive) --gzip --non-fixed-only --input-files %s "
+--Nlive $(macronlive) --gzip --non-fixed-only --input-files $(macroinput) $(macrolike) --oldChunks "
 getenv = True
 log = %s
 error = %s
@@ -88,7 +99,7 @@ output = %s
 notification = never
 accouting_group = ligo.dev.s6.cw.targeted.bayesian
 queue 1
-""" % (execu, priorfile, parfile, datafile, os.path.join(logdir, '$(cluster).log'), \
+""" % (execu, priorfile, parfile, os.path.join(logdir, '$(cluster).log'), \
        os.path.join(logdir,'$(cluster).err'), os.path.join(logdir,'$(cluster).out'))
 fp.write(subfiletxt)
 fp.close()
@@ -97,20 +108,83 @@ fp.close()
 dagfile = os.path.join(basedir, 'run.dag')
 fp = open(dagfile, 'w')
 
+# perform analysis for both Student's t and Gaussian likelihoods
+likelihoods = ['studentst', 'gaussian']
+
 for n in nlives:
   # create output directory
   livedir = os.path.join(basedir, '%d' % n)
   if not os.path.isdir(livedir):
     os.mkdir(livedir)
+  
+  for l in likelihoods:
+    likedir = os.path.join(livedir, l)
+ 
+    if not os.path.isdir(likedir):
+      os.mkdir(likedir)
+ 
+    for i in range(n):
+      # create output file
+      outfile = os.path.join(likedir, 'nest_%04d.txt' % i)
     
-  for i in range(n):
-    # create output file
-    outfile = os.path.join(livedir, 'nest_%04d.txt' % i)
+      lval = ''
+      infile = datafile
+      if l == 'gaussian':
+        lval = '--gaussian-like'
+        infile = datafilesigma
     
-    # unique ID
-    ui = uuid.uuid4().hex
-    dagstr = 'JOB %s %s\nRETRY %s 0\nVARS %s macrooutfile=\"%s\" macronlive=\"%d\"\n' % (ui, subfile, ui, \
-      ui, outfile, n)
-    fp.write(dagstr)
+      # unique ID
+      ui = uuid.uuid4().hex
+      dagstr = 'JOB %s %s\nRETRY %s 0\nVARS %s macrooutfile=\"%s\" macronlive=\"%d\" macroinput=\"%s\" \ 
+macrolike=\"%d\"\n' % (ui, subfile, ui, ui, outfile, n, infile, lval)
+      fp.write(dagstr)
     
+fp.close()
+
+# run the grid-based posterior function to get UL and evidence ratio for comparison
+
+# setup grid
+paramranges = {}
+paramranges['h0'] = (0., 2.sigma, 100)
+paramranges['psi'] = (0., np.pi/2., 75)
+paramranges['phi0'] = (0., np.pi, 75)
+paramranges['cosiota'] = (-1., 1., 75)
+ra = 0.0
+dec = 0.0
+dets = 'H1'
+ts = {}
+ts[dets] = fakedata[:, 0]
+data = {}
+data[dets] = fakedata[:,1:3]
+
+
+outdict = {}
+outdict['Odds ratios'] = {}
+outdict['Upper limits'] = {}
+
+for l in likelihoods:
+  sigmas = None
+  if l == 'gaussian':
+    sigmas = {}
+    sigmsa[dets] = fakedatasigma[:,3]
+
+
+  L, h0pdf, phi0pdf, psipdf, cosiotapdf, grid, evrat = pulsar_posterior_grid(dets, ts, data, ra, dec, \
+                                                                             sigmas=sigmas \
+                                                                             paramranges=paramranges)
+
+  # scale evidence ratio
+  evrat *= (2.*sigma/h0max)
+
+  # get 95% amplitude upper limits
+  ctu, ui = np.unique(h0pdf, return_index=True)
+  intf = interp1d(ctu, grid['h0'][ui], kind='linear')
+  h95ul = intf(0.95)
+  
+  outdict['Odds ratios'][l] = evrat
+  outdict['Upper limits'][l] = h95ul
+
+infofile = os.path.join(basedir, 'gridoutput.txt')
+fp = open(infofile, 'w')
+json.dump(outdict, fp, indent=2)
 fp.close()

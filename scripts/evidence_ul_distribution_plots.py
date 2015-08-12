@@ -27,11 +27,11 @@ datast = []
 datagauss = []
 for n in nlives:
   # get the evidence ratios from the '_B' files
-  p = (sp.check_output("cat "+os.path.join(basedir, "%d/gaussian/post_*.txt_B.txt"), shell=True)).split('\n')
+  p = (sp.check_output("cat "+os.path.join(basedir, "%d/gaussian/post_*.txt_B.txt" % n), shell=True)).split('\n')
   TAodds = np.array([float(line.split()[0]) for line in p if len(line) > 0])
   datagauss.append(TAodds)
   
-  p = (sp.check_output("cat "+os.path.join(basedir, "%d/studentst/post_*.txt_B.txt"), shell=True)).split('\n')
+  p = (sp.check_output("cat "+os.path.join(basedir, "%d/studentst/post_*.txt_B.txt" % n), shell=True)).split('\n')
   TAodds = np.array([float(line.split()[0]) for line in p if len(line) > 0])
   datast.append(TAodds)
 
@@ -50,7 +50,7 @@ bp = pl.boxplot(datagauss, whis=[5, 95], notch=0, sym='x', positions=nlives)
 pl.axhline(y=info['Odds ratios']['gaussian'], color='k', linewidth=2)
 pl.xlabel('Number of live points')
 pl.ylabel('log(Odds Ratio)')
-outfig = os.path.join(basedir, 'oddsratio_distr_studentst.pdf')
+outfig = os.path.join(basedir, 'oddsratio_distr_gaussian.pdf')
 fig.savefig(outfig)
 fig.clf()
 pl.close(fig)

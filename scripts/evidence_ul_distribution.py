@@ -213,7 +213,7 @@ for l in likelihoods:
   h95ul = intf(0.95)
   
   outdict['Odds ratios'][l] = evrat
-  outdict['Upper limits'][l] = h95ul
+  outdict['Upper limits'][l] = float(h95ul)
 
 infofile = os.path.join(basedir, 'gridoutput.txt')
 fp = open(infofile, 'w')

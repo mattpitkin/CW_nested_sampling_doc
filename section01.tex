@@ -16,7 +16,7 @@ evolution parameters (e.g.\ required if the
 estimation code has been re-written to use the nested sampling algorithm \cite{Skilling:2006}, in particular
 a method based on that described in \citet{Veitch:2010}. This allows us to evaluate the {\it evidence} or {\it
 marginal likelihood} for the signal model and compare it to other model evidences (i.e.\ the data is just
-Gaussian noise), whilst also giving posterior probabilty distributions for the signal parameters.
+Gaussian noise), whilst also giving posterior probability distributions for the signal parameters.
 
 This code makes use of the nested sampling algorithm provided within the \lalinf software library
 \citep{2015PhRvD..91d2003V}. As such this document will not give a detailed description of how that algorithm
@@ -55,9 +55,9 @@ evidence that the data consists of Gaussian noise to form an odds ratio for the 
 where on the right hand side we have explicitly set the prior odds for the two models to
 $p(M|I)/p(\text{noise}|I) = 1$.
 
-Other than this evidence value and odds ratio the code will also output all of the samples accumlated during
+Other than this evidence value and odds ratio the code will also output all of the samples accumulated during
 the nested sampling process. These samples will not be drawn from the posterior probability distribution as in
-an MCMC method, but they can be resampled to generate a subset of samples that are drawn from the posteior
+an MCMC method, but they can be resampled to generate a subset of samples that are drawn from the posterior
 distribution. This resampling (performed using the {\tt lalapps\_nest2pos} {\tt python} script within
 {\tt lalapps}\footnote{\url{https://www.lsc-group.phys.uwm.edu/daswg/projects/lalsuite.html}}) uses the
 value of $L_i w_i$ for each point, normalised by $(L_iw_i)_{\rm max}$ to give values proportional to the
@@ -72,7 +72,8 @@ In our case the data $d$ in the above equations is heterodyned, low-pass filtere
 for a detector, or set of detectors, each giving a single data stream or two data streams depending on
 whether the heterodyne was performed at one of both potential signal frequencies near the rotation frequency
 and/or twice the rotation frequency. Here we will use $\mathbf{B}$ to represent a vector of these heterodyned
-data values, for which a single time sample is often refered to as $B_k$ (``{\it B of k}''), although we will
+data values, for which a single time sample is often referred to as $B_k$ (``{\it B of k}''), although we will
 not consistently use $k$ as the time index for the data.
 
+  
   

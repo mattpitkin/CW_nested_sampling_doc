@@ -11,6 +11,11 @@ import json
 import os
 import subprocess as sp
 
+# set some plot defaults
+pl.rc('text', usetex=True)
+pl.rc('font', family='serif')
+pl.rc('font', size=14)
+
 basedir = '/home/sismp2/projects/code_testing/evidence_ul_distribution'
 
 nlives = [128, 256, 512, 1024, 2048, 4096]
@@ -36,9 +41,10 @@ for n in nlives:
   datast.append(TAodds)
 
 fig, ax = pl.subplots(figsize=(8,5))
-bp = pl.boxplot(datast, whis=[5, 95], notch=0, sym='x', positions=nlives) 
+bp = pl.boxplot(datast, whis=[5, 95], notch=0, sym='x', positions=np.log2(nlives)) 
+ax.set_xlims((0., np.log2(nlive[-1]*2.)))
 pl.axhline(y=info['Odds ratios']['studentst'], color='k', linewidth=2)
-pl.xlabel('Number of live points')
+pl.xlabel('$\log{}_2(\\textrm(Number of live points)$')
 pl.ylabel('log(Odds Ratio)')
 outfig = os.path.join(basedir, 'oddsratio_distr_studentst.pdf')
 fig.savefig(outfig)
@@ -46,9 +52,10 @@ fig.clf()
 pl.close(fig)
 
 fig, ax = pl.subplots(figsize=(8,5))
-bp = pl.boxplot(datagauss, whis=[5, 95], notch=0, sym='x', positions=nlives) 
+bp = pl.boxplot(datagauss, whis=[5, 95], notch=0, sym='x', positions=np.log2(nlives)) 
+ax.set_xlims((0., np.log2(nlive[-1]*2.)))
 pl.axhline(y=info['Odds ratios']['gaussian'], color='k', linewidth=2)
-pl.xlabel('Number of live points')
+pl.xlabel('$\log{}_2(\\textrm(Number of live points)$')
 pl.ylabel('log(Odds Ratio)')
 outfig = os.path.join(basedir, 'oddsratio_distr_gaussian.pdf')
 fig.savefig(outfig)

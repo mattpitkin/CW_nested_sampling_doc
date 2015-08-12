@@ -2,6 +2,26 @@
 
 \subsection{Simulated Gaussian noise}
 
+Here we will test accuracy and distribution of the odds ratios calculated by the nested sampling
+algorithm.
+
+\subsubsection{Odds ratio distribution}
+
+The nested sampling algorithm is a stochastic sampling method for estimating the evidence integral
+and as such the value returned will vary each time it is run. It will also be dependent on the
+number of live points used in the calculation, with larger numbers of live points giving more
+accurate and consistent answers. The uncertainty on a given evidence calculation can be calculated
+analytically \citep[see][]{Skilling:2006} from the ``information'', but here we evaluate it
+empirically.
+
+We created a single complex data set consisting of 1440 points with the real and imaginary parts drawn
+from a Gaussian distribution with $\mu = 0$ and $\sigma = 1\ee{-23}$. Our code was run on this data set
+(for a source located at $\alpha = 0$ and $\delta = 0$) 125 times each using 128, 256, 512, 1024, 2048 
+and 4096 live points. The code assumed stationary block sizes of 30 points (this is that assumed by
+the legacy code, but does not matter much for this example). The code was also run using both the 
+Student's {\it t} likelihood function in Eqn.~\ref{eq:stlikelihood} and the Gaussian likelihood 
+function in Eqn.~\ref{eq:gausslikelihood} (for which the known $\sigma$ value of $1\ee{-23} was used).
+
 \subsection{LIGO S5 data}
 
 \subsubsection{Evaluating coherent signals}
@@ -15,3 +35,5 @@ detectors)
 \begin{equation}
 \mathcal{O}_{\rm coherent} = \frac{\mathcal{Z}_{\rm Joint}}{\sum_{i=1}^{N_{\rm det}} \mathcal{Z}_{{\rm det}_i}}
 \end{equation}
+
+  

@@ -1,7 +1,8 @@
 % check if compiling with latexml on authorea
 \RequirePackage{latexml}
 \iflatexml
-  \documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4}
+  %\documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4}
+  \documentclass[revtex4]{emulateapj}
 \else
   \documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4-1}
  
@@ -22,3 +23,5 @@
 \newcommand{\gw}{gravitational wave\xspace}
 \newcommand{\lalinf}{\texttt{LALInference}\xspace}
 \newcommand{\ee}[1]{\!\times\!10^{#1}}
+
+  

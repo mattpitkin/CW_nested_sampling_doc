@@ -1,8 +1,9 @@
 % check if compiling with latexml on authorea
 \RequirePackage{latexml}
 \iflatexml
-  %\documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4}
-  \documentclass{aastex}
+  \documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4}
+
+  \bibliographystyle{aipauth4}
 \else
   \documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4-1}
  
@@ -24,5 +25,6 @@
 \newcommand{\lalinf}{\texttt{LALInference}\xspace}
 \newcommand{\ee}[1]{\!\times\!10^{#1}}
 
+  
   
   

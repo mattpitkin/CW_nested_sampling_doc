@@ -50,7 +50,7 @@ np.savetxt(datafilesigma, fakedatasigma, fmt='%.1f\t%.7e\t%.7e\t%.7e')
 # create a prior file
 priorfile = os.path.join(basedir, 'prior.txt')
 fp = open(priorfile, 'w')
-h0max = 1e-21 # maximum of h0 range
+h0max = 1e-20 # maximum of h0 range
 priortxt = """
 H0 uniform 0 %.2e
 COSIOTA uniform -1 1
@@ -92,7 +92,7 @@ subfiletxt = """
 universe = vanilla
 executable = %s
 arguments = " --prior-file %s --detectors H1 --par-file %s --Nmcmcinitial 200 --outfile $(macrooutfile) \
---Nlive $(macronlive) --gzip --non-fixed-only --input-files $(macroinput) $(macrolike) --oldChunks "
+--Nlive $(macronlive) --gzip --input-files $(macroinput) $(macrolike) --oldChunks "
 getenv = True
 log = %s
 error = %s

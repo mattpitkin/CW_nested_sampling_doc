@@ -61,7 +61,7 @@ an MCMC method, but they can be resampled to generate a subset of samples that a
 distribution. This resampling (performed using the {\tt lalapps\_nest2pos} {\tt python} script within
 {\tt lalapps}\footnote{\url{https://www.lsc-group.phys.uwm.edu/daswg/projects/lalsuite.html}}) uses the
 value of $L_i w_i$ for each point, normalised by $(L_iw_i)_{\rm max}$ to give values proportional to the
-posterior probability, and the accepts a point with a probability given by its value, i.e.\ \ point is
+posterior probability, and then accepts a point with a probability given by its value, i.e.\ \ point is
 accepted with the probability
 \begin{equation}
 P_{\text{accept}} = \frac{L_i w_i}{(L_iw_i)_{\rm max}}.

@@ -140,11 +140,11 @@ from each detector then we would need these factors to still be present.
 \subsubsection{Fast likelihood evaluations}
 
 In cases when the only time varying components of the model are the antenna pattern functions the likelihood
-evaluation can be greatly sped-up by precalculated the components in the internal summations. For a given sky
+evaluation can be greatly sped-up by pre-calculated the components in the internal summations. For a given sky
 position and detector the antenna patterns can be defined by \citep{1998PhRvD..58f3001J}
 \begin{align}
 F_+(t,\psi) &= \sin{\zeta}\left[a(t)\cos{2\psi} + b(t)\sin{2\psi}\right], \nonumber \\
-F_{\times}(t,\psi) &= \sin{\zeta}\left[b(t)\cos{2\psi} - b(t)\sin{2\psi}\right],
+F_{\times}(t,\psi) &= \sin{\zeta}\left[b(t)\cos{2\psi} - a(t)\sin{2\psi}\right],
 \end{align}
 where $\psi$ is the \gw polarisation angle, $\zeta$ is the known angle between the detector arms (generally
 $90^{\circ}$), and $a(t)$ and $b(t)$ are the time dependent functions for a given detector position and

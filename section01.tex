@@ -36,7 +36,7 @@ evidence, $\mathcal{Z}$, for a given model, $M$, defined by a set of parameters,
 \begin{equation}\label{eq:evidence}
 \mathcal{Z}_M = p(d|M,I) = \int^{\vec{\theta}} p(d|\vec{\theta},M,I)p(\vec{\theta}|M,I) {\rm d}\vec{\theta},
 \end{equation}
-where $p(d|\vec{\theta},M)$ is the likelihood function for the data $d$ given the
+where $p(d|\vec{\theta},M,I)$ is the likelihood function for the data $d$ given the
 model and its set of defining parameters and $p(\vec{\theta}|M,I)$ is the prior probability distribution on
 $\vec{\theta}$. During nested sampling this integral is evaluated by transforming it into the one dimensional
 sum
@@ -72,7 +72,7 @@ In our case the data $d$ in the above equations is heterodyned, low-pass filtere
 for a detector, or set of detectors, each giving a single data stream or two data streams depending on
 whether the heterodyne was performed at one of both potential signal frequencies near the rotation frequency
 and/or twice the rotation frequency. Here we will use $\mathbf{B}$ to represent a vector of these heterodyned
-data values, for which a single time sample is often referred to as $B_k$ (``{\it B of k}''), although we will
+data values, for which a single time sample is often referred to using the jargon term of $B_k$ (``{\it B of k}''), although we will
 not consistently use $k$ as the time index for the data.
 
   

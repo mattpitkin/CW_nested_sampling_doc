@@ -149,7 +149,7 @@ F_{\times}(t,\psi) &= \sin{\zeta}\left[b(t)\cos{2\psi} - a(t)\sin{2\psi}\right],
 where $\psi$ is the \gw polarisation angle, $\zeta$ is the known angle between the detector arms (generally
 $90^{\circ}$), and $a(t)$ and $b(t)$ are the time dependent functions for a given detector position and
 source sky location that vary over a sidereal day. These functions can be precomputed at a set of times over
-a sidereal day to uses for look-up table interpolation to give the value at any other time (our code
+a sidereal day and used, via look-up table interpolation, to give the value at any other time (our code
 defaults to calculate $a(t)$ and $b(t)$ at 2880 points over a sidereal day). If, for example, we take the
 imaginary part of the cross polarisation component of a signal model, then the summation in the likelihood for a
 single detector (with $\zeta = 90^{\circ}$), single data stream and single chunk of length $n$ will be given

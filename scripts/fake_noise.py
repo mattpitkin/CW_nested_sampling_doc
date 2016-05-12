@@ -106,7 +106,7 @@ COSIOTA uniform -1 1
 """
 
 fp = open(priorfile, 'w')
-fp.write(priordat.format(ulest*6., np.pi, np.pi/2.))
+fp.write(priordat.format(ulest*10., np.pi, np.pi/2.))
 fp.close()
 
 ### RUN lalapps_pulsar_parameter_estimation_nested
@@ -158,16 +158,12 @@ jsondic['evrats']['nested'] = evsig - evnoise
 
 print("Nested sampling 95%% credible upper limit = %.3e, evidence ratio = %.4e" % (h0ul, evsig-evnoise))
 
-### RUN lalapps_pulsar_parameter_estimation in grid mode
+### RUN python-ised grid-based code
 h0steps = 80 # number of grid points for each parameter
 psisteps = 25
 phi0steps = 25
 cosiotasteps = 25
-h0max = ulest*6.
-
-### RUN python-ised grid-based code
-h0steps = 80 # number of grid points for each parameter
-h0max = ulest*6.
+h0max = ulest*10.
 
 datacomp = {detector: data[:,0] + 1j*data[:,1]}
 tsdic = {detector: gpstimes}

@@ -192,7 +192,7 @@ ct = cumtrapz(h0pdf, lingrid['h0'])
 ctu, ui = np.unique(ct, return_index=True)
 intf = interp1d(ctu, lingrid['h0'][ui], kind='quadratic')
 
-jsondic['h0uls']['nested'] = intf(0.95)[0]
+jsondic['h0uls']['nested'] = float(intf(0.95))
 jsondic['evrats']['grid'] = evrat
 
 fpjson = open(jsonout, 'w')

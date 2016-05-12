@@ -37,8 +37,6 @@ if not os.path.isdir(rundir): # make the directory
 
 detector = opts.detector
 
-detector = 'H1' # the detector to pretend to use
-
 # set the output directory
 outdir = os.path.join(rundir, opts.outpath)
 if not os.path.isdir(outdir):

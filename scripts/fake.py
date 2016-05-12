@@ -25,8 +25,8 @@ parser = argparse.ArgumentParser( description = description )
 
 parser.add_argument("-r", "--run-path", dest="runpath", default='.', help="Set the run directory [default: '%(default)s']")
 parser.add_argument("-o", "--out-path", dest="outpath", default='output', help="Set the output directory (within the run directory) [default: '%(default)s']")
-parser.add_argument("-o", "--detector", dest="detector", default='H1', help="Set the detector [default: '%(default)s']")
-parser.add_argument("-o", "--data-path", dest="datapath", default='data', help="Set the data directory (within the run directory) [default: '%(default)s']")
+parser.add_argument("-d", "--detector", dest="detector", default='H1', help="Set the detector [default: '%(default)s']")
+parser.add_argument("-p", "--data-path", dest="datapath", default='data', help="Set the data directory (within the run directory) [default: '%(default)s']")
 
 opts = parser.parse_args()
 
@@ -158,10 +158,10 @@ jsondic['evrats']['nested'] = evsig - evnoise
 print("Nested sampling 95%% credible upper limit = %.3e, evidence ratio = %.4e" % (h0ul, evsig-evnoise))
 
 ### RUN lalapps_pulsar_parameter_estimation in grid mode
-h0steps = '40' # number of grid points for each parameter
-psisteps = '40'
-phi0steps = '40'
-cosiotasteps = '40'
+h0steps = 80 # number of grid points for each parameter
+psisteps = 25
+phi0steps = 25
+cosiotasteps = 25
 h0max = ulest*6.
 
 ### RUN python-ised grid-based code
@@ -173,7 +173,10 @@ tsdic = {detector: gpstimes}
 ra = 0.0
 dec = 0.0
 
-paramranges = {'h0': (0., h0max, h0steps)}
+paramranges = {'h0': (0., h0max, h0steps),
+               'phi0': (0., np.pi, phi0steps),
+               'cosiota': (-1., 1., cosiotasteps),
+               'psi': (0., np.pi/2., psisteps)}
 
 t0 = time()
 L, h0pdf, phi0pdf, psipdf, cosiotapdf, lingrid, evrat = pulsar_posterior_grid(detector, tsdic, datacomp, ra, dec, paramranges=paramranges)

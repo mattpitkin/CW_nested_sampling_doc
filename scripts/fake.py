@@ -198,3 +198,8 @@ jsondic['evrats']['grid'] = evrat
 fpjson = open(jsonout, 'w')
 json.dump(jsondic, fpjson, indent=2)
 fpjson.close()
+
+# clean up nested samples posteriors and data files
+os.remove(os.path.join(outdir, 'fake_nest.txt.gz'))
+os.remove(os.path.join(outdir, 'fake_post.txt.gz'))
+os.remove(datafile)

@@ -17,7 +17,7 @@ import sys
 import argparse
 import json
 from time import time
-from lalapps.pulsarpputils import pulsar_posterior_grid, upper_limit_greedy, pulsar_nest_to_posterior
+from lalapps.pulsarpputils import *
 
 description = "Compare lalapps_pulsar_parameter_estimation_nested with a grid-based posterior"
 
@@ -114,12 +114,15 @@ fp.close()
 ### RUN lalapps_pulsar_parameter_estimation_nested
 # set the executables (this assumes that you are using virtual environments with virtualenvwrapper.sh and
 # have a WORKON_HOME environment variable set, but you can change the path as required)
-virenv = 'local' # name of your virtual environment
-execpath = os.path.join(os.environ['WORKON_HOME'], virenv)
-execpath = os.path.join(execpath, 'bin')
-
-ppenexec = os.path.join(execpath, 'lalapps_pulsar_parameter_estimation_nested')
-n2pexec = os.path.join(execpath, 'lalapps_nest2pos') # script to convert nested samples to posterior samples
+try:
+  virenv = 'local' # name of your virtual environment
+  execpath = os.path.join(os.environ['WORKON_HOME'], virenv)
+  execpath = os.path.join(execpath, 'bin')
+  ppenexec = os.path.join(execpath, 'lalapps_pulsar_parameter_estimation_nested')
+  n2pexec = os.path.join(execpath, 'lalapps_nest2pos') # script to convert nested samples to posterior samples
+except: # assume execs are in path
+  ppenexec = 'lalapps_pulsar_parameter_estimation_nested'
+  n2pexec = 'lalapps_nest2pos'
 
 nlive = '2048' # number of live points
 ppencall = ' '.join([ppenexec, '--detectors', detector,
@@ -141,7 +144,7 @@ if p.returncode != 0:
 print("lalapps_pulsar_parameter_estimation_nested took %f s" % (t1-t0))
 
 # run lalapps_nest2pos to convert nested samples to posterior samples
-n2pcall = ' '.join([n2pexec, '--Nlive', '2048', '-p', os.path.join(outdir, 'fake_post.txt'),
+n2pcall = ' '.join([n2pexec, '--Nlive', nlive, '-p', os.path.join(outdir, 'fake_post.txt'),
                     '-H', os.path.join(outdir, 'fake_nest.txt_params.txt'), '-z',
                     os.path.join(outdir, 'fake_nest.txt.gz')])
 

@@ -182,9 +182,9 @@ t1 = time()
 print("Python grid-mode took %f s" % (t1-t0))
 print("Evidence ratio = %.12e" % evrat)
 
-ct = cumtrapz(h0pdf, lingrid['h0'])
+ct = cumtrapz(h0pdf, lingrid['h0'])/np.trapz(h0pdf, lingrid['h0'])
 ctu, ui = np.unique(ct, return_index=True)
-intf = interp1d(ctu, lingrid['h0'][ui], kind='quadratic')
+intf = interp1d(ctu, lingrid['h0'][ui], kind='linear')
 
 jsondic['h0uls']['grid'] = float(intf(0.95))
 jsondic['evrats']['grid'] = evrat

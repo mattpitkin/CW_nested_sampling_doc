@@ -233,7 +233,7 @@ evratgrid = float((evlines[0].split())[-1])
 # and also account for lalapps_pulsar_parameter_estimation using a 2pi phi0 range rather than pi
 evratgrid = evratgrid - np.log(10.*ulest) - np.log(2.) + np.log(np.pi)
 
-jsondic['h0uls']['nested'] = h0ulgrid
+jsondic['h0uls']['grid'] = h0ulgrid
 jsondic['evrats']['grid'] = evratgrid
 
 print("Grid-based 95%% credible upper limit = %.3e, evidence ratio = %.4e" % (h0ulgrid, evratgrid))

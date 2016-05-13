@@ -49,11 +49,26 @@ jsondic['h0uls'] = {}
 jsondic['evrats'] = {}
 
 # fake heterodyned data directory
-datadir = os.path.join(rundir, opts.datapath+detector)
+datadir = os.path.join(rundir, opts.datapath)
 if not os.path.isdir(datadir): # make the directory
   os.makedirs(datadir)
 
-datafile = os.path.join(datadir, 'finehet-'+detector+'.txt')
+# create random sky positions
+rarad = 2.*np.pi*np.random.rand()
+decrad = np.arccos(-1.+2.*np.random.rand()) - np.pi/2.
+rah, ram, ras = rad_to_hms(rarad)
+decd, decm, decs = rad_to_dms(decrad)
+
+if decd > 0:
+  decds = '+%02d' % decd
+else:
+  decds = '%02d' % decd
+psrname = 'J%02d%02d%s%02d' % (int(rah), int(ram), decds, int(decm))
+
+datafile = os.path.join(datadir, 'data'+detector)
+if not os.path.isdir(datafile): # make the directory
+  os.makedirs(datafile)
+datafile = os.path.join(datafile, 'finehet_'+psrname+'_'+detector)
 
 # set data standard deviation
 sigma = 1.0e-22
@@ -72,18 +87,6 @@ tad = np.vstack((gpstimes, data.T)).T
 # output fake data
 np.savetxt(datafile, tad, fmt='%.6f %.7e %.7e', delimiter='\t')
 
-# create random sky positions
-rarad = 2.*np.pi*np.random.rand()
-decrad = np.arccos(-1.+2.*np.random.rand()) - np.pi/2.
-rah, ram, ras = rad_to_hms(rarad)
-decd, decm, decs = rad_to_dms(decrad)
-
-if decd > 0:
-  decds = '+%02d' % decd
-else:
-  decds = '%02d' % decd
-psrname = 'J%02d%02d%s%02d' % (int(rah), int(ram), decds, int(decm))
-
 # create a fake pulsar parameter file
 parfile = os.path.join(datadir, '%s.par' % psrname)
 pardat = """PSRJ {}
@@ -101,12 +104,12 @@ fp.close()
 priorfile = os.path.join(datadir, '%s.prior' % psrname)
 priordat = """H0 uniform 0 {}
 PHI0 uniform 0 {}
-PSI uniform 0 {}
+PSI uniform {} {}
 COSIOTA uniform -1 1
 """
 
 fp = open(priorfile, 'w')
-fp.write(priordat.format(ulest*10., np.pi, np.pi/2.))
+fp.write(priordat.format(ulest*10., np.pi, -np.pi/4., np.pi/4.))
 fp.close()
 
 ### RUN lalapps_pulsar_parameter_estimation_nested
@@ -118,19 +121,21 @@ try:
   execpath = os.path.join(execpath, 'bin')
   ppenexec = os.path.join(execpath, 'lalapps_pulsar_parameter_estimation_nested')
   n2pexec = os.path.join(execpath, 'lalapps_nest2pos') # script to convert nested samples to posterior samples
+  ppeexec = os.path.join(execpath, 'lalapps_pulsar_parameter_estimation')
 except: # assume execs are in path
   ppenexec = 'lalapps_pulsar_parameter_estimation_nested'
   n2pexec = 'lalapps_nest2pos'
+  ppeexec = 'lalapps_pulsar_parameter_estimation'
 
 nlive = '2048' # number of live points
-ppencall = ' '.join([ppenexec, '--detectors', detector,
+codecall = ' '.join([ppenexec, '--detectors', detector,
                     '--par-file', parfile, '--prior-file', priorfile,
                     '--input-files', datafile, '--outfile', os.path.join(outdir, 'fake_nest.txt'),
                     '--gzip', '--Nlive', nlive, '--Nmcmcinitial', '0', '--oldChunks'])
 
-print(ppencall)
+print(codecall)
 t0 = time()
-p = sp.Popen(ppencall, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
+p = sp.Popen(codecall, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
 out, err = p.communicate()
 t1 = time()
 if p.returncode != 0:
@@ -142,12 +147,12 @@ if p.returncode != 0:
 print("lalapps_pulsar_parameter_estimation_nested took %f s" % (t1-t0))
 
 # run lalapps_nest2pos to convert nested samples to posterior samples
-n2pcall = ' '.join([n2pexec, '--Nlive', nlive, '-p', os.path.join(outdir, 'fake_post.txt'),
-                    '-H', os.path.join(outdir, 'fake_nest.txt_params.txt'), '-z',
-                    os.path.join(outdir, 'fake_nest.txt.gz')])
+codecall = ' '.join([n2pexec, '--Nlive', nlive, '-p', os.path.join(outdir, 'fake_post.txt'),
+                     '-H', os.path.join(outdir, 'fake_nest.txt_params.txt'), '-z',
+                     os.path.join(outdir, 'fake_nest.txt.gz')])
 
-print(n2pcall)
-p = sp.Popen(n2pcall, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
+print(codecall)
+p = sp.Popen(codecall, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
 out, err = p.communicate()
 
 post, evsig, evnoise = pulsar_nest_to_posterior(os.path.join(outdir, 'fake_post.txt.gz'))
@@ -158,36 +163,79 @@ jsondic['evrats']['nested'] = evsig - evnoise
 
 print("Nested sampling 95%% credible upper limit = %.3e, evidence ratio = %.4e" % (h0ul, evsig-evnoise))
 
-### RUN python-ised grid-based code
-h0steps = 80 # number of grid points for each parameter
-psisteps = 25
-phi0steps = 25
-cosiotasteps = 25
-h0max = ulest*10.
+# RUN lalapps_pulsar_parameter_estimation in grid mode
+# delete any previously created evidence file as things get appended to it
+evfile = os.path.join(outdir, 'evidence_%s' % psrname)
+if os.path.isfile(evfile):
+  os.remove(evfile)
 
-datacomp = {detector: data[:,0] + 1j*data[:,1]}
-tsdic = {detector: gpstimes}
-ra = 0.0
-dec = 0.0
+h0steps = '100' # number of grid points for each parameter
+psisteps = '40'
+phi0steps = '40'
+cosiotasteps = '40'
+h0max = '%.5e' % (10.*ulest) # maximum range of h0 values
+h0ulc = '95'                 # % credible h0 upper limit to output
 
-paramranges = {'h0': (0., h0max, h0steps),
-               'phi0': (0., np.pi, phi0steps),
-               'cosiota': (-1., 1., cosiotasteps),
-               'psi': (0., np.pi/2., psisteps)}
+codecall = ' '.join([ppeexec, '--detectors', detector,
+                     '--pulsar', psrname, '--par-file', parfile, '--input-dir', os.path.join(rundir, datadir),
+                     '--output-dir', outdir, '--psi-bins', '1000', '--time-bins', '1440',
+                     '--h0steps', h0steps, '--maxh0', h0max, '--phi0steps', phi0steps,
+                     '--psisteps', psisteps, '--cisteps', cosiotasteps, '--dob-ul', h0ulc])
 
 t0 = time()
-L, h0pdf, phi0pdf, psipdf, cosiotapdf, lingrid, evrat = pulsar_posterior_grid(detector, tsdic, datacomp, ra, dec, paramranges=paramranges)
+p = sp.Popen(codecall, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
+out, err = p.communicate()
 t1 = time()
+timegrid = (t1-t0)
 
-print("Python grid-mode took %f s" % (t1-t0))
-print("Evidence ratio = %.12e" % evrat)
+print("lalapps_pulsar_parameter_estimation took %f s" % (t1-t0))
 
-ct = cumtrapz(h0pdf, lingrid['h0'])/np.trapz(h0pdf, lingrid['h0'])
-ctu, ui = np.unique(ct, return_index=True)
-intf = interp1d(ctu, lingrid['h0'][ui], kind='linear')
+# get upper limit and evidence ratio
+# evidence at end of first line, UL at end of second
+fp = open(evfile, 'r')
+evlines = fp.readlines()
+h0ulgrid = float((evlines[1].split())[-1])
+evratgrid = float((evlines[0].split())[-1])
 
-jsondic['h0uls']['grid'] = float(intf(0.95))
-jsondic['evrats']['grid'] = evrat
+# lalapps_pulsar_parameter_estimation does not apply the h0 prior or cos(iota) prior, so adjust evidence accordingly
+# and also account for lalapps_pulsar_parameter_estimation using a 2pi phi0 range rather than pi
+evratgrid = evratgrid - np.log(10.*ulest) - np.log(2.) + np.log(np.pi)
+
+print("Grid-based 95%% credible upper limit = %.3e, evidence ratio = %.4e" % (h0ulgrid, evratgrid))
+
+jsondic['h0uls']['grid'] = h0ulgrid
+jsondic['evrats']['grid'] = evratgrid
+
+### RUN python-ised grid-based code
+#h0steps = 80 # number of grid points for each parameter
+#psisteps = 25
+#phi0steps = 25
+#cosiotasteps = 25
+#h0max = ulest*10.
+
+#datacomp = {detector: data[:,0] + 1j*data[:,1]}
+#tsdic = {detector: gpstimes}
+#ra = rarad
+#dec = decrad
+
+#paramranges = {'h0': (0., h0max, h0steps),
+#               'phi0': (0., np.pi, phi0steps),
+#               'cosiota': (-1., 1., cosiotasteps),
+#               'psi': (0., np.pi/2., psisteps)}
+
+#t0 = time()
+#L, h0pdf, phi0pdf, psipdf, cosiotapdf, lingrid, evrat = pulsar_posterior_grid(detector, tsdic, datacomp, ra, dec, paramranges=paramranges)
+#t1 = time()
+
+#print("Python grid-mode took %f s" % (t1-t0))
+#print("Evidence ratio = %.12e" % evrat)
+
+#ct = cumtrapz(h0pdf, lingrid['h0'])/np.trapz(h0pdf, lingrid['h0'])
+#ctu, ui = np.unique(ct, return_index=True)
+#intf = interp1d(ctu, lingrid['h0'][ui], kind='linear')
+
+#jsondic['h0uls']['grid'] = float(intf(0.95))
+#jsondic['evrats']['grid'] = evrat
 
 fpjson = open(jsonout, 'w')
 json.dump(jsondic, fpjson, indent=2)

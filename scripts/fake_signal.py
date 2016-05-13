@@ -55,39 +55,6 @@ datadir = os.path.join(rundir, opts.datapath+detector)
 if not os.path.isdir(datadir): # make the directory
   os.makedirs(datadir)
 
-datafile = os.path.join(datadir, 'finehet-'+detector+'.txt')
-
-# set data standard deviation
-sigma = 1.0e-22
-
-# create the fake data
-gpstimes = np.arange(900000000, 900000000+864000, 60)
-dlen = len(gpstimes)
-data = sigma*np.random.randn(dlen, 2)
-
-# get an estimate of the 95% credible upper limit to be expected
-ulest = 10.8*np.sqrt(sigma**2/dlen)
-
-# generate signal parameters
-h0 = ulest
-psi = np.random.rand()*np.pi/2.
-phi0 = np.random.rand()*np.pi
-cosiota = -1. + 2.*np.random.rand()
-
-# generate signal
-
-# calculate SNR
-
-# scale signal to required SNR
-
-# add signal to data
-
-# append times and data together
-tad = np.vstack((gpstimes, data.T)).T
-
-# output fake data
-np.savetxt(datafile, tad, fmt='%.6f %.7e %.7e', delimiter='\t')
-
 # create random sky positions
 rarad = 2.*np.pi*np.random.rand()
 decrad = np.arccos(-1.+2.*np.random.rand()) - np.pi/2.
@@ -99,6 +66,55 @@ if decd > 0:
 else:
   decds = '%02d' % decd
 psrname = 'J%02d%02d%s%02d' % (int(rah), int(ram), decds, int(decm))
+
+datafile = os.path.join(datadir, 'data'+detector)
+if not os.path.isdir(datafile): # make the directory
+  os.makedirs(datafile)
+datafile = os.path.join(datafile, 'finehet_'+psrname+'_'+detector)
+
+# set data standard deviation
+sigma = 1.0e-22
+
+# create the fake data
+starttime = 900000000
+duration = 864000
+dt = 60
+gpstimes = np.arange(starttime, starttime+duration, dt)
+dlen = len(gpstimes)
+data = sigma*np.random.randn(dlen, 2)
+
+# get an estimate of the 95% credible upper limit to be expected
+ulest = 10.8*np.sqrt(sigma**2/dlen)
+
+# generate signal parameters
+pardict = {}
+pardict['h0'] = ulest
+pardict['psi'] = -np.pi/4. + np.random.rand()*np.pi/2.
+pardict['phi0'] = np.random.rand()*np.pi
+pardict['cosiota'] = -1. + 2.*np.random.rand()
+pardict['ra'] = rarad
+pardict['dec'] = decrad
+
+# generate signal
+tssig, sig = heterodyned_pulsar_signal(starttime, duration, dt, detector, pardict)
+
+# calculate SNR
+snropt = get_optimal_snr(sig[0], sigma)
+
+# scale signal to required SNR
+sig = sig*(snr/snropt)
+
+h0true = ulest*(snr/snropt) # the new h0 value
+
+# add signal to data
+data[:,0] = data[:,0] + sig[0].real
+data[:,1] = data[:,1] + sig[0].imag
+
+# append times and data together
+tad = np.vstack((gpstimes, data.T)).T
+
+# output fake data
+np.savetxt(datafile, tad, fmt='%.6f %.7e %.7e', delimiter='\t')
 
 # create a fake pulsar parameter file
 parfile = os.path.join(datadir, '%s.par' % psrname)
@@ -113,16 +129,18 @@ fp = open(parfile, 'w')
 fp.write(pardat.format(psrname, coord_to_string(rah, ram, ras), coord_to_string(decd, decm, decs)))
 fp.close()
 
+h0max = h0true + ulest*.6
+
 # create a prior file (PHI0 in here is rotational phase, whereas for the older code it is GW phase for trixial emission l=m=2)
 priorfile = os.path.join(datadir, '%s.prior' % psrname)
 priordat = """H0 uniform 0 {}
 PHI0 uniform 0 {}
-PSI uniform 0 {}
+PSI uniform {} {}
 COSIOTA uniform -1 1
 """
 
 fp = open(priorfile, 'w')
-fp.write(priordat.format(ulest*6., np.pi, np.pi/2.))
+fp.write(priordat.format(h0max, np.pi, -np.pi/4., np.pi/4.))
 fp.close()
 
 ### RUN lalapps_pulsar_parameter_estimation_nested
@@ -134,9 +152,11 @@ try:
   execpath = os.path.join(execpath, 'bin')
   ppenexec = os.path.join(execpath, 'lalapps_pulsar_parameter_estimation_nested')
   n2pexec = os.path.join(execpath, 'lalapps_nest2pos') # script to convert nested samples to posterior samples
+  ppeexec = os.path.join(execpath, 'lalapps_pulsar_parameter_estimation')
 except: # assume execs are in path
   ppenexec = 'lalapps_pulsar_parameter_estimation_nested'
   n2pexec = 'lalapps_nest2pos'
+  ppeexec = 'lalapps_pulsar_parameter_estimation'
 
 nlive = '2048' # number of live points
 ppencall = ' '.join([ppenexec, '--detectors', detector,
@@ -174,40 +194,48 @@ jsondic['evrats']['nested'] = evsig - evnoise
 
 print("Nested sampling 95%% credible upper limit = %.3e, evidence ratio = %.4e" % (h0ul, evsig-evnoise))
 
-### RUN lalapps_pulsar_parameter_estimation in grid mode
-h0steps = 80 # number of grid points for each parameter
-psisteps = 25
-phi0steps = 25
-cosiotasteps = 25
-h0max = ulest*6.
+# RUN lalapps_pulsar_parameter_estimation in grid mode
+# delete any previously created evidence file as things get appended to it
+evfile = os.path.join(outdir, 'evidence_%s' % psrname)
+if os.path.isfile(evfile):
+  os.remove(evfile)
 
-### RUN python-ised grid-based code
-h0steps = 80 # number of grid points for each parameter
-h0max = ulest*6.
+h0steps = '100' # number of grid points for each parameter
+psisteps = '40'
+phi0steps = '40'
+cosiotasteps = '40'
+h0max = '%.5e' % (h0max) # maximum range of h0 values
+h0ulc = '95'                 # % credible h0 upper limit to output
 
-datacomp = {detector: data[:,0] + 1j*data[:,1]}
-tsdic = {detector: gpstimes}
-ra = 0.0
-dec = 0.0
-
-paramranges = {'h0': (0., h0max, h0steps),
-               'phi0': (0., np.pi, phi0steps),
-               'cosiota': (-1., 1., cosiotasteps),
-               'psi': (0., np.pi/2., psisteps)}
+codecall = ' '.join([ppeexec, '--detectors', detector,
+                     '--pulsar', psrname, '--par-file', parfile, '--input-dir', os.path.join(rundir, datadir),
+                     '--output-dir', outdir, '--psi-bins', '1000', '--time-bins', '1440',
+                     '--h0steps', h0steps, '--maxh0', h0max, '--phi0steps', phi0steps,
+                     '--psisteps', psisteps, '--cisteps', cosiotasteps, '--dob-ul', h0ulc])
 
 t0 = time()
-L, h0pdf, phi0pdf, psipdf, cosiotapdf, lingrid, evrat = pulsar_posterior_grid(detector, tsdic, datacomp, ra, dec, paramranges=paramranges)
+p = sp.Popen(codecall, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
+out, err = p.communicate()
 t1 = time()
+timegrid = (t1-t0)
 
-print("Python grid-mode took %f s" % (t1-t0))
-print("Evidence ratio = %.12e" % evrat)
+print("lalapps_pulsar_parameter_estimation took %f s" % (timegrid))
 
-ct = cumtrapz(h0pdf, lingrid['h0'])
-ctu, ui = np.unique(ct, return_index=True)
-intf = interp1d(ctu, lingrid['h0'][ui], kind='quadratic')
+# get upper limit and evidence ratio
+# evidence at end of first line, UL at end of second
+fp = open(evfile, 'r')
+evlines = fp.readlines()
+h0ulgrid = float((evlines[1].split())[-1])
+evratgrid = float((evlines[0].split())[-1])
+
+# lalapps_pulsar_parameter_estimation does not apply the h0 prior or cos(iota) prior, so adjust evidence accordingly
+# and also account for lalapps_pulsar_parameter_estimation using a 2pi phi0 range rather than pi
+evratgrid = evratgrid - np.log(10.*ulest) - np.log(2.) + np.log(np.pi)
 
 jsondic['h0uls']['nested'] = float(intf(0.95))
 jsondic['evrats']['grid'] = evrat
+
+print("Grid-based 95%% credible upper limit = %.3e, evidence ratio = %.4e" % (h0ulgrid, evratgrid))
 
 fpjson = open(jsonout, 'w')
 json.dump(jsondic, fpjson, indent=2)

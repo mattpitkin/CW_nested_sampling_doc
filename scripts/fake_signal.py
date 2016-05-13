@@ -102,7 +102,7 @@ tssig, sig = heterodyned_pulsar_signal(starttime, duration, dt, detector, pardic
 snropt = get_optimal_snr(sig[0], sigma)
 
 # scale signal to required SNR
-sig = sig*(snr/snropt)
+sig[0] = sig[0]*(snr/snropt)
 
 h0true = ulest*(snr/snropt) # the new h0 value
 
@@ -232,8 +232,8 @@ evratgrid = float((evlines[0].split())[-1])
 # and also account for lalapps_pulsar_parameter_estimation using a 2pi phi0 range rather than pi
 evratgrid = evratgrid - np.log(10.*ulest) - np.log(2.) + np.log(np.pi)
 
-jsondic['h0uls']['nested'] = float(intf(0.95))
-jsondic['evrats']['grid'] = evrat
+jsondic['h0uls']['nested'] = h0ulgrid
+jsondic['evrats']['grid'] = evratgrid
 
 print("Grid-based 95%% credible upper limit = %.3e, evidence ratio = %.4e" % (h0ulgrid, evratgrid))
 

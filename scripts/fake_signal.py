@@ -27,6 +27,7 @@ parser.add_argument("-o", "--out-path", dest="outpath", default='output', help="
 parser.add_argument("-d", "--detector", dest="detector", default='H1', help="Set the detector [default: '%(default)s']")
 parser.add_argument("-p", "--data-path", dest="datapath", default='data', help="Set the data directory (within the run directory) [default: '%(default)s']")
 parser.add_argument("-s", "--snr", dest="snr", type=float, default=5.0, help="Set the SNR of the simulated signal [default: %(default)f]")
+parser.add_argument("-n", "--nlive", dest="nlive", type=int, default=2048, help="Set the number of live points [default: %(default)d]")
 
 opts = parser.parse_args()
 
@@ -158,7 +159,7 @@ except: # assume execs are in path
   n2pexec = 'lalapps_nest2pos'
   ppeexec = 'lalapps_pulsar_parameter_estimation'
 
-nlive = '2048' # number of live points
+nlive = str(opts.nlive) # number of live points
 ppencall = ' '.join([ppenexec, '--detectors', detector,
                     '--par-file', parfile, '--prior-file', priorfile,
                     '--input-files', datafile, '--outfile', os.path.join(outdir, 'fake_nest.txt'),

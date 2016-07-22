@@ -43,10 +43,16 @@ The $F_{+}$ and $F_{\times}$ values are the detector dependent antenna patterns,
 detector position, source sky position and source polarisation angle $\psi$. The $C_{21}$, $C_{22}$,
 $\Phi_{21}^C$ and $\Phi_{22}^C$ values are convenient ways of representing the waveform in terms of an
 amplitude and phase of the signal for the $l=2$, $m=1$ harmonic and $l=m=2$ harmonic respectively. The
-$\Delta\phi(t)$ values represents any time dependent phase deviation between the phase used in the heterodyne
+$\Delta\phi(t)$ values represent any time dependent phase deviation between the phase used in the heterodyne
 and the true signal phase (which does not necessarily have to precisely follow the true rotational phase), so
 $\Delta\phi_1(t) = (\phi_{1,{\rm true}}(t)-\Phi_{1,{\rm het}}(t))$ and $\Delta\phi_2(t) = (\phi_{2,{\rm
 true}}(t)-\Phi_{2,{\rm het}}(t))$.
+
+To calculate the $\Delta\phi$ values, and try to avoid numerical overflow issues when dealing with large
+phases, the following equation is used
+\begin{equation}
+\Delta\phi(t) = \sum_{k=1}^n \left( \frac{\Delta f^{(k-1)}}{k!}(t+\delta t_1)^k + \frac{f^{(k-1)}_2}{k!} \sum_{i=0}^{i<k} \binom{k}{i} (\Delta t)^{k-i} (t+\delta t_1)^i \right),
+\end{equation}
 
 By default the code assumes emission just from the $l=m=2$ mode, i.e.\ there is only a signal at twice the
 rotation frequency. In this case $C_{22}$ and $\Phi_{22}^C$ can be related to the more familiar physical

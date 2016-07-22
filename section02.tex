@@ -48,11 +48,13 @@ and the true signal phase (which does not necessarily have to precisely follow t
 $\Delta\phi_1(t) = (\phi_{1,{\rm true}}(t)-\Phi_{1,{\rm het}}(t))$ and $\Delta\phi_2(t) = (\phi_{2,{\rm
 true}}(t)-\Phi_{2,{\rm het}}(t))$.
 
-To calculate the $\Delta\phi$ values, and try to avoid numerical overflow issues when dealing with large
+To calculate the $\Delta\phi$ values using up to the $(n-1)^{\rm th}$ frequency derivative, and try to avoid numerical overflow issues when dealing with large
 phases, the following equation is used
 \begin{equation}
 \Delta\phi_j(t) = \sum_{k=1}^n \left( \frac{\left(f^{(k-1)}_{j,{\rm true}} - f^{(k-1)}_{j,{\rm het}}\right)}{k!}(t+\delta t_{\rm het})^k + \frac{f^{(k-1)}_{j,{\rm true}}}{k!} \sum_{i=0}^{i<k} \left(\begin{array}{c}k \\ i\end{array} \right) (\delta t_{\rm true}-\delta t_{\rm het})^{k-i} (t+\delta t_{\rm het})^i \right),
 \end{equation}
+where $f^{(n)}$ is the $n^{\rm th}$ frequency derivative, and $\delta t$ is the combination of any solar system barycentring and binary system
+barycentring time delays.
 
 By default the code assumes emission just from the $l=m=2$ mode, i.e.\ there is only a signal at twice the
 rotation frequency. In this case $C_{22}$ and $\Phi_{22}^C$ can be related to the more familiar physical

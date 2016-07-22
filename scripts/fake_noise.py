@@ -131,8 +131,8 @@ except: # assume execs are in path
 nlive = str(opts.nlive)  # number of live points
 codecall = ' '.join([ppenexec, '--detectors', detector,
                     '--par-file', parfile, '--prior-file', priorfile,
-                    '--input-files', datafile, '--outfile', os.path.join(outdir, 'fake_nest.txt'),
-                    '--gzip', '--Nlive', nlive, '--Nmcmcinitial', '0', '--oldChunks'])
+                    '--input-files', datafile, '--outhdf', os.path.join(outdir, 'fake_nest.hdf'),
+                    '--gzip', '--Nlive', nlive, '--Nmcmcinitial', '0', '--oldChunks'])#, '--ensembleWalk 1 --uniformprop 0'])
 
 print(codecall)
 t0 = time()
@@ -148,15 +148,13 @@ if p.returncode != 0:
 print("lalapps_pulsar_parameter_estimation_nested took %f s" % (t1-t0))
 
 # run lalapps_nest2pos to convert nested samples to posterior samples
-codecall = ' '.join([n2pexec, '--Nlive', nlive, '-p', os.path.join(outdir, 'fake_post.txt'),
-                     '-H', os.path.join(outdir, 'fake_nest.txt_params.txt'), '-z',
-                     os.path.join(outdir, 'fake_nest.txt.gz')])
+codecall = ' '.join([n2pexec, '-p', os.path.join(outdir, 'fake_post.hdf'), os.path.join(outdir, 'fake_nest.hdf')])
 
 print(codecall)
 p = sp.Popen(codecall, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
 out, err = p.communicate()
 
-post, evsig, evnoise = pulsar_nest_to_posterior(os.path.join(outdir, 'fake_post.txt.gz'))
+post, evsig, evnoise = pulsar_nest_to_posterior(os.path.join(outdir, 'fake_post.hdf'))
 h0ul = upper_limit_greedy(post['h0'].samples, upperlimit=0.95)
 
 jsondic['h0uls']['nested'] = h0ul
@@ -243,6 +241,6 @@ json.dump(jsondic, fpjson, indent=2)
 fpjson.close()
 
 # clean up nested samples posteriors and data files
-os.remove(os.path.join(outdir, 'fake_nest.txt.gz'))
-os.remove(os.path.join(outdir, 'fake_post.txt.gz'))
-os.remove(datafile)
+#os.remove(os.path.join(outdir, 'fake_nest.hdf'))
+#os.remove(os.path.join(outdir, 'fake_post.hdf'))
+#os.remove(datafile)

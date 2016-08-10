@@ -58,8 +58,8 @@ barycentring time delays.
 
 By default the code assumes emission just from the $l=m=2$ mode, i.e.\ there is only a signal at twice the
 rotation frequency. In this case $C_{22}$ and $\Phi_{22}^C$ can be related to the more familiar physical
-$h_0$ and $\phi_0$ values via $h_0 = -2C_{22}$ (where the minus sign maintains consistency with the signal for in cite{1998PhRvD..58f3001J})
-and $\phi_0 = \Phi_{22}^C/2$. For the more general case the
+$h_0$ and $\phi_0$ values via $h_0 = -2C_{22}$ (where the minus sign maintains consistency with the signal convention in
+\cite{1998PhRvD..58f3001J}) and $\phi_0 = \Phi_{22}^C/2$. For the more general case the
 relations between the waveform amplitude and phase parameters and physical source parameters are given in
 \citet{2015arXiv150105832J}. In general for previous searches we have often assumed that we track the true
 signal phase perfectly with the heterodyne and as such $\Delta\phi_i(t) = 0$. In such cases the only time
@@ -69,7 +69,7 @@ signal generation and likelihood calculations.
 \subsection{The likelihood functions}\label{sec:likelihood}
 
 Our code can make use of two different likelihood functions. The default likelihood function is a
-Student's {\it t}-likelihood function in which it is assumed that the standard deviation of the noise in the
+Student's {\it t} likelihood function in which it is assumed that the standard deviation of the noise in the
 data is unknown, and can therefore be marginalised over. A Gaussian likelihood function can also be used, for
 which the code can either take in estimates of the noise standard deviation at each data point, or calculates
 these internally based on stationary stretches of data. For the Student's {\it t}-likelihood function, and if

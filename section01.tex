@@ -2,14 +2,14 @@
 
 One of the primary methods used in searches for \gws from known pulsars is based on two stages: a heterodyne
 stage that pre-processes the calibrated \gw detector data by removing a signal's expected intrinsic phase
-evolution (based on the observed solution from electromagnetic observations), low-pass filtering and
-down-sampling (via averaging) \citep{2005PhRvD..72j2002D}; and, a parameter estimation stage that takes the
+evolution (based on the observed solution from electromagnetic observations), whilst also low-pass filtering and
+down-sampling (via averaging) the heterodyned data\citep{2005PhRvD..72j2002D}; and, a parameter estimation stage that takes the
 processed data and uses it to estimate posterior probability distributions of the unknown signal parameters
 \citep[e.g.\ using a Markov chain Monte Carlo (MCMC)][]{2010ApJ...713..671A}. This method has been variously
 called the {\it Time Domain Method}, the {\it Heterodyne Method}, the {\it Bayesian Method}, the {\it Glasgow
 Method}, or some combination of these names. Up to now this method has only been used to set upper limits
-on signal amplitudes, but has had no explicit criteria for deciding on signal detection/significance. A further
-limitation has been that the MCMC method used was not designed to be efficient and required tuning. It also
+on signal amplitudes, but has included no explicit criteria for deciding on signal detection/significance. A further
+limitation has been that the MCMC method used was not designed to be efficient and required a lot of tuning. It also
 did not straightforwardly have the ability to perform a search on the data over small ranges in the phase
 evolution parameters (e.g.\ required if the
 \gw signal does not well match the known pulsar's phase evolution). For these reasons the parameter
@@ -70,10 +70,7 @@ P_{\text{accept}} = \frac{L_i w_i}{(L_iw_i)_{\rm max}}.
 
 In our case the data $d$ in the above equations is heterodyned, low-pass filtered and down-sampled data
 for a detector, or set of detectors, each giving a single data stream or two data streams depending on
-whether the heterodyne was performed at one of both potential signal frequencies near the rotation frequency
+whether the heterodyne was performed at one or both potential signal frequencies near the rotation frequency
 and/or twice the rotation frequency. Here we will use $\mathbf{B}$ to represent a vector of these heterodyned
-data values, for which a single time sample is often referred to using the jargon term of $B_k$ (``{\it B of k}''), although we will
+data values, for which a single time sample is often referred to using the jargon term $B_k$ (``{\it B of k}''), although we will
 not consistently use $k$ as the time index for the data.
-
-  
-  

@@ -117,7 +117,7 @@ fp.close()
 # set the executables (this assumes that you are using virtual environments with virtualenvwrapper.sh and
 # have a WORKON_HOME environment variable set, but you can change the path as required)
 try:
-  virenv = 'local' # name of your virtual environment
+  virenv = 'production_gmm' # name of your virtual environment
   execpath = os.path.join(os.environ['WORKON_HOME'], virenv)
   execpath = os.path.join(execpath, 'bin')
   ppenexec = os.path.join(execpath, 'lalapps_pulsar_parameter_estimation_nested')
@@ -131,7 +131,7 @@ except: # assume execs are in path
 nlive = str(opts.nlive)  # number of live points
 codecall = ' '.join([ppenexec, '--detectors', detector,
                     '--par-file', parfile, '--prior-file', priorfile,
-                    '--input-files', datafile, '--outhdf', os.path.join(outdir, 'fake_nest.hdf'),
+                    '--input-files', datafile, '--outfile', os.path.join(outdir, 'fake_nest.hdf'),
                     '--gzip', '--Nlive', nlive, '--Nmcmcinitial', '0', '--oldChunks'])#, '--ensembleWalk 1 --uniformprop 0'])
 
 print(codecall)
@@ -148,6 +148,8 @@ if p.returncode != 0:
 print("lalapps_pulsar_parameter_estimation_nested took %f s" % (t1-t0))
 
 # run lalapps_nest2pos to convert nested samples to posterior samples
+if os.path.isfile(os.path.join(outdir, 'fake_post.hdf')):
+  os.remove(os.path.join(outdir, 'fake_post.hdf'))
 codecall = ' '.join([n2pexec, '-p', os.path.join(outdir, 'fake_post.hdf'), os.path.join(outdir, 'fake_nest.hdf')])
 
 print(codecall)

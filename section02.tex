@@ -50,9 +50,11 @@ true}}(t)-\Phi_{2,{\rm het}}(t))$.
 
 To calculate the $\Delta\phi$ values using up to the $(n-1)^{\rm th}$ frequency derivative, and try to avoid numerical overflow issues when dealing with large
 phases, the following equation is used
+\begin{widetext}
 \begin{equation}
 \Delta\phi_j(t) = 2\pi \sum_{k=1}^n \left( \frac{\left(f^{(k-1)}_{j,{\rm true}} - f^{(k-1)}_{j,{\rm het}}\right)}{k!}(t+\delta t_{\rm het})^k + \frac{f^{(k-1)}_{j,{\rm true}}}{k!} \sum_{i=0}^{i<k} \left(\begin{array}{c}k \\ i\end{array} \right) (\delta t_{\rm true}-\delta t_{\rm het})^{k-i} (t+\delta t_{\rm het})^i \right),
 \end{equation}
+\end{widetext}
 where $f^{(n)}$ is the $n^{\rm th}$ frequency derivative, and $\delta t$ is the combination of any solar system barycentring and binary system
 barycentring time delays.
 

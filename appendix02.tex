@@ -160,9 +160,10 @@ used, or held fixed.
 
 For pulsars in binary systems the code can currently use the following binary system models: {\tt BT}, {\tt BTX},
 {\tt BT1P}, {\tt BT2P}, {\tt ELL1}, {\tt DD}, {\tt DDS}, {\tt MSS}, and {\tt T2} (although not all aspects of the
-{\tt T2} model are implemented). The code can use the TDB or TCB time systems. The code can accept {\tt .par} files
-calculated using the JPL DE200, DE405, DE414, or DE421 solar system ephemerides, noting that it only takes into
-account the motion of the Earth-Moon system and the Sun, but no other solar system bodies.
+{\tt T2} model are implemented). The code can use the TDB or TCB time systems, with the TCB system being the default if not otherwise
+specified (either by supplying the require timing files, as described below, or by setting {\tt UNITS TDB} in the {\tt .par} file).
+The code can accept {\tt .par} files calculated using the JPL DE200, DE405, DE414, or DE421 solar system ephemerides, noting
+that it only takes into account the motion of the Earth-Moon system and the Sun, but no other solar system bodies.
 
 \subsubsection{Example prior file}
 
@@ -175,6 +176,7 @@ H0      fermidirac 4.316e-24 9.1625
 PHI0    uniform    0.0       3.141593
 COSIOTA gmm        2  1.5896  0.0219  1.0  1.5519  0.0219  1.0
 PSI     gaussian   0.6764    0.16532
+A1      loguniform 1e-3      1e6
 \end{verbatim}
 \end{widetext}
 

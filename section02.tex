@@ -193,9 +193,21 @@ code, but will be discussed in a separate paper.
 
 \subsection{The prior functions}\label{sec:priorfuncs}
 
-Here we describe the prior functions allowed for the parameters
+Here we describe the prior functions allowed for the parameters.
+
+Certain parameters are physically not allowed to take negative values, so the it is hardcoded that the following parameters
+have zero probability below zero: gravitational wave amplitude, $h_0$; $l=m=2$ mass quadrupole moment, $Q_{22}$; the pulsar
+distance; the pulsar parallax; the speed of gravitational waves; the projected semi-major axis of a binary orbit; the total
+binary system mass; and, the companion mass in a binary system.
+
+There are also other hardcoded priors for waveform amplitudes in two particular cases when searching for emission at both once
+and twice the rotation frequency: if searching for a signal from a biaxial star then the two waveform amplitudes, $C_{21}$ and $C_{22}$,
+must either both be positive or both be negative; if using the source model then the two amplitude $I_{21}$ and $I_{31}$, must
+have $I_{31} \geqslant I_{21}$.
 
 \subsubsection{Uniform prior}
+
+Figure~\ref{fig:prioruniform}.
 
 \subsubsection{Gaussian prior}
 

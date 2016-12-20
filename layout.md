@@ -1,6 +1,8 @@
 abstract.tex
 section01.tex
 section02.tex
+figures/priors/uniform/uniform.png
+figures/priors/fermidirac/fermidirac.png
 section03.tex
 section04.tex
 appendix01.tex

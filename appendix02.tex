@@ -2,7 +2,7 @@
 
 Here we document the various command line options for the code and its use in a variety of situations. All the command
 line options for \lppen, as shown with the \verb|--help| command, are given below.
-\onecolumngrid
+
 \begin{footnotesize}
 \begin{verbatim}
 Usage: lalapps_pulsar_parameter_estimation_nested [options]
@@ -108,19 +108,21 @@ Usage: lalapps_pulsar_parameter_estimation_nested [options]
                     be performed
 \end{verbatim}
 \end{footnotesize}
-\twocolumngrid
 
 \subsection{Examples}
 
-Here we show a few real examples of using the code for a variety of situations. In all cases there data are a minimum of
+Here we show a few real examples of using the code for a variety of situations. In all cases there are a minimum of
 three files that must be specified to run the code:
 \begin{enumerate}
  \item one (or more) data files containing a complex time series. These will generally be (although do not have to be) the output
  of the heterodyne method described in \citep{2005PhRvD..72j2002D} (and implemented with {\tt lalapps\_heterodyne\_pulsar}), or
- the {\it Spectral Interpolation} method described in \citep{0264-9381-34-1-015010}. Files must be in ascii text format with three
- whitespace-seperated columns
- specifying the data timestamp in GPS seconds, the real part of the data, and the imaginary part of the data, e.g.
- \verb|900000000 1.2564374e-22 -4.5764347e-22|. The data does not have to be uniformly sampled and can contain gaps. However,
+ the {\it Spectral Interpolation} method described in \citep{0264-9381-34-1-015010}. Files must be in ascii text format with three, or
+ four, whitespace-seperated columns. In either case the first three columns
+ specify the data timestamp in GPS seconds, the real part of the data, and the imaginary part of the data, e.g.
+ \verb|900000000 1.2564374e-22 -4.5764347e-22|. In the case where a fourth column is present this should give the noise standard
+ deviation, and is for use if running with the Gaussian likelihood function. The code will automatically determine if the input
+ contains three or four columns. The data does not have to be uniformly sampled and can 
+contain gaps. However,
  if searching for a signal for which there could still be some frequency modulation it is useful for the data to have a large
  enough bandwidth to contain the modulation.
  The file can contain comments if the comment lines start with
@@ -165,12 +167,68 @@ specified (either by supplying the require timing files, as described below, or 
 The code can accept {\tt .par} files calculated using the JPL DE200, DE405, DE414, or DE421 solar system ephemerides, noting
 that it only takes into account the motion of the Earth-Moon system and the Sun, but no other solar system bodies.
 
+The {\tt .par} file can also contain a selection of gravitational wave parameters not present in the case of a standard
+electromagnetically observed pulsar. A full list of the allowed parameter names for a {\tt .par}, and a prior file described below,
+is given in Table~\ref{tab:paramlist}.
+
+\begin{longtable}{l|l}
+\caption{A list of parameters allowed in a {\tt .par} file or a prior file. The true-type font versions, in uppercase only,
+are what is allowed in the files. The specified units are for the {\tt .par} file, whereas the prior file
+requires values in SI units.}\label{tab:paramlist} \\
+Parameter & Description \\
+\hline
+\multicolumn{2}{c}{Gravitational wave parameters} \\
+\hline
+{\tt H0}, $h_0$      & gravitational wave amplitude for the $l=m=2$ mode in the source model \\
+{\tt IOTA}, $\iota$  & pulsar inclination angle to the line-of-sight (rads) \\
+{\tt COSIOTA}, $\cos{\iota}$ & cosine of $\iota$ \\
+{\tt PSI}, $\psi$    & polarisation angle of the gravitational waves (rads) \\
+{\tt PHI0}, $\phi_0$ & rotational phase of the pulsar (rads) \\
+{\tt C22}, $C_{22}$  & gravitational wave amplitude for the $l=m=2$ mode in the waveform model \\
+{\tt C21}, $C_{21}$  & gravitational wave amplitude for the $l=2, m=1$ mode in the waveform model \\
+{\tt PHI22}, $\Phi_{22}^C$ & gravitational wave phase for the $l=m=2$ mode in the waveform model (rads) \\
+{\tt PHI21}, $\Phi_{21}^C$ & gravitational wave phase for the $l=2, m=1$ mode in the waveform model (rads) \\
+{\tt Q22}, $Q_{22}$ & $l=m=2$ mass quadrupole moment (kg\,m$^{2}$) \\
+{\tt HPLUS}, $H_+$ &  gravitational wave amplitude for the $l=m=2$ mode in the source model for the $+$-polarisation \\
+{\tt HCROSS}, $H_{\times}$ &  gravitational wave amplitude for the $l=m=2$ mode in the source model for the $\times$-polarisation \\
+{\tt CGW}, $c_{rm gw}$ & speed of gravitational waves as a fraction of the speed of light \\
+{\tt I21}, $I_{21}$ & physical gravitational wave amplitude in source model\hl{add reference} \\
+{\tt I31}, $I_{31}$ & physical gravitational wave amplitude in source model\hl{add reference} \\
+{\tt LAMBDA}, $\lambda$ & angle in source model \hl{add reference} \\
+{\tt THETA}, $\theta$ & angle in source model\hl{add reference} \\
+{\tt COSTHETA}, $\cos{\theta}$ & cosine of $\theta$ \\
+\hline
+\multicolumn{2}{c}{Signal phase parameters} \\
+\hline
+{\tt F}$X$, $f_X$ & rotational frequency, and frequency derivatives (starting at 0), (Hz$\,s^{-X}$) \\
+{\tt PEPOCH} & the epoch of the frequency \\
+\hline
+\multicolumn{2}{c}{Signal positional parameters} \\
+\hline
+{\tt RA}/{\tt RAJ}, $\alpha$ & pulsar right ascension ({\tt hh:mm:ss.s}) \\
+{\tt DEC}/{\tt DECJ}, $\delta$ & pulsar declination ({\tt dd:mm:ss.s}) \\
+{\tt PMRA} & proper motion in right ascension (mas\,yr$^{-1}$) \\
+{\tt PMDEC} & proper motion in declination (mas\,yr$^{-1}$) \\
+{\tt POSEPOCH} & the epoch of the sky position (MJD) \\
+{\tt EPHEM} & the JPL solar system ephemeris \\
+{\tt PX} & pulsar parallax (mas) \\
+{\tt DIST} & pulsar distance (kpc) \\
+\hline
+\multicolumn{2}{c}{Binary system parameters} \\
+\hline
+\multicolumn{2}{c}{\hl{Complete these}} \\
+\hline
+\multicolumn{2}{c}{Glitch parameters} \\
+\hline
+\multicolumn{2}{c}{\hl{Complete these}} \\
+\end{longtable}
+
+
 \subsubsection{Example prior file}
 
 The prior functions used by the code are decribed in Section~\ref{sec:priorfuncs}. To implement them in the code requires a prior
 file specifying the prior function require for each parameter that will be varied. A an example prior file containing all the
 allowed prior types (for descriptive purposed only) is:
-\begin{widetext}
 \begin{verbatim}
 H0      fermidirac 4.316e-24 9.1625
 PHI0    uniform    0.0       3.141593
@@ -178,7 +236,9 @@ COSIOTA gmm        2  1.5896  0.0219  1.0  1.5519  0.0219  1.0
 PSI     gaussian   0.6764    0.16532
 A1      loguniform 1e-3      1e6
 \end{verbatim}
-\end{widetext}
+
+The units required for parameters in a prior file are all SI units, whereas for the {\tt .par} file they often follow a different
+convention (see Table~ref{tab:paramlist}).
 
 \hl{Describe each example and refer back to decriptions to be added in Section~\ref{sec:priorfuncs}.}
 

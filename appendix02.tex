@@ -116,7 +116,7 @@ three files that must be specified to run the code:
 \begin{enumerate}
  \item one (or more) data files containing a complex time series. These will generally be (although do not have to be) the output
  of the heterodyne method described in \citep{2005PhRvD..72j2002D} (and implemented with {\tt lalapps\_heterodyne\_pulsar}), or
- the {\it Spectral Interpolation} method described in \citep{0264-9381-34-1-015010}. Files must be in ascii text format with three, or
+ the {\it Spectral Interpolation} method described in \citep{2017CQGra..34a5010D}. Files must be in ascii text format with three, or
  four, whitespace-seperated columns. In either case the first three columns
  specify the data timestamp in GPS seconds, the real part of the data, and the imaginary part of the data, e.g.
  \verb|900000000 1.2564374e-22 -4.5764347e-22|. In the case where a fourth column is present this should give the noise standard
@@ -160,7 +160,8 @@ Note that the code does not compute effects of dispersion measure (i.e.\ it assu
 or atmospheric effects, so it is highly preferable to use a {\tt .par} file for which these parameters have been not
 used, or held fixed.
 
-For pulsars in binary systems the code can currently use the following binary system models: {\tt BT}, {\tt BTX},
+For pulsars in binary systems the code can currently use the following binary system models \citep[see e.g.][for discussion
+of some of the models]{1989ApJ...345..434T,2007PhRvD..76d2006P}: {\tt BT}, {\tt BTX},
 {\tt BT1P}, {\tt BT2P}, {\tt ELL1}, {\tt DD}, {\tt DDS}, {\tt MSS}, and {\tt T2} (although not all aspects of the
 {\tt T2} model are implemented). The code can use the TDB or TCB time systems, with the TCB system being the default if not otherwise
 specified (either by supplying the require timing files, as described below, or by setting {\tt UNITS TDB} in the {\tt .par} file).
@@ -184,18 +185,17 @@ Parameter & Description \\
 {\tt COSIOTA}, $\cos{\iota}$ & cosine of $\iota$ \\
 {\tt PSI}, $\psi$    & polarisation angle of the gravitational waves (rads) \\
 {\tt PHI0}, $\phi_0$ & rotational phase of the pulsar (rads) \\
-{\tt C22}, $C_{22}$  & gravitational wave amplitude for the $l=m=2$ mode in the waveform model \\
-{\tt C21}, $C_{21}$  & gravitational wave amplitude for the $l=2, m=1$ mode in the waveform model \\
-{\tt PHI22}, $\Phi_{22}^C$ & gravitational wave phase for the $l=m=2$ mode in the waveform model (rads) \\
-{\tt PHI21}, $\Phi_{21}^C$ & gravitational wave phase for the $l=2, m=1$ mode in the waveform model (rads) \\
-{\tt Q22}, $Q_{22}$ & $l=m=2$ mass quadrupole moment (kg\,m$^{2}$) \\
+{\tt C22}, $C_{22}$  & gravitational wave amplitude for the $l=m=2$ mode in the waveform model \citep[see][]{2015MNRAS.453.4399P} \\
+{\tt C21}, $C_{21}$  & gravitational wave amplitude for the $l=2, m=1$ mode in the waveform model \citep[see][]{2015MNRAS.453.4399P} \\
+{\tt PHI22}, $\Phi_{22}^C$ & gravitational wave phase for the $l=m=2$ mode in the waveform model (rads) \citep[see][]{2015MNRAS.453.4399P} \\
+{\tt PHI21}, $\Phi_{21}^C$ & gravitational wave phase for the $l=2, m=1$ mode in the waveform model (rads) \citep[see][]{2015MNRAS.453.4399P} \\
+{\tt Q22}, $Q_{22}$ & $l=m=2$ mass quadrupole moment (kg\,m$^{2}$) \citep[see e.g.][]{2005PhRvL..95u1101O} \\
 {\tt HPLUS}, $H_+$ &  gravitational wave amplitude for the $l=m=2$ mode in the source model for the $+$-polarisation \\
 {\tt HCROSS}, $H_{\times}$ &  gravitational wave amplitude for the $l=m=2$ mode in the source model for the $\times$-polarisation \\
-{\tt CGW}, $c_{rm gw}$ & speed of gravitational waves as a fraction of the speed of light \\
-{\tt I21}, $I_{21}$ & physical gravitational wave amplitude in source model\hl{add reference} \\
-{\tt I31}, $I_{31}$ & physical gravitational wave amplitude in source model\hl{add reference} \\
-{\tt LAMBDA}, $\lambda$ & angle in source model \hl{add reference} \\
-{\tt THETA}, $\theta$ & angle in source model\hl{add reference} \\
+{\tt I21}, $I_{21}$ & physical gravitational wave amplitude in source model \citep[see][]{2015MNRAS.453.4399P} \\
+{\tt I31}, $I_{31}$ & physical gravitational wave amplitude in source model \citep[see][]{2015MNRAS.453.4399P} \\
+{\tt LAMBDA}, $\lambda$ & Euler angle in source model \citep[see][]{2015MNRAS.453.4399P} \\
+{\tt THETA}, $\theta$ & Euler angle in source model \citep[see][]{2015MNRAS.453.4399P} \\
 {\tt COSTHETA}, $\cos{\theta}$ & cosine of $\theta$ \\
 \hline
 \multicolumn{2}{c}{Signal phase parameters} \\
@@ -214,13 +214,58 @@ Parameter & Description \\
 {\tt PX} & pulsar parallax (mas) \\
 {\tt DIST} & pulsar distance (kpc) \\
 \hline
-\multicolumn{2}{c}{Binary system parameters} \\
+\multicolumn{2}{c}{Binary system oribital parameters} \\
 \hline
-\multicolumn{2}{c}{\hl{Complete these}} \\
+{\tt BINARY} & binary system model \citep[see e.g.][and references therein]{1989ApJ...345..434T} \\
+{\tt A1}, $a\sin{i}$ & projected semi-major axis (lt-s) \\
+{\tt PB}, $P_{\rm b}$ & binary period (days) \\
+{\tt OM}, $\omega_0$ & longitude of periastron (degs) \\
+{\tt T0} & time of periastron (MJD) \\
+{\tt ECC}, $e$ & oribtal eccentricity \\
+{\tt EPS1}, $\varepsilon_1$/$\eta$ & $e\sin{\omega_0}$ for {\tt ELL1} model \citep[see Appendix in][]{2001MNRAS.326..274L} \\
+{\tt EPS2}, $\varepsilon_2$/$\kappa$ & $e\cos{\omega_0}$ for {\tt ELL1} model \citep[see Appendix in][]{2001MNRAS.326..274L} \\
+{\tt TASC}, $T_{\rm asc}$ & time of the ascending node for {\tt ELL1} model \citep[see Appendix in][]{2001MNRAS.326..274L} \\
+{\tt GAMMA}, $\gamma$ & relativistic gravitational redshift and time dilation term in {\tt BT} model (s) \\
+{\tt OMDOT}, $\dot{\omega_0}$ & time derivative of $\omega_0$ (degs\,yr${-1}$) \\
+{\tt XDOT} & time derivative of $a\sin{i}$ (lt\,s\,s$^{-1}$ or $10^{-12}$lt-s\,s$^{-1}$ if $|\dot{a\sin{i}}| > 10^{-7}$)  \\
+{\tt PBDOT}, $\dot{P_{\rm b}}$ & time derivative of period ($10^{-12}$ if $|\dot{P_{\rm b}}| > 10^{-7}$) \\
+{\tt EDOT}, $\dot{e}$ & time derivative of eccentricity (s$^{-1}$ or $10^{-12}$\,s$^{-1}$ if $|\dot{e}| > 10^{-7}$) \\
+{\tt EPS1DOT}, $\dot{\varepsilon_1}$ & time derivative of $\varepsilon_1$ (s$^{-1}$ or $10^{-12}$\,s$^{-1}$ if $|\dot{\varepsilon_1}| > 10^{-7}$) \\
+{\tt EPS2DOT}, $\dot{\varepsilon_2}$ & time derivative of $\varepsilon_2$ (s$^{-1}$ or $10^{-12}$\,s$^{-1}$ if $|\dot{\varepsilon_2}| > 10^{-7}$) \\
+{\tt XPBDOT} & time derivative of period minus GR prediction ($10^{-12}$ if $|\dot{P_{\rm b}}| > 10^{-7}$) \\
+{\tt SINI}, $\sin{i}$ & sine of oribital inclination angle \\
+{\tt MTOT}, $M$ & total binary system mass (M$_{\odot}$) \\
+{\tt M2}, $m_2$ & binary companion mass (M$_{\odot}$) \\
+{\tt DR}, $d_r$ & relativistic deformation of the orbit \\
+{\tt DTHETA}, $d_{\theta}$ & relativistic deformation of the orbit \\
+{\tt SHAPMAX}, $s_x$ & defined as $-{\rm ln}(1-\sin{i})$ \\
+{\tt KIN}, $i$ & inclination angle (Kopeikin term) (degs) \\
+{\tt KOM}, $\Omega$ & longitude of ascending node (Kopeikin term) (degs) \\
+{\tt D\_AOP} & Kopeikin term (arcsec$^{-1}$) \citep[see e.g.\ Section~2.7.1 of][]{2006MNRAS.372.1549E} \\
+{\tt A1\_}$X$ & projected semi-major axes for multiple orbital components ($X=2,3$ for {\tt BT1P} and {\tt BT2P} models) (lt-s) \\
+{\tt PB\_}$X$ & periods for multiple orbital components ($X=2,3$ for {\tt BT1P} and {\tt BT2P} models) (days) \\
+{\tt OM\_}$X$ & longitudes of periastron for multiple orbital components ($X=2,3$ for {\tt BT1P} and {\tt BT2P} models) (degs) \\
+{\tt T0\_}$X$ & times of periastron for multiple orbital components ($X=2,3$ for {\tt BT1P} and {\tt BT2P} models) (MJD) \\
+{\tt ECC\_}$X$ & eccentricities for multiple orbital components ($X=2,3$ for {\tt BT1P} and {\tt BT2P} models) \\
+{\tt FB}$X$ & orbital frequencies for multiple components (in {\tt BTX} model) (Hz) \\
+{\tt A0}, $A$ & first aberration parameter \citep[see e.g.\ Section~2.7.3 of][]{2006MNRAS.372.1549E} \\
+{\tt B0}, $B$ & second aberration parameter \citep[see e.g.\ Section~2.7.3 of][]{2006MNRAS.372.1549E} \\
 \hline
-\multicolumn{2}{c}{Glitch parameters} \\
+\multicolumn{2}{c}{Glitch parameters \citep[see][]{2006MNRAS.369..655H,2013MNRAS.429..688Y}} \\
 \hline
-\multicolumn{2}{c}{\hl{Complete these}} \\
+{\tt GLEP\_}$X$ & glitch epochs (MJD) \\
+{\tt GLPH\_}$X$ & glitch rotational phase offsets (rads) \\
+{\tt GLF0\_}$X$ & glitch frequency offsets (Hz) \\
+{\tt GLF1\_}$X$ & glitch first frequency derivative offsets (Hz\,s$^{-1}$) \\
+{\tt GLF2\_}$X$ & glitch second  frequency derivative offsets (Hz\,s$^{-2}$) \\
+{\tt GLF0D\_}$X$ & glitch decaying frequency components (Hz) \\
+{\tt GLTD\_}$X$ & glitch time constant for decaying components (s) \\
+\hline
+\multicolumn{2}{c}{Non-GR parameters} \\
+{\tt CGW}, $c_{\rm gw}$ & speed of gravitational waves as a fraction of the speed of light \\
+\hline
+
+\hline
 \end{longtable}
 
 

@@ -62,10 +62,10 @@ By default the code assumes emission just from the $l=m=2$ mode, i.e.\ there is 
 rotation frequency. In this case $C_{22}$ and $\Phi_{22}^C$ can be related to the more familiar physical
 $h_0$ and $\phi_0$ values via $h_0 = -2C_{22}$ \citep[where the minus sign maintains consistency of equation~\ref{eq:h2f} with the form given in][]{1998PhRvD..58f3001J} and $\phi_0 = \Phi_{22}^C/2$. For the more general case the
 relations between the waveform amplitude and phase parameters and physical source parameters are given in
-\citet{2015arXiv150105832J}. In general for previous searches we have often assumed that we track the true
+\citet{2015arXiv150105832J} and \citet{2015MNRAS.453.4399P}. In general, for previous searches we have often assumed that we track the true
 signal phase perfectly with the heterodyne and as such $\Delta\phi_i(t) = 0$. In such cases the only time
 varying components of the signal are the antenna pattern functions, which allows great speed increases in the
-signal generation and likelihood calculations.
+signal generation and likelihood calculations (see \S\ref{sec:fastlike}).
 
 \subsection{The likelihood functions}\label{sec:likelihood}
 
@@ -76,7 +76,7 @@ which the code can either take in estimates of the noise standard deviation at e
 these internally based on stationary stretches of data. For the Student's {\it t}-likelihood function, and if
 calculating noise standard deviations for the Gaussian likelihood function internally, the code needs to break
 up the data into chunks that have (roughly) the same distribution. The method for doing this is given in
-Section~\ref{sec:splitting}.
+\S\ref{sec:splitting}.
 
 \subsubsection{Student's {\it t}-likelihood}
 
@@ -147,7 +147,7 @@ ratio. But, in this code we keep them for cases when such a comparison is not pe
 want to compared the joint multi-detector likelihood for a signal with the incoherent product of likelihoods
 from each detector then we would need these factors to still be present.
 
-\subsubsection{Fast likelihood evaluations}
+\subsubsection{Fast likelihood evaluations}\label{sec:fastlike}
 
 In cases when the only time varying components of the model are the antenna pattern functions (i.e.\ when 
 $\Delta \phi_j(t)$ in equation~\ref{eq:hf} or \ref{eq:h2f} is zero) the likelihood
@@ -193,25 +193,67 @@ code, but will be discussed in a separate paper.
 
 \subsection{The prior functions}\label{sec:priorfuncs}
 
-Here we describe the prior functions allowed for the parameters.
+An important part of any Bayesian inference method is the choice of parameter prior probability functions. Here we describe the prior
+functions allowed in the code for any of the required parameters.
 
-Certain parameters are physically not allowed to take negative values, so the it is hardcoded that the following parameters
+Certain parameters are physically not allowed to take negative values, so it is hardcoded that the following parameters
 have zero probability below zero: gravitational wave amplitude, $h_0$; $l=m=2$ mass quadrupole moment, $Q_{22}$; the pulsar
 distance; the pulsar parallax; the speed of gravitational waves; the projected semi-major axis of a binary orbit; the total
 binary system mass; and, the companion mass in a binary system.
 
 There are also other hardcoded priors for waveform amplitudes in two particular cases when searching for emission at both once
 and twice the rotation frequency: if searching for a signal from a biaxial star then the two waveform amplitudes, $C_{21}$ and $C_{22}$,
-must either both be positive or both be negative; if using the source model then the two amplitude $I_{21}$ and $I_{31}$, must
+must either both be positive or both be negative; if using the source model then the two amplitudes $I_{21}$ and $I_{31}$, must
 have $I_{31} \geqslant I_{21}$.
 
 \subsubsection{Uniform prior}
 
-Figure~\ref{fig:prioruniform}.
+A parameter can be given a uniform (or flat, or top-hat) prior, in which the probabilty is constant within a given
+range and zero outside that range, i.e.
+\begin{equation}
+p(x|I) = \begin{cases}
+             C & \text{if~} x_{\rm min} < x < x_{\rm max}, \\
+             0 & \text{otherwise},
+            \end{cases}
+\end{equation}
+where for parameter $x$ the upper and lower bounds on the parameter values and $x_{\rm min}$ and $x_{\rm max}$. This
+prior can be normalised by setting $C = 1/(x_{\rm max}-x_{\rm min})$, although within nested sampling the normalisation
+is not specifically required.
+
+A histogram of a set of samples produced by the code when drawing from a uniform prior distribution are shown in Figure~\ref{fig:prioruniform},
+along with the true prior function.
+
+Some parameters for which the uniform prior is often considered appropriate are angle parameters, such as the $\Phi_{22}^C$ and $\psi$
+parameters in Equation~\ref{eq:h2f}, which can be restricted to a specific non-degenerate range \citep[see, e.g., Table~1 in][]{2015MNRAS.453.4399P}. 
 
 \subsubsection{Gaussian prior}
 
+A parameter can be given a prior with a Gaussian distribution, defined by its mean $mu_x$ and standard deviation $\sigma_x$, i.e.
+\begin{equation}
+ p(x|I) = \frac{1}{\sqrt{2\pi\sigma_x^2}}\exp{\left(-\frac{(x-\mu_x)^2}{2\sigma_x^2}\right)}.
+\end{equation}
+
+A histogram of a set of samples produced by the code when drawing from a Gaussian prior distribution are shown in Figure~\ref{fig:priorgaussian},
+along with the true prior function.
+
 \subsubsection{Gaussian Mixture Model prior}
+
+A parameter, or pair of parameters, can be given a prior distribution composed of a superposition of Gaussian distributions (a
+Gaussian Mixture Model), with each component defined by a set of means for each parameter, a covariance matrix, and a weight
+describing the relative probability concentrated in it. For an $n$ component mixture on a set of parameters $\vec{x}$ the prior
+function will be
+\begin{equation}
+ p(\vec{x}|I) = \sum_{i=1}^n w_i(2\pi)^{n/2}|C_i|^{-1/2}\exp{\left(-\frac{1}{2}{\Delta\vec{x}_i}'C_i^{-1}\Delta\vec{x}_i\right)},
+\end{equation}
+where, for component $i$, $w_i$ is the weight, $\Delta\vec{x_i}= \vec{x}-\vec{{\mu_x}_i}$, $\vec{{\mu_x}_i}$ are the means, and
+$C_i$ is the covariance matrix.
+
+Such a model can be used, for example, if there is a bimodal Gaussian prior on a particular parameter, as is the case for the
+inclination angle $\iota$ if it is calculated from fits to pulsar wind nebulae. In such a case the Gaussian Mixture Model can define
+two Gaussian distributions of equal standard deviations and weights. A more complex use of this prior would be for creating a smooth
+probability distribution using samples drawn from it, i.e. taking posterior samples from a search for a particular pulsar, and
+creating a smooth model of those samples (for, say, the two parameters $h_0$ and $cos{\iota}$) to be input as a prior when looking
+at future data for the same source.
 
 \subsubsection{Log-Uniform prior}
 

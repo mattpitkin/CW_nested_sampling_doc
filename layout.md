@@ -2,6 +2,7 @@ abstract.tex
 section01.tex
 section02.tex
 figures/priors/uniform/uniform.png
+figures/priors/gaussian/gaussian.png
 figures/priors/fermidirac/fermidirac.png
 section03.tex
 section04.tex

@@ -3,8 +3,12 @@ section01.tex
 section02.tex
 figures/priors/uniform/uniform.png
 figures/priors/gaussian/gaussian.png
+figures/priors/gmm/gmm.png
+figures/priors/loguniform/loguniform.png
 figures/priors/fermidirac/fermidirac.png
+figures/changepoint/changepoint.png
 section03.tex
 section04.tex
+section05.tex
 appendix01.tex
 appendix02.tex

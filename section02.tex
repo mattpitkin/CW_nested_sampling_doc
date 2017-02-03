@@ -78,7 +78,7 @@ calculating noise standard deviations for the Gaussian likelihood function inter
 up the data into chunks that have (roughly) the same distribution. The method for doing this is given in
 \S\ref{sec:splitting}.
 
-\subsubsection{Student's {\it t}-likelihood}
+\subsubsection{Student's {\it t}-likelihood}\label{sec:stlikelihood}
 
 A full derivative of the Student's {\it t}-likelihood function \citep[see e.g.][]{2005PhRvD..72j2002D} is given
 in Appendix~\ref{app:likelihood}, but the final form of the joint likelihood (and its natural logarithm,
@@ -104,7 +104,7 @@ each chunk. The model $y(\vec{\theta})$ is that given by Eqns.~\ref{eq:hf} and/o
 depending on which data streams are being analysed. For notational convenience we have made the substitution
 $\mathcal{A}_{i,j,k} = \ln{\left([m_{i,j,k}-1]!\right)} - \ln{2} - m_{i,j,k}\ln{\pi}$.
 
-\subsubsection{Gaussian likelihood}
+\subsubsection{Gaussian likelihood}\label{sec:glikelihood}
 
 The Gaussian likelihood, and its natural logarithm, are similarly given by
 \begin{widetext}
@@ -126,7 +126,7 @@ product of the real and imaginary data components.
 As we will most often want to perform model comparison for the signal model against the data just containing
 noise (the null hypothesis in this case) we can define the null likelihoods for both of the above likelihoods
 by setting $y(\vec{\theta}) = 0$, so that we have
-\begin{align}
+\begin{align}\label{eq:nulllike}
 \ln{p(\mathbf{B}|y=0)} &= \sum_{i=1}^{N_{\rm dets}} \sum_{j=1}^{N_{\rm s}}
 \sum_{k=1}^{M_{i,j}} \Bigg( \mathcal{A}_{i,j,k} - \nonumber \\
 &m_{i,j,k}\ln{
@@ -218,13 +218,21 @@ p(x|I) = \begin{cases}
 \end{equation}
 where for parameter $x$ the upper and lower bounds on the parameter values and $x_{\rm min}$ and $x_{\rm max}$. This
 prior can be normalised by setting $C = 1/(x_{\rm max}-x_{\rm min})$, although within nested sampling the normalisation
-is not specifically required.
+is not specifically required. The prior requires a lower and upper bound to allow it to be normalisable and to enable
+an initial set of samples to be drawn from it. However, it should be noted that the choice of range will have an
+effect on evidences that are calculated.
 
 A histogram of a set of samples produced by the code when drawing from a uniform prior distribution are shown in Figure~\ref{fig:prioruniform},
 along with the true prior function.
 
 Some parameters for which the uniform prior is often considered appropriate are angle parameters, such as the $\Phi_{22}^C$ and $\psi$
 parameters in Equation~\ref{eq:h2f}, which can be restricted to a specific non-degenerate range \citep[see, e.g., Table~1 in][]{2015MNRAS.453.4399P}. 
+In previous gravitational wave pulsar searches, such as \citet{2010ApJ...713..671A,2014ApJ...785..119A} a uniform prior was often used for
+the gravitational wave amplitude parameter $h_0$. For those searches the prior upper bound was based on inspection of the data to find a
+value that was very large compared to the sensitivity suggested by the data. A uniform prior was used, as opposed to the more
+uninformative choice for such as scale parameter of the log-uniform prior (see \S\ref{sec:loguniform}), due to the fact that the main
+result was in producing upper limits, and wanting these to be primarily based on the data (i.e. the likelihood) rather than being reduced
+by the prior.
 
 \subsubsection{Gaussian prior}
 
@@ -249,23 +257,138 @@ where, for component $i$, $w_i$ is the weight, $\Delta\vec{x_i}= \vec{x}-\vec{{\
 $C_i$ is the covariance matrix.
 
 Such a model can be used, for example, if there is a bimodal Gaussian prior on a particular parameter, as is the case for the
-inclination angle $\iota$ if it is calculated from fits to pulsar wind nebulae. In such a case the Gaussian Mixture Model can define
+inclination angle $\iota$ if it is calculated from fits to pulsar wind nebulae \citep[see, e.g., Appendix B in][]{2017arXiv170107709T}. In such a case the Gaussian Mixture Model can define
 two Gaussian distributions of equal standard deviations and weights. A more complex use of this prior would be for creating a smooth
 probability distribution using samples drawn from it, i.e. taking posterior samples from a search for a particular pulsar, and
 creating a smooth model of those samples (for, say, the two parameters $h_0$ and $cos{\iota}$) to be input as a prior when looking
 at future data for the same source.
 
-\subsubsection{Log-Uniform prior}
+Two examples of histrograms of samples drawn from one-dimensional Gaussian Mixture Models with two and three modes respectively
+are shown in Figure~\ref{fig:priorgmm}.
+
+\subsubsection{Log-Uniform prior}\label{sec:loguniform}
+
+A parameter can be given a prior distribution that is uniform in the logarithm of the parameter, i.e.
+\begin{equation}
+ p(x|I) = \begin{cases}
+             \left(\ln{x_{\rm max}}-\ln{x_{\rm min}}\right)^{-1}\frac{1}{x} & \text{if~} x_{\rm min} < x < x_{\rm max}, \\
+             0 & \text{otherwise}.
+            \end{cases}
+\end{equation}
+This prior requires minimum and maximum values to be specified to make it normalisable and allow samples to be drawn from the
+distribution. It should be noted that the choice of range, and in particular the lower bound, can have a significant effect on
+the calculated evidence.
+
+A histogram of a set of samples produced by the code when drawing from a log-uniform prior distribution, with a range between
+$10^{-3}$ and 1 are shown in Figure~\ref{fig:priorloguniform},
+along with the true prior function.
 
 \subsubsection{Fermi-Dirac prior}
 
+A Fermi-Dirac distribution prior function was inspired by that used in \citet{Middleton_2015}. The prior has a sigmoid, or logistic,
+shape, although starts at large values and slopes downwards and is restricted to positive values. The form of the function, for
+parameter $x$, is
+\begin{equation}\label{eq:fermidirac}
+ p(x|\sigma, \mu, I) = \begin{cases}\frac{1}{\sigma\ln{\left(1+e^{\mu/\sigma} \right)}}\left(e^{(x-\mu)/\sigma} + 1\right)^{-1} & \text{if~} x \geqslant 0, \\
+                        0 & \text{otherwise},
+                       \end{cases}
+\end{equation}
+and is defined by two parameters $\sigma$ and $\mu$. $\mu$ defines the point at which the distribution falls to 50\% of
+its maximum value, whilst $\sigma$ defines the range over which the attenuation happens. We also make use of a parameter
+$r = \mu/\sigma$. The band over which the probability falls from 97.5\% to 2.5\% of its maximum value is given by $\mu \pm Z\mu/2r$, where
+$Z\approx7.33$. Therefore, if we want, for example, the distribution to have this particular fall of over a range that is 10\% of $\mu$
+we would have $Z/2r = 0.1$ and $\sigma = 0.027\mu$.
+
+Three different examples of Fermi-Dirac priors, and samples drawn from them by the code, are shown in Figure~\ref{fig:priorfermidirac},
+for a selection of $\mu$ and $\sigma$ values.
+
+The sampling from the prior uses inverse transform sampling. The cumulative distribution function (CDF) of Equation~\ref{eq:fermidirac}
+is
+\begin{widetext}
+\begin{align}
+ C(X_0) &= \int_0^{X_0} \frac{1}{\sigma\ln{\left(1+e^{r} \right)}}\left(e^{(x-\mu)/\sigma} + 1\right)^{-1} {\rm d}x, \nonumber \\
+ &= \frac{1}{\ln{\left(1+e^{r}\right)}}\left[\frac{X_0}{\sigma} + \ln{\left(1+e^{-r} \right)} - \ln{\left( 1+e^{(X_0-\mu)/\sigma}\right)} \right],
+\end{align}
+which can be inverted to give
+\begin{equation}
+X_0 = -\sigma \ln{}\left(-e^{-r} + \left(1+e^{r} \right)^{-C(X_0)} + e^{1-r}\left(1+e^{r} \right)^{-C(X_0)} \right).
+\end{equation}
+\end{widetext}
+Thus, drawing CDF samples uniformly between 0 and 1, and inverting via the above equation gives values drawn from Equation~\ref{eq:fermidirac}.
+
+This prior can use useful for amplitude parameter, where a uniform prior may have previously been used. It has the property of being roughly
+flat at low values of the parameter and with an exponetial fall off at large values. This gives the advantage over a uniform prior with a
+sharp upper cut-off in that the distribution is continuous rather than (perhaps) arbitrarily truncated.
+
+This form of prior was used for the gravitational wave amplitude parameter, $h_0$ in \citet{2017arXiv170107709T} as opposed to the earlier use of
+a uniform prior with arbitrary upper cut-off used in, e.g., \citet{2014ApJ...785..119A}.
+
 \subsection{Splitting the data}\label{sec:splitting}
 
-The above likelihood functions require us to have an idea about the timescales on which the data is
+The Student's $t$-likelihood function (\S\ref{sec:stlikelihood}) requires us to have an idea about the timescales on which the data is
 stationary, i.e.\ periods when the noise in the data is best described as being drawn from a single
 Gaussian distribution. We therefore use a scheme similar to the BayesianBlocks change point algorithm
-\citep{1998ApJ...504..405S} to find points at which the statistics of the noise changes.
+\citep{1998ApJ...504..405S} to find points at which the statistics of the noise changes. This is done with
+a top-down iterative {\it divide and conquer} approach \citep{2000physics...9033S}.
 
-  
-  
-  
+We start by taking a full complex time series data set for a detector and subtracting a running median from both
+the real and imaginary components. This
+subtraction is performed to try and remove the effect of any very strong signals in the data, as we want to
+assess the properties of the noise rather than any signal.\footnote{In reality this is only likely to be a current issue for strong
+simulated signals injected into the data, as real signals will have a very low signal-to-noise ratio in short stretches of data.} The running median is calculated over a running window
+of 30 data points (or a minimum of 15 points at the start are end of the data), but not accounting for gaps in the data.
+For the standard data sample rate of
+1 per 60 seconds, this means that half an hour of data is used, over which time the detector antenna patterns will not change
+too drastically (unless there is a gap in the data). However, it should be noted that if using much more slowly sampled data set
+then this hardcoded 30 sample window may not work well for very strong signals.
+
+The next thing we do is calculate the evidence that the whole (running-median-removed) dataset is drawn from a single
+Gaussian distribution with unknown variance. To do this we just use Equation~\ref{eq:nulllike}, with $N_{\rm dets} =1$,
+$N_{\rm s}=1$, $M_{1,1}=1$, $n_{1,1,0}=1$ and, given a dataset of length $N$, set $m_{1,1,1}=N$. We will call the natural logarithm
+of this value $\ln{Z_{\rm single}}$. We want to calculate the odds between this evidence and that for the data containing
+{\it any} single change point (i.e. point at which the data seems to be drawn from a different Gaussian distribution). So, for
+one single change point, at index $i$, we calculate $\ln{Z_{\rm cp,i}}$, by using Equation~\ref{eq:nulllike} and setting
+$N_{\rm dets} =1$, $N_{\rm s}=1$, $M_{1,1}=2$, $n_{1,1}=\{1,i\}$ and $m_{1,1} = \{i,N-i\}$. We also impose a minumum allowed data
+chunk size of $n_{\min}$ (which defaults to a value of 5 data points in the code), so that $i \geqslant n_{\rm min}$. As we want
+the evidence for {\it any} single change point, we must take the sum all the single change point evidences
+\begin{equation}
+ \ln{Z_{\rm any-cp}} = \ln{\left(\sum_{i=n_{\min}}^{N-n_{\rm min}} Z_{\rm cp,i} \right)}.
+\end{equation}
+Finally, we are left with the odds (assuming equal prior probabilities for each hypothesis)
+\begin{equation}\label{eq:cpodds}
+ \ln{\mathcal{O}_{\rm any-cp}^{\rm single}} = \ln{Z_{\rm any-cp}} - \ln{Z_{\rm single}},
+\end{equation}
+for which values above zero favour there being a change point in the data. We could simply use this as the criterion on which to
+split the data into two chunks at the change point value $i$ with the largest evidence. However, in practice this leads to
+data drawn from a single Gaussian distribution actually being split far too often, and also there being a dependence on the
+data length. So, instead, we empirically calculate an odds threshold above which the value of Equation~\ref{eq:cpodds} must be to
+impose a split in the data.\footnote{A different approach would be to apply different priors to each hypothesis. These are most
+probably fairly straighforward to work out (i.e. something using the number of change point positions tried), although we have just taken
+the empirical approach.} The empirical threshold we use is worked out by finding the 99\% upper limit on value of
+Equation~\ref{eq:cpodds} when data is purely drawn from a single Gaussian distribution (i.e. it gives a 1\% false alarm probability)
+as a function of the data length $N$. The results of doing this for 30\,000 instances of data for a range of $n$ values, and three
+different false alarm probabilities (1\%, 0.5\% and 0.1\%), are shown in Figure~\ref{fig:changepoint}. Fitting a line to the 1\% false alarm
+probability points gives and odds ratio threshold dependence of
+\begin{equation}
+ T = 4.07 + 1.33\log{}_{10}{N}.
+\end{equation}
+
+The above process just splits the data once, so it must be applied iteratively to split the data further. When a change point is
+found then the process is repeated on the two split data chunks, and stops when either no change point is found within a chunk,
+or the split would give a segment smaller than $n_{\rm min}$.
+
+\subsection{Signal-to-noise ratio calculation}\label{sec:snr}
+
+Whether a signal is found or not the code will output a signal-to-noise ratio (SNR). The calculated SNR uses the set of signal
+parameters, $\vec{\theta}_{\rm ML}$, that give the maximum value for the likelihood, which are then used to create the best-fit
+complex signal template $y(\vec{\theta}_{\rm ML})$. We then use calculations of the
+noise standard deviation for each data chunk after removal of a running median from the data (the splitting and running median are
+described in \S\ref{sec:splitting}). The SNR is then calculated as
+\begin{equation}\label{eq:snr}
+ \rho = \sqrt{\sum_{i=1}^{N_{\rm dets}} \sum_{j=1}^{N_{\rm s}}
+\sum_{k=1}^{M_{i,j}} \sum_{n=n_{i,j,0}}^{n_{i,j,0}+(m_{i,j,k}-1)}\left(\frac{|y(\vec{\theta}_{\rm ML})_{i,j,n}|^2}{\sigma_{i,j,k}^2}\right)},
+\end{equation}
+using the notation given in \S\ref{sec:likelihood}.\footnote{If using data input from the spectral interpolation code \citep{2017CQGra..34a5010D}
+the noise standard deviations are actually passed to the code (see \S\ref{app:examples}), so in Equation~\ref{eq:snr} $M_{i,j}$ is replaced
+by $L_{i,j}$ and $y(\vec{\theta}_{\rm ML})_{i,j,n}$ is replace by $y(\vec{\theta}_{\rm ML})_{i,j,k}$ as in \S\ref{sec:glikelihood}.}
+

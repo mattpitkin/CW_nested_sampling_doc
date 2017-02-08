@@ -15,10 +15,8 @@ Copyright (C) 2017 Matthew Pitkin
 from __future__ import print_function
 
 import os
-import subprocess
-import numpy as np
+import sys
 import uuid
-import json
 import argparse
 
 # import some pulsar utilities

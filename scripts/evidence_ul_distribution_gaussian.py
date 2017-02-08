@@ -180,7 +180,7 @@ for i, maxv in enumerate(maxvals):
     outfilenest = os.path.join(maxvdir, 'nest_%04d.hdf' % j)
     
     # write out ppen job
-    dagstr = 'JOB %s %s\nRETRY %s 0\nVARS %s macrooutfile=\"%s\" macroprior=\"%d\"\n' % (uippen, subfile, uippen, uippen, outfilenest, priorfile)
+    dagstr = 'JOB %s %s\nRETRY %s 0\nVARS %s macrooutfile=\"%s\" macroprior=\"%s\"\n' % (uippen, subfile, uippen, uippen, outfilenest, priorfile)
     fp.write(dagstr)
 
     # write out n2p job

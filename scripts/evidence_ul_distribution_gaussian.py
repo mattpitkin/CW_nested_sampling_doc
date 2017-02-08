@@ -181,7 +181,7 @@ for i, maxv in enumerate(maxvals):
 
     # write out n2p job
     uin2p = uuid.uuid4().hex
-    outfilepost = os.path.join(maxvdir, 'post_%04d.hdf' % i)
+    outfilepost = os.path.join(maxvdir, 'post_%04d.hdf' % j)
     dagstr = 'JOB %s %s\nRETRY %s 0\nVARS %s macronest=\"%s\" macropost=\"%s\"\n' % (uin2p, n2psubfile, uin2p, uin2p, outfilenest, outfilepost)
     fp.write(dagstr)
 

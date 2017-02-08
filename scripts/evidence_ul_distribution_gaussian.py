@@ -192,7 +192,7 @@ for i, maxv in enumerate(maxvals):
 
     # write out job for removing nested samples files and posterior files
     uirm = uuid.uuid4().hex
-    dagstr = 'JOB %s %s\nRETRY %s 0\nVARS %s macropost=\"%s %s\"\n' % (uirm, rmsubfile, uirm, uirm, outfilepost, outfilenest)
+    dagstr = 'JOB %s %s\nRETRY %s 0\nVARS %s macrofile=\"%s %s\"\n' % (uirm, rmsubfile, uirm, uirm, outfilepost, outfilenest)
     fp.write(dagstr)
 
     # output parents and children

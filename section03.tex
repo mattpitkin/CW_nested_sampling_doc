@@ -1,0 +1,79 @@
+\section{Nested sampling setup}
+
+Here we will briefly describe some of the core functions used for the Nested Sampling algorithm within our code. We will
+not describe nested sampling itself, over-and-above the very brief summary given in \S{sec:general}, but instead refer
+the reader to \citet{Veitch:2010}. We also refer the reader to \citep{2015PhRvD..91d2003V} for a more thorough description
+of some of the concepts we will discuss below.
+
+One main point about the nested sampling algorithm is that it starts by randomly drawing a certain number of samples (the number of
+which we call the number of live points, $N_{\rm live}$, which will be the constant number of ``active'', or ``live'', samples),  
+where a sample is a vector containing a value for each parameter $\vec{\theta}$, from the prior distribution (see \S\ref{sec:priorfuncs}).
+The samples must be independent draws. For each of these samples the likeihood will be calculated and the sample $\vec{\theta}_{\rm min}$
+corresponding to the minimum likelihood, $L_{\rm min} = p(\mathbf{B}|\vec{\theta}_{\rm min})$, will be noted. As the algorithm
+progresses the number of live points stays the
+same, but at each iteration a new sample will be added in place of the one with the minimum likelihood, and therefore the
+minimum likelihood will continuously be updated to be the minimum value for the current set of points.
+
+\subsection{Proposal functions}
+
+The nested sampling algorithm requires a way to draw new samples from the parameter space that is being explored. The
+particular requirement for nested sampling is that any new sample is an independent draw from a constrained version
+of prior probabilty function for each parameter. The constraint is that the new sample's likelihood must be greater
+than the current value of $L_{\rm min}$, e.g. for a single parameter $x$, the probability of drawing a point at $x_i$ 
+would be
+\begin{equation}
+ p(x=x_i|I)_{\rm constrained} = \begin{cases}
+             p(x=x_i|I) & \text{if~} p(\mathbf{B}|x_i) > L_{\rm min}, \\
+             0 & \text{otherwise},
+            \end{cases}
+\end{equation}
+where $p(x|I)$ is the prior on $x$.
+
+There are various methods to sample from the constrained prior, the simplest of which is just to samples from the full
+prior and only accept a sample if it meets the likelihood constraint. However, such a simple method soon becomes very
+inefficient if the likelihood gets more and more tightly concentracted within the prior volume (which can happen rapidly
+for high-dimensional problems). One popular nested sampling method is MultiNest \citep{2009MNRAS.398.1601F}, which performs
+the sampling by calculating a set of ellipsoids bounding the live points and drawing points uniformly from within them.
+Various other approaches exist such as Diffusive Nested Sampling \citet{Brewer2011,2016arXiv160603757B} and POLYCHORD \citet{2015MNRAS.450L..61H}.
+
+The version of nested sampling used in the \lalinf library, as used by our code, makes use of a Markov chain Monte Carlo (MCMC) approach to
+drawing new samples \citep{Veitch:2010}. The MCMC attempts to sample from the constrained prior distributions in an efficient manner, with
+the final sample of the chain being a statistically independent samples from the rest of the live points. To sample most efficiently
+the MCMC requires a proposal distribution that closely resembles the underlying constrain prior that it is trying to sample from.
+\lalinf has a variety of potential proposal distributions \citep{2015PhRvD..91d2003V}, but our code currently allows five different
+proposals, that can be used in different proportions:
+\begin{description}
+ \item[Ensemble walk] This is one of the affine invarient ensemble proposals described by \citet{GoodmanWeare}, which adopt the
+ scale and shape of the current set of samples. The hard-coded setup in \lalinf is that three samples randomly drawn from a cache
+ of samples are used to define the walker samples. This is the main default proposal of our code, and is used as the proposal
+ 75\% of the time.
+ \item[Ensemble stretch] This is another affine invarient ensemble proposal described by \citet{GoodmanWeare}, and makes use of
+ two samples randomly drawn from the sample cache. By default this proposal is not used at all.
+ \item[Differential evolution] This is similar to the stretch proposal in that it uses two samples randomly drawn from the sample
+ cache. By default this proposal is not used at all.
+ \item[Uniform proposal] This proposal just draws points from their full prior for parameters that have a uniform prior specified.
+ This proposal ise used 25\% of the time by default.
+ \item[Frequency jump] This proposal tries jumping between Fourier frequency bins if frequency is one of the required parameters.
+ This proposal has not been tested and, by default, is not used at all.
+\end{description}
+The cache of samples mentioned above, and used by the nested sampling algorithm, is the set of live points, but this cache is
+only updated on iterations of the algorithm that are a factor of 10\% of the number of live points.
+
+The length of each MCMC run can be chosen by the user, but by default it is automatically set within the code. To do this,
+at the same rate as the cache is updated, the autocorrelation length of the parameters is calculated. A random sample from the current
+live points in chosen, and evolved via the MCMC, and the autocorrelation length of each parameter is calculated, $\vec{{\rm acl}}$. The number
+of MCMC iterations, $n_{\rm MCMC}$, is then chosen as $n_{\rm MCMC} = {\rm min}({\rm max}(\vec{{\rm acl}}), 5000)$, where 5000 is
+a hardcoded maximum length.
+
+\subsubsection{Testing proposals}
+
+We would like to test whether the above proposals lead to accurate calculations of the evidence integral as given in Equation~\ref{eq:evidence}.
+It is especially interesting to do this over ranges of prior volumes that are initially similar to the posterior volume, but then diverge to be
+much larger than the posterior volume (or in other words, as the information gain, or Kullback–Leibler divergence, increases). To do this
+we have created a simple dataset consisting of 1440 complex samples drawn from a Gaussian distribution (and sampled at 1/60\,Hz) and, assuming
+a signal model of the form given by Equation~\ref{eq:h2f} (but using the $h_0$ amplitude convention), calculated the signal model evidence
+by numerically integrating over $h_0$, whilst holding the other parameters fixed at zero, for a uniform prior (where the prior's lower range was zero
+and upper range was set to a value at which the likelihood was very small). We have then run our code multiple times over using a range of 
+upper values on a uniform prior on $h_0$ (starting at the same value as used for the numerical calculation) using different combinations of
+.
+

@@ -42,7 +42,7 @@ opts = parser.parse_args()
 
 # the base directory
 basedir = opts.rundir
-if not os.path.isidr(basedir):
+if not os.path.isdir(basedir):
   print("Error... base directory '%s' does not exist." % basedir, file=sys.stderr)
   sys.exit(1)
 

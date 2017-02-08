@@ -79,8 +79,7 @@ if not os.path.isdir(logdir):
 # setup Condor sub file for runs
 subfile = os.path.join(basedir, 'ppen.sub')
 fp = open(subfile, 'w')
-subfiletxt = """
-universe = vanilla
+subfiletxt = """universe = vanilla
 executable = %s
 arguments = " --prior-file $(macroprior) --Nmcmcinitial 0 --outfile $(macrooutfile) --Nlive %d --test-gaussian-likelihood --test-gaussian-mean %s --test-gaussian-sigma %s --uniformprop %d --ensembleWalk %d --ensembleStretch %d"
 getenv = True
@@ -98,8 +97,7 @@ fp.close()
 # setup sub file for lalapps_nest2pos jobs
 n2psubfile = os.path.join(basedir, 'n2p.sub')
 fp = open(n2psubfile, 'w')
-subfiletxt = """
-universe = vanilla
+subfiletxt = """universe = vanilla
 executable = %s
 arguments = "  -p $(macropost) $(macronest) "
 getenv = True
@@ -121,8 +119,7 @@ if not os.path.isfile(opts.extract):
 
 extractsubfile = os.path.join(basedir, 'extract.sub')
 fp = open(extractsubfile, 'w')
-subfiletxt = """
-universe = vanilla
+subfiletxt = """universe = vanilla
 executable = %s
 arguments = " $(macropost) "
 getenv = True
@@ -140,10 +137,9 @@ fp.close()
 # sub file for removing files
 rmsubfile = os.path.join(basedir, 'rm.sub')
 fp = open(rmsubfile, 'w')
-subfiletxt = """
-universe = local
+subfiletxt = """universe = local
 executable = /bin/rm
-arguments = " $(macrofile) "
+arguments = " -f $(macrofile) "
 getenv = True
 log = %s
 error = %s

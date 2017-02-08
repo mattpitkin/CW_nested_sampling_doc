@@ -44,14 +44,14 @@ if not os.path.isdir(basedir):
   print("Error... base directory '%s' does not exist." % basedir, file=sys.stderr)
   sys.exit(1)
 
-if opt.maxval is None:
+if opts.maxval is None:
   # set the maximum values of the prior distribution
   maxvals = [1e-22, 1e-21, 1e-20, 1e-19, 1e-18, 1e-17, 1e-16, 1e-15, 1e-14, 1e-13]
 else:
   maxvals = [float(v) for v in opts.maxval]
 
 # get code path
-cpath = opt.execpath
+cpath = opts.execpath
 if not os.path.isdir(cpath):
   print("Error... path to executable files '%s' does not exist." % cpath, file=sys.stderr)
   sys.exit(1)
@@ -67,9 +67,9 @@ if not os.path.isfile(ppen):
   sys.exit(1)
 
 # set the numbers of live points to run with
-nlive = opt.nlive
+nlive = opts.nlive
 # set the number of runs with each case
-Nruns = opt.niter
+Nruns = opts.niter
 
 # create log directory if it doesn't exist
 logdir = os.path.join(basedir, 'log')

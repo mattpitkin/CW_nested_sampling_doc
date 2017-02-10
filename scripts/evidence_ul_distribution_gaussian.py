@@ -72,7 +72,7 @@ subfile = os.path.join(basedir, 'runtestgauss.sub')
 fp = open(subfile, 'w')
 subfiletxt = """universe = vanilla
 executable = %s
-arguments = " --outfile $(macrooutfile) --Nlive %d --gauss-mean %s --gauss-sigma %s --uniformprop %d --ensembleWalk %d --ensembleStretch %d --exec-path %s --priorfile $(macroprior) "
+arguments = " --outfile $(macrooutfile) --Nlive %d --gauss-mean %s --gauss-sigma %s --uniformprop %d --walkprop %d --stretchprop %d --exec-path %s --priorfile $(macroprior) "
 getenv = True
 log = %s
 error = %s

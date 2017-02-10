@@ -14,6 +14,7 @@ import numpy as np
 import argparse
 from scipy import stats
 from scipy.special import erf
+import subprocess as sp
 
 from lalapps.pulsarpputils import pulsar_nest_to_posterior as pn2p
 from lalapps.pulsarpputils import upper_limit_greedy as ulg
@@ -36,7 +37,7 @@ parser.add_argument("-u", "--uniformprop", dest="uniformprop", type=int, default
 parser.add_argument("-w", "--walkprop", dest="walkprop", type=int, default=1, help="Set the amount of time to use the ensemble walk proposal [default: %(default)s]")
 parser.add_argument("-s", "--stretchprop", dest="stretchprop", type=int, default=0, help="Set the amount of time to use the ensemble stretch proposal [default: %(default)s]")
 parser.add_argument("-x", "--priorfile", dest="priorfile", default=None, help="Set a prior file to use, if not specifying max and min ranges")
-parser.add_argument("-r", "--dont-remove", dest="drm", action=store_true, default=False, help="Set to NOT remove files (will be removed by default)")
+parser.add_argument("-r", "--dont-remove", dest="drm", action='store_true', default=False, help="Set to NOT remove files (will be removed by default)")
 
 # parse input options
 opts = parser.parse_args()
@@ -130,7 +131,7 @@ except:
   sys.exit(1)
 
 # get the information and work out the expected error in the logZ value
-hdf = h5py.File(infile, 'r')
+hdf = h5py.File(postfile, 'r')
 a = hdf['lalinference']['lalinference_nest']
 info = a.attrs['information_nats']
 nlive = a.attrs['number_live_points']

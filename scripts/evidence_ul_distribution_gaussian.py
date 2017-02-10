@@ -18,7 +18,6 @@ import os
 import sys
 import uuid
 import argparse
-import subprocess as sp
 
 # import some pulsar utilities
 from lalapps import pulsarpputils as pppu

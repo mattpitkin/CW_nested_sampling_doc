@@ -19,9 +19,6 @@ import sys
 import uuid
 import argparse
 
-# import some pulsar utilities
-from lalapps import pulsarpputils as pppu
-
 parser = argparse.ArgumentParser( )
 parser.add_argument("-i", "--niter", dest="niter", default=100, type=int, help="Set the number of runs for each maximum prior value [default: %(default)s]")
 parser.add_argument("-N", "--Nlive", dest="nlive", default=1024, type=int, help="Set the number of live points to use [default: %(default)s]")

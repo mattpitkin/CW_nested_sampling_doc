@@ -121,7 +121,7 @@ extractsubfile = os.path.join(basedir, 'extract.sub')
 fp = open(extractsubfile, 'w')
 subfiletxt = """universe = vanilla
 executable = %s
-arguments = " $(macropost) "
+arguments = " --gauss-mean %s --gauss-sigma %s --min-val 0.0 --max-val $(macromax) $(macropost) "
 getenv = True
 log = %s
 error = %s
@@ -129,7 +129,7 @@ output = %s
 notification = never
 accounting_group = ligo.dev.o1.cw.targeted.bayesian
 queue 1
-""" % (opts.extract, os.path.join(logdir, 'extract-$(cluster).log'), \
+""" % (opts.extract, opts.mean, opts.sigma, os.path.join(logdir, 'extract-$(cluster).log'), \
        os.path.join(logdir,'extract-$(cluster).err'), os.path.join(logdir,'extract-$(cluster).out'))
 fp.write(subfiletxt)
 fp.close()
@@ -187,7 +187,7 @@ for i, maxv in enumerate(maxvals):
 
     # write out job for extracting values
     uiextract = uuid.uuid4().hex
-    dagstr = 'JOB %s %s\nRETRY %s 0\nVARS %s macropost=\"%s\"\n' % (uiextract, extractsubfile, uiextract, uiextract, outfilepost)
+    dagstr = 'JOB %s %s\nRETRY %s 0\nVARS %s macromax=\"%s\" macropost=\"%s\"\n' % (uiextract, extractsubfile, uiextract, uiextract, str(maxv), outfilepost)
     fp.write(dagstr)
 
     # write out job for removing nested samples files and posterior files

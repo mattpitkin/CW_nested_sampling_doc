@@ -49,17 +49,31 @@ basedir = os.path.dirname(outfile)
 
 # check minimum and maximum prior ranges are valid, or if a prior file has been passed
 priorfile = None
+minv = 0.
+maxv = np.inf
 if opts.minv is not None and opts.maxv is not None:
-  if opts.minv > opts.maxv:
-    print("Error... minimum prior ranges is greater than maximum.", file=sys.stderr)
-    sys.exit(1)
+  minv = opts.minv
+  maxv = opts.maxv
 elif opts.priorfile is not None:
   priorfile = opts.priorfile
   if not os.path.isfile(priorfile):
     print("Error... prior file '%s' does not exist." % priorfile, file=sys.stderr)
     sys.exit(1)
+  try:
+    fp = open(priorfile, 'r')
+    l = fp.readline().split()
+    fp.close()
+    minv = float(l[-2].strip())
+    maxv = float(l[-1].strip())
+  except:
+    print("Error... could not read minimum and maximum range from prior file.", file=sys.stderr)
+    sys.exit(1)
 else:
   print("Error... must either specify a max and min prior range, or give a prior file.", file=sys.stderr)
+  sys.exit(1)
+
+if minv > maxv:
+  print("Error... minimum prior ranges is greater than maximum.", file=sys.stderr)
   sys.exit(1)
 
 # get code path
@@ -82,7 +96,7 @@ if not os.path.isfile(n2p) or not os.access(n2p, os.X_OK):
 if priorfile is None:
   priorfile = os.path.splitext(outfile)[0]+'.prior'
   fp = open(priorfile, 'w')
-  fp.write("H0 uniform {} {}\n".format(opts.minv, opts.maxv))
+  fp.write("H0 uniform {} {}\n".format(minv, maxv))
   fp.close()
 
 # check proposal ratios
@@ -140,7 +154,7 @@ onesigerror = np.sqrt(info/nlive)
 
 # get the two-sided KS statistic p-value
 try:
-  D, ksp = stats.kstest(post['H0'].samples[:,0], truncgauss_cdf, args=(opts.mean, opts.sigma, opts.minv, opts.maxv))
+  D, ksp = stats.kstest(post['H0'].samples[:,0], truncgauss_cdf, args=(opts.mean, opts.sigma, minv, maxv))
 except:
   print("Warning... could not perform KS test.", file=sys.stderr)
   ksp = 0.

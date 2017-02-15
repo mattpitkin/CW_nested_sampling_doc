@@ -65,15 +65,48 @@ live points in chosen, and evolved via the MCMC, and the autocorrelation length 
 of MCMC iterations, $n_{\rm MCMC}$, is then chosen as $n_{\rm MCMC} = {\rm min}({\rm max}(\vec{{\rm acl}}), 5000)$, where 5000 is
 a hardcoded maximum length.
 
-\subsubsection{Testing proposals}
+\subsubsection{Testing the proposals}
 
-We would like to test whether the above proposals lead to accurate calculations of the evidence integral as given in Equation~\ref{eq:evidence}.
+We would like to test whether some of the above proposals lead to accurate calculations of the evidence integral as given in Equation~\ref{eq:evidence}.
 It is especially interesting to do this over ranges of prior volumes that are initially similar to the posterior volume, but then diverge to be
-much larger than the posterior volume (or in other words, as the information gain, or Kullback–Leibler divergence, increases). To do this
-we have created a simple dataset consisting of 1440 complex samples drawn from a Gaussian distribution (and sampled at 1/60\,Hz) and, assuming
-a signal model of the form given by Equation~\ref{eq:h2f} (but using the $h_0$ amplitude convention), calculated the signal model evidence
-by numerically integrating over $h_0$, whilst holding the other parameters fixed at zero, for a uniform prior (where the prior's lower range was zero
-and upper range was set to a value at which the likelihood was very small). We have then run our code multiple times over using a range of 
-upper values on a uniform prior on $h_0$ (starting at the same value as used for the numerical calculation) using different combinations of
-.
+much larger than the posterior volume (or in other words, as the information gain, or Kullback–Leibler divergence, increases). To do this our
+code has the option of setting a one-dimensional Gaussian distribution as the likelihood function, and using a flat prior bounded between $A$ and $B$,
+and working out the evidence. Analytically the evidence is given by
+\begin{align}
+ Z &= \int_A^B \frac{1}{\sqrt{2\pi}\sigma}\exp{\left(-\frac{(x-\mu)}{2\sigma^2} \right)}\frac{1}{(B-A)} {\rm d}x, \nonumber \\
+   &= \frac{1}{2(B-A)}\left(\erf{\left[\frac{(\mu-A)}{\sqrt{2}\sigma}\right]}-\erf{\left[\frac{(\mu-B)}{\sqrt{2}\sigma}\right]}\right).
+\end{align}
+As we are often interested in setting upper limits of, for example, the \gw amplitude $h_0$, we can also use the test to see if the
+upper limits we obtain from the posterior samples match the expected upper limit obtained (via root finding) from the CDF of the distribution
+\begin{equation}
+ {\rm UL(x)} = \frac{1}{2a}\left(\erf{\left[\frac{(\mu-A)}{\sqrt{2}\sigma}\right]} - \erf{\left[\frac{(\mu-x)}{\sqrt{2}\sigma}\right]}\right),
+\end{equation}
+where $a = (\erf{\left[(\mu - A)/\sqrt{2}\sigma\right]} - \erf{\left[(\mu - B)/\sqrt{2}\sigma\right]})/2$ is the area under the distribution.
+We can calculate the true Kullback-Leibler divergence for via
+\begin{align}
+ D_{\rm KL} =& \int_A^B p(x)\ln{\left(\frac{p(x)}{q(x)}\right)} {\rm d}x, \nonumber \\
+ =& \frac{1}{2}\Bigg[\frac{(B-\mu)}{\sqrt{2\pi\sigma^2}}\exp{\left(-\frac{(B-\mu)^2}{2\sigma^2}\right)} - \nonumber \\
+ & \erf{\left(\frac{(B-\mu)}{\sqrt{2}\sigma}\right)}\frac{1+2K+\ln{2\pi\sigma^2}}{2} - \nonumber \\
+ & \frac{(A-\mu)}{\sqrt{2\pi\sigma^2}}\exp{\left(-\frac{(A-\mu)^2}{2\sigma^2}\right)} + \nonumber \\
+ & \erf{\left(\frac{(A-\mu)}{\sqrt{2}\sigma}\right)}\frac{1+2K+\ln{2\pi\sigma^2}}{2}\Bigg],
+\end{align}
+where $p(x)$ and $q(x)$ are the posterior and prior distributions respectively, and $K = \ln{q(x)} = -\ln{(B-A)}$.
+A final thing that we can check, on top of the upper limit value, is whether the posterior samples appear to be drawn from the posterior
+distribution. To do this we use a Kolmogorov-Smirnov test comparing the CDF of the samples with the analytical CDF and calculating the
+two-sided $p$-value for the null hypothesis that the two distributions are the same.
+
+In the tests below we have run the code on this Gaussian likelihood by with a Gaussian of zero mean and $\sigma = 10^{-24}$, truncated at zero
+by fixing the lower prior bound to $A=0$. This is similar to the form of the likelihood seen in pulsar searches when no signal is present.
+We have then set a range of upper bounds, $B$ from $10^{-23}$ to $10^{-13}$ increasing by a factor of ten each time, and a range of numbers of
+live points from $2^9$ to $2^{13}$ increasing by powers of two each time. For each combination of upper bound and number of live points we have
+run the code on the test Gaussian likelihood 100 times to see the statistical spread of the output.
+
+In the first test we check how just using the ensemble walk proposal fairs at estimating the evidence, upper limit, and posterior distribution.
+Show plots
+For walk
+N live: 512, linear fit ln(Z/Z_true) = -0.24 + 0.09(KL-div)
+N live: 1024, linear fit ln(Z/Z_true) = -0.20 + 0.12(KL-div)
+N live: 2048, linear fit ln(Z/Z_true) = -0.14 + 0.13(KL-div)
+N live: 4096, linear fit ln(Z/Z_true) = -0.08 + 0.14(KL-div)
+N live: 8192, linear fit ln(Z/Z_true) = -0.04 + 0.14(KL-div)
 

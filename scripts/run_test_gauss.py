@@ -163,7 +163,7 @@ except:
 try:
   of = os.path.splitext(outfile)[0]+'_stats.txt'
   fp = open(of, 'w')
-  fp.write("%.12e\t%.6e\t%.6e\t%.6f\n" % (B, ul, onesigerror, ksp))
+  fp.write("%.12e\t%.6e\t%.6e\t%.6e\n" % (B, ul, onesigerror, ksp))
   fp.close()
 except:
   print("Error... could not output upper limit and odds to file.", file=sys.stderr)

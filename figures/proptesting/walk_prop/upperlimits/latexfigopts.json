@@ -1,4 +1,5 @@
 {
 "figure_env": "figure*",
-"width": "1\\textwidth"
+"width": "0.92\\textwidth",
+"placement": "phtb"
 }

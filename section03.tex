@@ -113,26 +113,41 @@ of live points are shown in Table~\ref{tab:klvsz}. It is interesting to note tha
 systematic offset) are consistent with the expected range given by the error bars, and calculated using $\sqrt{I/N_{\rm live}}$, where
 $I$ is the mean of the {\it information} (in nats) returned by the nested sampling algorithm for each run.
 
-\begin{deluxetable}{l c c}[!h]
-\tabletypesize{\footnotesize}
-\tablecaption{Linear coefficient in fits of $\ln{(Z/Z_{\rm true})} = mD_{\rm KL} + c$ from the results
+\begin{table}[h]
+\caption{Linear coefficient in fits of $\ln{(Z/Z_{\rm true})} = mD_{\rm KL} + c$ from the results
 shown in Figure~\ref{fig:walkpropevs} for differing numbers of live points.\label{tab:klvsz}}
-\tablehead{
-\colhead{$N_{\rm live}$} &
-\colhead{$c$} &
-\colhead{$m$}}
-\startdata
+\begin{tabular}{l c c}
+\hline
+$N_{\rm live}$ & $c$ & $m$ \\
+\hline
 512 & $-0.24$ & 0.09 \\
 1024 & $-0.20$ & 0.12 \\
 2048 & $-0.14$ & 0.13 \\
 4096 & $-0.08$ & 0.14 \\
-8192 & $-0.04$ & 0.14
-\enddata
-\end{deluxetable}
+8192 & $-0.04$ & 0.14 \\
+\hline
+\end{tabular}
+\end{table}
 
 Figure~\ref{fig:walkpropuls} shows the distribution of 95\% upper limits on the $x$ parameter in Equation~\ref{eq:testcdf} (calculated by solving
 the equation for ${\rm UL}(x) = 0.95$). It can be seen that, other than for the narrowest prior range, there is a systematic bias towards the
-upper limit being underestimated by $\sim 2\%$.
+upper limit being underestimated by $\sim 2\%$. Figure~\ref{fig:walkpropks} show the distribution of two-sided $p$-values from a Kolmogorov-Smirnov
+test comparing the CDF of posterior samples against the analytical CDF in Equation~\ref{eq:testcdf}. The $p$-value null hypothesis is that both
+distributions are the same, and it should be noted that we performed 100 trials for each prior range value and number of live points. For the
+lower numbers of live points the distributions appear to be consistent, however, for larger numbers of live points the distributions are rather
+inconsistent a large amount of the time. This is most likely due to differences in distributions showing up more obviously when there are more
+posterior samples to use.
 
 The systematic biases in evidence values and upper limits may not be major problem, but does point towards there being some issue with the
 implememtation of the ensemble walk proposal.
+
+In the second test we have check what happens with the codes current default proposal settings: using the ensemble walk proposal 75\%
+of the time and the uniform proposal 25\% of the time. It should be noted that this default is not an accident and came about from tests
+similar to these when just using the ensemble walk proposal.
+
+Figure~\ref{fig:walkunipropevs} shows the evidence distributions equivalent to those in Figure~\ref{fig:walkpropevs}. However, what can
+be seen in this case is that there is no obvious systematic bias as a function of $D_{\rm KL}$, and the statistical uncertainty is
+consistent with expectations (as shown by the error bars). Similarly, the upper limits and Kolmogorov-Smirnov $p$-values shown in
+Figures~\ref{fig:walkunipropuls} and \ref{fig:walkunipropks} respectively are consistent. The reason why this combination of proposals
+seems to work whereas the ensemble walk proposal on its own does not is currently not understood, but we plan more work on figuring this
+out.

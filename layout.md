@@ -8,6 +8,12 @@ figures/priors/loguniform/loguniform.png
 figures/priors/fermidirac/fermidirac.png
 figures/changepoint/changepoint.png
 section03.tex
+figures/proptesting/walk_prop/evidences/collate_plots_wp_evidences.png
+figures/proptesting/walk_prop/upperlimits/collate_plots_wp_uls.png
+figures/proptesting/walk_prop/kstest/collate_plots_wp_ks.png
+figures/proptesting/walk_uniform_prop/evidences/collate_plots_wup_evidences.png
+figures/proptesting/walk_uniform_prop/upperlimits/collate_plots_wup_uls.png
+figures/proptesting/walk_uniform_prop/kstest/collate_plots_wup_ks.png
 section04.tex
 section05.tex
 appendix01.tex

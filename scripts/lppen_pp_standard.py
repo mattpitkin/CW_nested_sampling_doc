@@ -22,12 +22,11 @@ from ConfigParser import ConfigParser
 import lalapps.pulsarpputils as pppu
 
 # set of SNRs to use
-#snrs = [0., 2., 4., 6., 8., 10., 12., 14., 16., 18., 20.]
-snrs = [0., 2.]
+snrs = [0., 2., 4., 6., 8., 10., 12., 14., 16., 18., 20.]
 
 # run base directory (on RAVEN)
-#basedir = '/home/sismp/projects/testing/pp_standard'
-basedir = '/home/matthew/testing/lalapps_knope_O2/outdir'
+basedir = '/home/sismp2/projects/testing/pp_standard'
+#basedir = '/home/matthew/testing/lalapps_knope_O2/outdir'
 
 logdir = os.path.join(basedir, 'log')
 if not os.path.isdir(logdir):
@@ -44,7 +43,7 @@ nruns = 2    # number of parallel runs for each analysis
 # create sub file for running run_lppen.py
 subfile = os.path.join(basedir, 'lppen.sub')
 subdata = """universe = vanilla
-executable = /home/sismp2/repositories/CW_nest_sampling_doc/scripts/run_lppen.py
+executable = /home/sismp2/repositories/CW_nested_sampling_doc/scripts/run_lppen.py
 arguments = " $(macroinifile) "
 getenv = True
 log = %s
@@ -65,7 +64,7 @@ fp = open(dagfile, 'w')
 
 # set flat prior ranges
 h0range = [0., 1e-20]
-phi0range = [0., 2.*np.pi]
+phi0range = [0., np.pi]
 psirange = [0., np.pi/2.]
 cirange = [-1., 1.]
 
@@ -75,8 +74,8 @@ priorstr = """'H0 uniform {} {}\\nPHI0 uniform {} {}\\nPSI uniform {} {}\\nCOSIO
 # set fixed h0 value (that will be scale to SNR)
 h0fixed = 1e-24
 
-lppenexec = '/home/sismp2/lscsoft/.virtualenv/lalapps_knope_O2/bin/lalapps_pulsar_parameter_estimation_nested'
-n2pexec = '/home/sismp2/lscsoft/.virtualenv/lalapps_knope_O2/bin/lalapps_nest2pos'
+lppenexec = '/home/sismp2/lscsoft/.virtualenvs/lalapps_knope_O2/bin/lalapps_pulsar_parameter_estimation_nested'
+n2pexec = '/home/sismp2/lscsoft/.virtualenvs/lalapps_knope_O2/bin/lalapps_nest2pos'
 
 datasigma = [1e-22, 1e-22] # data standard deviation
 
@@ -105,6 +104,7 @@ for snr in snrs:
     cprun.set('run', 'outdir', outdir)
     cprun.set('run', 'outname', 'nest_%04d' % i)
     cprun.set('run', 'detectors', json.dumps(dets))
+    cprun.set('run', 'nruns', str(nruns))
 
     # set RA and DEC
     h, m, s = pppu.rad_to_hms(ras[i])

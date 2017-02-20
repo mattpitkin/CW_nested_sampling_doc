@@ -15,6 +15,7 @@ import argparse
 import json
 import uuid
 import ast
+import glob
 from scipy import stats
 import subprocess as sp
 from ConfigParser import ConfigParser
@@ -334,12 +335,11 @@ if not ipe:
       print("Error... injection parameters must be a dictionary" % outdir, file=sys.stderr)
       sys.exit(1)
     else:
-      pp = injpardet[i]
-      for key in pp.keys():
-        if key not in hetpars:
-          injpardet[i][key] = pp[key]  
-  
-  injpardata = ast.literal_eval(get_with_default(cp, 'injection', 'injdata', "["+defaultinjpar.format(**dip)+"]"))
+      for key in dip:
+        if key not in injpardet[i]:
+          injpardet[i][key] = dip[key]
+ 
+  injpardata = ast.literal_eval(get_with_default(cp, 'injection', 'injdata', "["+defaultinjpar+"]"))
   if len(injpardata) == 1:
     injpardata = [injpardata[0] for i in range(ndets)]
 
@@ -467,13 +467,24 @@ if not opts.drm:
   
     # remove posterior samples
     for f in outpost:
-      os.remove(ff)
+      os.remove(f)
     
+    # remove SNR and Znoise files
+    fs = glob.glob(os.path.join(outdir, '*_SNR'))
+    for f in fs:
+      os.remove(f)
+
+    fs = glob.glob(os.path.join(outdir, '*_Znoise'))
+    for f in fs:
+      os.remove(f)
+
     # remove data files (if not previously existing files)
     if not dfe:
       for d in idets:
         os.remove(datafilesdict[d])
-        os.remove(injectoutputs[d]+'*')
+        fs = glob.glob(injectoutputs[d]+'*')
+        for f in fs:
+          os.remove(f)
 
     # remove par file
     if not parfe:

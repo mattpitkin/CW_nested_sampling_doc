@@ -1,1 +1,37 @@
-\section{Evaluating the parameter estimation}
+\section{Evaluating the code}
+
+In this section we will show how the posterior parameter distributions that we can generate from the output
+of our nested sampling code compare to evaluating them on a grid, or with a previous implementation of the analysis code
+\citep[\lppe used in e.g.][]{2014ApJ...785..119A} using a (generally inefficient) MCMC algorithm. We will show this for
+simulated data containing purely Gaussian noise and containing fake signals added to Gaussian noise. We will also
+show this for some hardware injections (signals directly induced in detector data) in real LIGO data from the fifth
+science run (S5).
+
+We will also directly compare some S5 results for searches for real signals from pulsars with those previously published
+\citep{2010ApJ...713..671A}.
+
+Finally we show how the odds comparing a signal model and a noise only model change with signal-to-noise ratio, along
+with comparing coherent verses incoherent signals (for coherent simulated signal and incoherent simulations).
+
+Add p-p plots!
+
+\subsection{Simulated data}
+
+In each of the tests below we will be running our code (\lppen) using the default proposal distributions discussed in \S\ref{sec:proposals}
+and with the number of live points fixed to be 2048. We will also assume a source at a fixed sky position with right ascension of
+\hms{00}{00}{00}{0} and declination \dms{00}{00}{00}{0}. The simulated data in all cases will be generated as the complex heterodyned
+time series with 1440 points samples once per minute. When comparisons between the current code and previous codes are 
+made we run the current code in a way that splits datasets into 30 point chunks, rather than using the algorithm described in \S{sec:splitting},
+as this makes it consistent with the old code (\lppe). We also purely use the uniform prior ranges for the amplitude parameter to be
+consistent between codes.
+
+\subsubsection{Simulated noise}
+
+An initial test of the code is whether the output posterior probability distributions match those produced when evaluating the
+posterior over a fixed grid in the four-dimensional parameter space of $\vec{\theta} = \{h_0, \cos{\iota}, \psi, \phi_0\}$, when
+using purely Gaussian noise.\footnote{It is worth noting that in many of these tests the polarisation angle prior covers $-\pi/4$ to $\pi/4$
+rather than the 0 to $\pi/2$ range given in, e.g., \citet{2015MNRAS.453.4399P} due to this being the range required by the older
+parameter estimation MCMC code. Although this range is degenerate to rotations over $\pi/2$, so spans the same range of waveform models}
+A comparison of the marginalised posteriors for individual parameters, and pairs of parameters, are shown when using simulated data for
+a single detectors (the LIGO Hanford detector, H1, and Livingston detector, L1), and the two detectors combined coherently, is shown
+in Figure~\ref{}.

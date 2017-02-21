@@ -160,7 +160,7 @@ if not os.path.isdir(outdir):
 outname = get_with_default(cp, 'run', 'outname', 'nest'+uuid.uuid4().hex) # default to random string
 
 # get number of nested sample runs
-nruns = ast.literal_eval(get_with_default(cp, 'run', 'nruns', 1))
+nruns = ast.literal_eval(get_with_default(cp, 'run', 'nruns', '1'))
 if nruns < 1:
   print("Warning... number of nested sample runs is less than 1, default to 1 run", file=sys.stderr)
   nruns = 1
@@ -298,6 +298,11 @@ for line in fp.readlines():
   else:
     varpars.append(line.split()[0].strip())
 
+# check if using ROQ
+roq = ast.literal_eval(get_with_default(cp, 'nestedsampling', 'roq', 'False'))
+roqtraining = ast.literal_eval(get_with_default(cp, 'nestedsampling', 'roqntraining', '2500'))
+roqtolerance = ast.literal_eval(get_with_default(cp, 'nestedsampling', 'roqtolerance', '5e-12'))
+
 # simulated injection information
 injsnr = ast.literal_eval(get_with_default(cp, 'injection', 'snr', 0.0)) # injection SNR (scale injection to this SNR)
 injpar = ast.literal_eval(get_with_default(cp, 'injection', 'parfile', "['%s']" % os.path.join(outdir, 'inj_{}_pulsar.par'))) # injection par file for each detector (can be different if wanting incoherent signals)
@@ -365,10 +370,13 @@ cis = {}
 ainjpars = {}
 for j in range(len(dets)):
   ci = {}
-  
+
   extraargs = ""
   if j < ndets and not dfe: # doing single detector analyses
     extraargs += "--inject-file {} --inject-output {} --scale-snr {}".format(injpar[j].format(dets[j]), injectoutputs[dets[j]], injsnr)
+
+  if roq:
+    extraargs += " --roq --ntraining {} --roq-tolerance {}".format(roqtraining, roqtolerance)
 
   snrs = []
 

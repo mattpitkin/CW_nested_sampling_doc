@@ -120,7 +120,7 @@ for i in range(nsigs):
   cprun.add_section('data')
   cprun.set('data', 'sigma', json.dumps(datasigma))
   cprun.set('data', 'start', json.dumps([900000000]))
-  cprun.set('data', 'step', json.dumps([60))
+  cprun.set('data', 'step', json.dumps([60]))
   cprun.set('data', 'length', json.dumps([1440]))
 
   # set nested sampling parameters

@@ -21,8 +21,16 @@ from ConfigParser import ConfigParser
 
 import lalapps.pulsarpputils as pppu
 
-# set of SNRs to use
-snrs = [0., 2., 4., 6., 8., 10., 12., 14., 16., 18., 20.]
+# range of (multi-detector) SNRs to use
+snrrange = [0., 20.]
+# set flat prior ranges on other parameters
+h0range = [0., 1e-20]
+phi0range = [0., np.pi]
+psirange = [0., np.pi/2.]
+cirange = [-1., 1.]
+
+# set fixed h0 value (that will be scale to SNR)
+h0fixed = 1e-24
 
 # run base directory (on RAVEN)
 basedir = '/home/sismp2/projects/testing/pp_standard'
@@ -35,7 +43,19 @@ if not os.path.isdir(logdir):
 # detectors to use
 dets = ['H1', 'L1']
 
-nsigs = 100 # number of signals per SNR
+nsigs = 2000 # total number of signals
+
+# generate signal parameters
+snrs = np.random.rand(nsigs)*np.diff(snrrange)[0] # randomly distributed SNRs
+# generate RA and dec values uniformly over the sky
+ras = 2.*np.pi*np.random.rand(nsigs)
+decs = -(np.pi/2.) + np.arccos(2.*np.random.rand(nsigs) - 1.)
+
+# set injection parameters
+h0s = np.ones(nsigs)*h0fixed
+phi0s = phi0range[0] + np.diff(phi0range)[0]*np.random.rand(nsigs)  # phi0 value
+psis = psirange[0] + np.diff(psirange)[0]*np.random.rand(nsigs)     # psi value
+cis = cirange[0] + np.diff(cirange)[0]*np.random.rand(nsigs)        # cos(iota) value
 
 nlive = 1024 # number of live points
 nruns = 2    # number of parallel runs for each analysis
@@ -62,95 +82,69 @@ fp.close()
 dagfile = os.path.join(basedir, 'lppen.dag')
 fp = open(dagfile, 'w')
 
-# set flat prior ranges
-h0range = [0., 1e-20]
-phi0range = [0., np.pi]
-psirange = [0., np.pi/2.]
-cirange = [-1., 1.]
-
 priorstr = """'H0 uniform {} {}\\nPHI0 uniform {} {}\\nPSI uniform {} {}\\nCOSIOTA uniform {} {}'
 """.format(h0range[0], h0range[1], phi0range[0], phi0range[1], psirange[0], psirange[1], cirange[0], cirange[1])
-
-# set fixed h0 value (that will be scale to SNR)
-h0fixed = 1e-24
 
 lppenexec = '/home/sismp2/lscsoft/.virtualenvs/lalapps_knope_O2/bin/lalapps_pulsar_parameter_estimation_nested'
 n2pexec = '/home/sismp2/lscsoft/.virtualenvs/lalapps_knope_O2/bin/lalapps_nest2pos'
 
-datasigma = [1e-22, 1e-22] # data standard deviation
+datasigma = [1e-22] # data standard deviation
 
-for snr in snrs:
-  # generate RA and dec values uniformly over the sky
-  ras = 2.*np.pi*np.random.rand(nsigs)
-  decs = -(np.pi/2.) + np.arccos(2.*np.random.rand(nsigs) - 1.)
+for i in range(nsigs):
+  cprun = ConfigParser() # set config parser to output .ini configuration file
 
-  snrdir = os.path.join(basedir, 'snr%.1f' % snr)
-  if not os.path.isdir(snrdir):
-    os.makedirs(snrdir)
+  # set executables configuration
+  cprun.add_section('executables')
+  cprun.set('executables', 'lppen', lppenexec)
+  cprun.set('executables', 'n2p', n2pexec)
 
-  for i in range(nsigs):
-    cprun = ConfigParser() # set config parser to output .ini configuration file
+  # set run information
+  outdir = os.path.join(basedir, '%04d' % i)
+  if not os.path.isdir(outdir):
+    os.makedirs(outdir)
+  cprun.add_section('run')
+  cprun.set('run', 'outdir', outdir)
+  cprun.set('run', 'outname', 'nest_%04d' % i)
+  cprun.set('run', 'detectors', json.dumps(dets))
+  cprun.set('run', 'nruns', str(nruns))
 
-    # set executables configuration
-    cprun.add_section('executables')
-    cprun.set('executables', 'lppen', lppenexec)
-    cprun.set('executables', 'n2p', n2pexec)
+  # set RA and DEC
+  h, m, s = pppu.rad_to_hms(ras[i])
+  rastr = pppu.coord_to_string(h, m, s)
+  d, m, s = pppu.rad_to_dms(decs[i])
+  decstr = pppu.coord_to_string(d, m, s)
 
-    # set run information
-    outdir = os.path.join(snrdir, '%04d' % i)
-    if not os.path.isdir(outdir):
-      os.makedirs(outdir)
-    cprun.add_section('run')
-    cprun.set('run', 'outdir', outdir)
-    cprun.set('run', 'outname', 'nest_%04d' % i)
-    cprun.set('run', 'detectors', json.dumps(dets))
-    cprun.set('run', 'nruns', str(nruns))
+  cprun.set('run', 'hetparams', json.dumps({'RAJ': rastr, 'DECJ': decstr}))
 
-    # set RA and DEC
-    h, m, s = pppu.rad_to_hms(ras[i])
-    rastr = pppu.coord_to_string(h, m, s)
-    d, m, s = pppu.rad_to_dms(decs[i])
-    decstr = pppu.coord_to_string(d, m, s)
+  # set simulated data parameters
+  cprun.add_section('data')
+  cprun.set('data', 'sigma', json.dumps(datasigma))
+  cprun.set('data', 'start', json.dumps([900000000]))
+  cprun.set('data', 'step', json.dumps([60))
+  cprun.set('data', 'length', json.dumps([1440]))
 
-    cprun.set('run', 'hetparams', json.dumps({'RAJ': rastr, 'DECJ': decstr}))
+  # set nested sampling parameters
+  cprun.add_section('nestedsampling')
+  cprun.set('nestedsampling', 'nlive', str(nlive))
+  cprun.set('nestedsampling', 'priordata', priorstr)
 
-    # set simulated data parameters
-    cprun.add_section('data')
-    cprun.set('data', 'sigma', json.dumps(datasigma))
-    cprun.set('data', 'start', json.dumps([900000000, 900000000]))
-    cprun.set('data', 'step', json.dumps([60, 60]))
-    cprun.set('data', 'length', json.dumps([1440, 1440]))
+  cprun.add_section('injection')
+  cprun.set('injection', 'snr', str(snrs[i]))
+  cprun.set('injection', 'injparams', json.dumps([{'RAJ': rastr, 'DECJ': decstr, 'H0': h0s[i], 'PHI0': phi0s[i], 'PSI': psis[i], 'COSIOTA': cis[i]}]))
+  cprun.set('injection', 'coherent', 'True')
+
+  # write out configuration file
+  runconfig = os.path.join(outdir, 'config.ini')
+  fc = open(runconfig, 'w')
+  cprun.write(fc)
+  fc.close()
+
+  # write out to dag file
+  uippen = uuid.uuid4().hex
     
-    # set nested sampling parameters
-    cprun.add_section('nestedsampling')
-    cprun.set('nestedsampling', 'nlive', str(nlive))
-    cprun.set('nestedsampling', 'priordata', priorstr)
-    
-    # set injection parameters
-    if snr == 0.:
-      thish0 = 0.
-    else:
-      thish0 = h0fixed
-    thisphi0 = phi0range[0] + np.diff(phi0range)[0]*np.random.rand() # phi0 value
-    thispsi = psirange[0] + np.diff(psirange)[0]*np.random.rand()    # psi value
-    thisci = cirange[0] + np.diff(cirange)[0]*np.random.rand()       # cos(iota) value
-    cprun.add_section('injection')
-    cprun.set('injection', 'snr', str(snr))
-    cprun.set('injection', 'injparams', json.dumps([{'RAJ': rastr, 'DECJ': decstr, 'H0': thish0, 'PHI0': thisphi0, 'PSI': thispsi, 'COSIOTA': thisci}]))
-    cprun.set('injection', 'coherent', 'True')
-    
-    # write out configuration file
-    runconfig = os.path.join(outdir, 'config.ini')
-    fc = open(runconfig, 'w')
-    cprun.write(fc)
-    fc.close()
-
-    # write out to dag file
-    uippen = uuid.uuid4().hex
-    
-    # write out ppen job
-    dagstr = 'JOB {} {}\nRETRY {} 0\nVARS {} macroinifile=\"{}\"\n'.format(uippen, subfile, uippen, uippen, runconfig)
-    fp.write(dagstr)
+  # write out ppen job
+  dagstr = 'JOB {} {}\nRETRY {} 0\nVARS {} macroinifile=\"{}\"\n'.format(uippen, subfile, uippen, uippen, runconfig)
+  fp.write(dagstr)
 
 # close dag file
 fp.close()

@@ -33,8 +33,8 @@ cirange = [-1., 1.]
 h0fixed = 1e-24
 
 # run base directory (on RAVEN)
-basedir = '/home/sismp2/projects/testing/pp_roq'
-#basedir = '/home/matthew/testing/lalapps_knope_O2/outdir'
+#basedir = '/home/sismp2/projects/testing/pp_roq'
+basedir = '/home/matthew/testing/lalapps_knope_O2/outdir'
 
 logdir = os.path.join(basedir, 'log')
 if not os.path.isdir(logdir):
@@ -43,7 +43,8 @@ if not os.path.isdir(logdir):
 # detectors to use
 dets = ['H1', 'L1']
 
-nsigs = 2000 # total number of signals
+#nsigs = 2000 # total number of signals
+nsigs = 1
 
 # generate signal parameters
 snrs = np.random.rand(nsigs)*np.diff(snrrange)[0] # randomly distributed SNRs
@@ -51,7 +52,7 @@ snrs = np.random.rand(nsigs)*np.diff(snrrange)[0] # randomly distributed SNRs
 ramean = np.pi # central right ascension
 rasigma = (10./(60.*60.*24))*2.*np.pi # 10 seconds
 ras = ramean + np.random.randn(nsigs)*rasigma
-decs = np.zeros(nsigs) # set declination at zero degress
+decs = np.zeros(nsigs) # set declination at zero degrees
 
 h, m, s = pppu.rad_to_hms(ramean)
 rameanstr = pppu.coord_to_string(h, m, s)
@@ -133,7 +134,7 @@ for i in range(nsigs):
   cprun.add_section('data')
   cprun.set('data', 'sigma', json.dumps(datasigma))
   cprun.set('data', 'start', json.dumps([900000000]))
-  cprun.set('data', 'step', json.dumps([60))
+  cprun.set('data', 'step', json.dumps([60]))
   cprun.set('data', 'length', json.dumps([1440]))
 
   # set nested sampling parameters
@@ -159,7 +160,7 @@ for i in range(nsigs):
 
   # write out to dag file
   uippen = uuid.uuid4().hex
-    
+
   # write out ppen job
   dagstr = 'JOB {} {}\nRETRY {} 0\nVARS {} macroinifile=\"{}\"\n'.format(uippen, subfile, uippen, uippen, runconfig)
   fp.write(dagstr)

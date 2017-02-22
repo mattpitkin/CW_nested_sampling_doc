@@ -20,7 +20,7 @@ Add p-p plots!
 In each of the tests below we will be running our code (\lppen) using the default proposal distributions discussed in \S\ref{sec:proposals}
 and with the number of live points fixed to be 2048. We will also assume a source at a fixed sky position with right ascension of
 \hms{00}{00}{00}{0} and declination \dms{00}{00}{00}{0}. The simulated data in all cases will be generated as the complex heterodyned
-time series with 1440 points samples once per minute. When comparisons between the current code and previous codes are 
+time series sampled once per minute. When comparisons between the current code and previous codes are 
 made we run the current code in a way that splits datasets into 30 point chunks, rather than using the algorithm described in \S{sec:splitting},
 as this makes it consistent with the old code (\lppe). We also purely use the uniform prior ranges for the amplitude parameter to be
 consistent between codes.
@@ -31,7 +31,40 @@ An initial test of the code is whether the output posterior probability distribu
 posterior over a fixed grid in the four-dimensional parameter space of $\vec{\theta} = \{h_0, \cos{\iota}, \psi, \phi_0\}$, when
 using purely Gaussian noise.\footnote{It is worth noting that in many of these tests the polarisation angle prior covers $-\pi/4$ to $\pi/4$
 rather than the 0 to $\pi/2$ range given in, e.g., \citet{2015MNRAS.453.4399P} due to this being the range required by the older
-parameter estimation MCMC code. Although this range is degenerate to rotations over $\pi/2$, so spans the same range of waveform models}
-A comparison of the marginalised posteriors for individual parameters, and pairs of parameters, are shown when using simulated data for
-a single detectors (the LIGO Hanford detector, H1, and Livingston detector, L1), and the two detectors combined coherently, is shown
-in Figure~\ref{}.
+parameter estimation MCMC code. Although this range is degenerate to rotations over $\pi/2$, so spans the same range of waveform models.}
+A comparison of the marginalised posteriors for individual parameters, and pairs of parameters, are shown when using simulated data lasting
+ten days from a single detector (in this case assumed to be the LIGO Hanford detector, H1) in Figure~\ref{fig:simnoise_single}.
+
+It can be seen that the output posteriors look qualititavely consistent. However, we can also quantify some aspects of consistency by
+comparing the evidence output from the nested sampling code with that estimated from the grid-based method from \lppe, the upper limits
+on $h_0$ produced by the codes, and performing Kolmogorov-Smirnov consistency tests between the nested sampling posterior samples
+and MCMC posterior samples (giving a $p$-value for the null hypothesis that the samples are from the same distributions).
+These are shown in Table~\ref{tab:codeeval} and show very good consistency between the codes, although it should be noted that
+these are for one particular run and some statistical fluctuations in the exact values for different runs are to be expected (see e.g.\
+the variations in evidence values in \S\ref{sec:proposaltesting}).
+
+A {\tt jupyter} notebook with this test can be found \href{http://www.placeholder.com}{here}.
+
+\begin{table*}[h]
+\caption{Consistency tests between outputs of the new code, \lppen, and the old code, \lppe, when running on simulated data
+and searching over the four parameters $\{h_0, \cos{\iota}, \psi, \phi_0\}$.\label{tab:codeeval}}
+\begin{center}
+\begin{tabular}{l c c | c c c c}
+\hline
+\multirow{2}{*}{Simulation} & \multirow{2}{*}{$\ln{\left(\frac{Z_{\rm nested}}{Z_{\rm grid}}\right)}$} & \multirow{2}{*}{$\frac{(h_0^{95\%})_{\rm nested}}{(h_0^{95\%})_{\rm grid}}$} & 
+\multicolumn{4}{c}{K-S $p$-value} \\ \cline{4-7}
+ &  &  & $p(h_0)$ & $p(\phi_0)$ & $p(\cos{\iota})$ & $p(\psi)$ \\                      
+\hline
+\hline
+Noise (single detector)  & $-0.04$ & $0.995$ & 0.010 & 0.211 & 0.432 & 0.520 \\
+Noise (two detectors)    & $-0.09$ & $1.033$ & 0.054 & 0.535 & 0.626 & 0.305 \\
+Signal (single detector) &         &         &       &       &       &       \\
+Signal (two detectors)   &         &         &       &       &       &       \\
+\hline
+\end{tabular}
+\end{center}
+\end{table*}
+
+We see a very similar situation, in terms of agreement between the codes, when running on simulated data assumed to be from two detectors (the LIGO
+H1 and L1 sites) as shown in Figure~\ref{fig:simnoise_single} and the second line of Table~\ref{tab:codeeval}. A {\tt jupyter} notebook with this test
+can be found \href{http://www.placeholder.com}{here}.

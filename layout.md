@@ -15,6 +15,10 @@ figures/proptesting/walk_uniform_prop/evidences/collate_plots_wup_evidences.png
 figures/proptesting/walk_uniform_prop/upperlimits/collate_plots_wup_uls.png
 figures/proptesting/walk_uniform_prop/kstest/collate_plots_wup_ks.png
 section04.tex
+figures/codeeval/simulations/noise/simulatednoisetest.png
+figures/codeeval/simulations/noise_multi/simulatednoisemultidettest.png
+figures/codeeval/simulations/signal/simulatedsignaltest.png
+figures/codeeval/simulations/signal_multi/simulatedsignalmultitest.png
 section05.tex
 appendix01.tex
 appendix02.tex

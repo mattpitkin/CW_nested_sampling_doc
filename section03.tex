@@ -65,7 +65,7 @@ live points in chosen, and evolved via the MCMC, and the autocorrelation length 
 of MCMC iterations, $n_{\rm MCMC}$, is then chosen as $n_{\rm MCMC} = {\rm min}({\rm max}(\vec{{\rm acl}}), 5000)$, where 5000 is
 a hardcoded maximum length.
 
-\subsubsection{Testing the proposals}
+\subsubsection{Testing the proposals}\label{sec:proposaltesting}
 
 We would like to test whether some of the above proposals lead to accurate calculations of the evidence integral as given in Equation~\ref{eq:evidence}.
 It is especially interesting to do this over ranges of prior volumes that are initially similar to the posterior volume, but then diverge to be
@@ -114,9 +114,11 @@ systematic offset) are consistent with the expected range given by the error bar
 $I$ is the mean of the {\it information} (in nats) returned by the nested sampling algorithm for each run.
 
 \begin{table}[h]
-\caption{Linear coefficient in fits of $\ln{(Z/Z_{\rm true})} = mD_{\rm KL} + c$ from the results
+\caption{Linear coefficients in fits of $\ln{(Z/Z_{\rm true})} = mD_{\rm KL} + c$ from the results
 shown in Figure~\ref{fig:walkpropevs} for differing numbers of live points.\label{tab:klvsz}}
+\begin{center}
 \begin{tabular}{l c c}
+\hline
 \hline
 $N_{\rm live}$ & $c$ & $m$ \\
 \hline
@@ -127,6 +129,7 @@ $N_{\rm live}$ & $c$ & $m$ \\
 8192 & $-0.04$ & 0.14 \\
 \hline
 \end{tabular}
+\end{center}
 \end{table}
 
 Figure~\ref{fig:walkpropuls} shows the distribution of 95\% upper limits on the $x$ parameter in Equation~\ref{eq:testcdf} (calculated by solving

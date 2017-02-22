@@ -212,7 +212,7 @@ A parameter can be given a uniform (or flat, or top-hat) prior, in which the pro
 range and zero outside that range, i.e.
 \begin{equation}
 p(x|I) = \begin{cases}
-             C & \text{if~} x_{\rm min} < x < x_{\rm max}, \\
+             C & \text{if } x_{\rm min} < x < x_{\rm max}, \\
              0 & \text{otherwise},
             \end{cases}
 \end{equation}
@@ -236,7 +236,7 @@ by the prior.
 
 \subsubsection{Gaussian prior}
 
-A parameter can be given a prior with a Gaussian distribution, defined by its mean $mu_x$ and standard deviation $\sigma_x$, i.e.
+A parameter can be given a prior with a Gaussian distribution, defined by its mean $\mu_x$ and standard deviation $\sigma_x$, i.e.
 \begin{equation}
  p(x|I) = \frac{1}{\sqrt{2\pi\sigma_x^2}}\exp{\left(-\frac{(x-\mu_x)^2}{2\sigma_x^2}\right)}.
 \end{equation}
@@ -271,7 +271,7 @@ are shown in Figure~\ref{fig:priorgmm}.
 A parameter can be given a prior distribution that is uniform in the logarithm of the parameter, i.e.
 \begin{equation}
  p(x|I) = \begin{cases}
-             \left(\ln{x_{\rm max}}-\ln{x_{\rm min}}\right)^{-1}\frac{1}{x} & \text{if~} x_{\rm min} < x < x_{\rm max}, \\
+             \left(\ln{x_{\rm max}}-\ln{x_{\rm min}}\right)^{-1}\frac{1}{x} & \text{if } x_{\rm min} < x < x_{\rm max}, \\
              0 & \text{otherwise}.
             \end{cases}
 \end{equation}
@@ -289,7 +289,7 @@ A Fermi-Dirac distribution prior function was inspired by that used in \citet{Mi
 shape, although starts at large values and slopes downwards and is restricted to positive values. The form of the function, for
 parameter $x$, is
 \begin{equation}\label{eq:fermidirac}
- p(x|\sigma, \mu, I) = \begin{cases}\frac{1}{\sigma\ln{\left(1+e^{\mu/\sigma} \right)}}\left(e^{(x-\mu)/\sigma} + 1\right)^{-1} & \text{if~} x \geqslant 0, \\
+ p(x|\sigma, \mu, I) = \begin{cases}\frac{1}{\sigma\ln{\left(1+e^{\mu/\sigma} \right)}}\left(e^{(x-\mu)/\sigma} + 1\right)^{-1} & \text{if } x \geqslant 0, \\
                         0 & \text{otherwise},
                        \end{cases}
 \end{equation}

@@ -18,17 +18,20 @@ Add p-p plots!
 \subsection{Simulated data}
 
 In each of the tests below we will be running our code (\lppen) using the default proposal distributions discussed in \S\ref{sec:proposals}
-and with the number of live points fixed to be 2048. We will also assume a source at a fixed sky position with right ascension of
-\hms{00}{00}{00}{0} and declination \dms{00}{00}{00}{0}. The simulated data in all cases will be generated as the complex heterodyned
+and with the number of live points fixed to be 2048. We will also assume a source at a fixed sky position and that the signal model is purely
+that for the $l=m=2$ harmonic (Equation~\ref{eq:h2f}), and that we work in terms of the signal amplitude $h_0$ and signal phase
+$\Phi_{22}^C$ (this is for consistency with the old code which uses $\Phi_{22}^C$ rather than $\phi_0$, which we have earlier defined as the
+rotational phase). The simulated data in all cases 
+will be generated as the complex heterodyned
 time series sampled once per minute. When comparisons between the current code and previous codes are 
 made we run the current code in a way that splits datasets into 30 point chunks, rather than using the algorithm described in \S{sec:splitting},
 as this makes it consistent with the old code (\lppe). We also purely use the uniform prior ranges for the amplitude parameter to be
 consistent between codes.
 
-\subsubsection{Simulated noise}
+\subsubsection{Simulated noise}\label{sec:simnoise}
 
 An initial test of the code is whether the output posterior probability distributions match those produced when evaluating the
-posterior over a fixed grid in the four-dimensional parameter space of $\vec{\theta} = \{h_0, \cos{\iota}, \psi, \phi_0\}$, when
+posterior over a fixed grid in the four-dimensional parameter space of $\vec{\theta} = \{h_0, \cos{\iota}, \psi, \phi_{22}^C\}$, when
 using purely Gaussian noise.\footnote{It is worth noting that in many of these tests the polarisation angle prior covers $-\pi/4$ to $\pi/4$
 rather than the 0 to $\pi/2$ range given in, e.g., \citet{2015MNRAS.453.4399P} due to this being the range required by the older
 parameter estimation MCMC code. Although this range is degenerate to rotations over $\pi/2$, so spans the same range of waveform models.}
@@ -43,11 +46,11 @@ These are shown in Table~\ref{tab:codeeval} and show very good consistency betwe
 these are for one particular run and some statistical fluctuations in the exact values for different runs are to be expected (see e.g.\
 the variations in evidence values in \S\ref{sec:proposaltesting}).
 
-A {\tt jupyter} notebook with this test can be found \href{http://www.placeholder.com}{here}.
+A {\tt jupyter} notebook with this test can be found \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/noise/SimulatedNoiseTestsPaper.ipynb}{here}.
 
 \begin{table*}[h]
 \caption{Consistency tests between outputs of the new code, \lppen, and the old code, \lppe, when running on simulated data
-and searching over the four parameters $\{h_0, \cos{\iota}, \psi, \phi_0\}$.\label{tab:codeeval}}
+and searching over the four parameters $\{h_0, \cos{\iota}, \psi, \Phi_{22}^C\}$.\label{tab:codeeval}}
 \begin{center}
 \begin{tabular}{l c c | c c c c}
 \hline
@@ -56,10 +59,10 @@ and searching over the four parameters $\{h_0, \cos{\iota}, \psi, \phi_0\}$.\lab
  &  &  & $p(h_0)$ & $p(\phi_0)$ & $p(\cos{\iota})$ & $p(\psi)$ \\                      
 \hline
 \hline
-Noise (single detector)  & $-0.04$ & $0.995$ & 0.010 & 0.211 & 0.432 & 0.520 \\
-Noise (two detectors)    & $-0.09$ & $1.033$ & 0.054 & 0.535 & 0.626 & 0.305 \\
-Signal (single detector) &         &         &       &       &       &       \\
-Signal (two detectors)   &         &         &       &       &       &       \\
+Noise (single detector)  & $-0.07$ & $1.009$ & 0.404 & 0.026 & 0.010 & 0.703 \\
+Noise (two detectors)    & $-0.05$ & $0.992$ & 0.141 & 0.564 & 0.538 & 0.493 \\
+Signal (single detector) & 0.245   & $1.004$ & 0.237 & 0.291 & 0.125 & 0.175 \\
+Signal (two detectors)   & 0.240   & 0.991   & 0.722 & 0.052 & 0.067 & 0.032 \\
 \hline
 \end{tabular}
 \end{center}
@@ -67,4 +70,25 @@ Signal (two detectors)   &         &         &       &       &       &       \\
 
 We see a very similar situation, in terms of agreement between the codes, when running on simulated data assumed to be from two detectors (the LIGO
 H1 and L1 sites) as shown in Figure~\ref{fig:simnoise_single} and the second line of Table~\ref{tab:codeeval}. A {\tt jupyter} notebook with this test
-can be found \href{http://www.placeholder.com}{here}.
+can be found \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/noise_multidet/SimulatedNoiseTestsMultidetPaper.ipynb}{here}.
+
+\subsubsection{Simulated signal}
+
+The next test is checking how the codes compare when there is a signal present in the data. When generating the simulated signals we initially
+assume that the signal's phase evolution is perfectly known and has been removed via the heterodyne described in \S\ref{sec:model}, and therefore
+$\Delta\phi_2 = 0$ from Equation~\ref{eq:deltaphi}. As in \S\ref{sec:simnoise} then will search over the four-dimensional parameter space of
+$\vec{\theta} = \{h_0, \cos{\iota}, \psi, \phi_{22}^C\}$.
+
+We create a simulated signal in the H1 detector spanning ten days of data with parameters ($h_0 = 6.2\ee{-23}$, $\Phi_{22}^C = 2.4$\,rad, $\cos{\iota} = 0.3$
+and $\psi = 0.1$\,rad) that produce a signal-to-noise ratio of 8 when injected into
+Gaussian noise. The posterior probability distributions estimated for the parameters are shown in Figure~\ref{fig:simsignal_single}, which show consistency
+between the old and new codes and with the injected signal parameters. The quantitative consistency between the codes can be seen in Table~\ref{tab:codeeval},
+where is should be noted that the evidence ratio between the codes is larger than statistical uncertainty would expect, although the fractional difference between
+the values ($\lesssim 1\%$) is still small enough to not greatly effect conclusions drawn from either values if used in model selection.
+
+Similarly, using a signal with a coherent multi-detector signal-to-noise ratio of 8 (for the same parameters as above except with $h_0 = 3.5\ee{-23}$) when
+simulated and injected into Gaussian noise for two detectors (H1
+and L1) we see the posteriors shown in Figure~\ref{fig:simsignal_multi}, and consistency checks in Table~\ref{tab:codeeval}.
+
+The notebooks for the above two tests can be found \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/signal/SimulatedSignalTestsPaper.ipynb}{here} and 
+\href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/signal_multidet/SimulatedSignalMultidetTestsPaper.ipynb}{here}.

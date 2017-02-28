@@ -68,8 +68,8 @@ def kltrue(maxv, sigmah, lnZ):
 
   L = lnZ + 0.5*np.log(2.*np.pi*sigmah**2)
 
-  D = -(1.+2.*L)*erf(-B/(np.sqrt(2.)*sigmah))
-  G = -(1./(np.sqrt(2.*np.pi)*sigmah))*(B*np.exp(-0.5*B**2/sigmah**2))
+  D = -(1.+2.*L)*erf(-maxv/(np.sqrt(2.)*sigmah))
+  G = -(1./(np.sqrt(2.*np.pi)*sigmah))*(maxv*np.exp(-0.5*maxv**2/sigmah**2))
 
   return -0.25*p_Z*(D + 2.*G)
 

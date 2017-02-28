@@ -11,6 +11,7 @@ import os
 import numpy as np
 import argparse
 import subprocess as sp
+from scipy.special import erf
 
 import matplotlib as mpl
 from matplotlib import pyplot as pl
@@ -59,6 +60,18 @@ kspvalues = {}
 oformat = '*_stats.txt'
 pfile = 'prior.txt'
 truefile = 'test_gauss.txt'
+
+# calculate the true KL-divergence (required as the calculation used for the value in test_gauss.txt was wrong in the code version that was run for these tests)
+def kltrue(maxv, sigmah, lnZ):
+  prior = 1./maxv
+  p_Z = np.exp(np.log(prior)- lnZ)
+
+  L = lnZ + 0.5*np.log(2.*np.pi*sigmah**2)
+
+  D = -(1.+2.*L)*erf(-B/(np.sqrt(2.)*sigmah))
+  G = -(1./(np.sqrt(2.*np.pi)*sigmah))*(B*np.exp(-0.5*B**2/sigmah**2))
+
+  return -0.25*p_Z*(D + 2.*G)
 
 if opts.nlives is None:
   nlives = ['']
@@ -137,7 +150,8 @@ for j in range(len(nlives)):
     fp.close()
     trueevs[lname].append(float(l[0].strip()))
     trueuls[lname].append(float(l[1].strip())) 
-    truekls[lname].append(float(l[2].strip())) 
+    #truekls[lname].append(float(l[2].strip())) # this value was wrongly calculated
+    truekls[lname].append(kltrue(maxv, 1e-24, trueevs[lname][-1]))
 
     #print("Mean Z = %.7e +/- %.7e, true Z = %.7e" % (np.mean(evidences[lname][-1]), np.mean(evidenceerrs[lname][-1]), trueevs[lname][-1]), file=sys.stdout)
 
@@ -340,10 +354,15 @@ figks.tight_layout()
 
 fige.savefig(opts.outfile+'_evidences.png', dpi=300)
 fige.savefig(opts.outfile+'_evidences.pdf')
+p = sp.Popen('pdftops -eps %s' % opts.outfile+'_evidences.pdf', shell=True)
+p.communicate()
 
 figul.savefig(opts.outfile+'_uls.png', dpi=300)
 figul.savefig(opts.outfile+'_uls.pdf')
+p = sp.Popen('pdftops -eps %s' % opts.outfile+'_uls.pdf', shell=True)
+p.communicate()
 
 figks.savefig(opts.outfile+'_ks.png', dpi=300)
 figks.savefig(opts.outfile+'_ks.pdf')
-
+p = sp.Popen('pdftops -eps %s' % opts.outfile+'_ks.pdf', shell=True)
+p.communicate()

@@ -489,18 +489,18 @@ PHI0 {PHI0}\\n'"""
     except:
       print("Error... could not get 'H0' upper limit from posterior samples", file=sys.stderr)
       sys.exit(1)
-    
+
     # get error on the Z value
     hdf = h5py.File(outpost[j], 'r')
     a = hdf['lalinference']['lalinference_nest']
     info = a.attrs['information_nats']
     nlive = a.attrs['number_live_points']
     Zerrs[dets[j]] = np.sqrt(info/nlive)
-  
+
     # injection parameters
     if j < ndets:
       ainjpars[dets[j]] = pppu.psr_par(injpar[j].format(dets[j])).__dict__
-  
+
     # get smallest credible interval containing the injection (for p-p plots) - only do this for coherent injections
     if injcoh or ndets == 1:
       # get heterodyne parameters from par file and injection parameters from par file

@@ -25,6 +25,7 @@ import lalapps.pulsarpputils as pppu
 
 # range of (multi-detector) SNRs to use
 snrrange = [0., 30.]
+#snrrange = [20.,20.1]
 # set flat prior ranges on other parameters
 h0range = [0., 1e-20]
 phi0range = [0., np.pi]
@@ -36,6 +37,7 @@ h0fixed = 1e-24
 
 # run base directory (on RAVEN)
 basedir = '/home/sismp2/projects/testing/pp_incoherent'
+#basedir = '/home/matthew/testing/lalapps_knope_O2/outdir'
 
 logdir = os.path.join(basedir, 'log')
 if not os.path.isdir(logdir):
@@ -45,9 +47,11 @@ if not os.path.isdir(logdir):
 dets = ['H1', 'L1']
 
 nsigs = 2000 # total number of signals
+#nsigs = 1
 
 # generate signal parameters
-snrs = np.random.rand(nsigs)*np.diff(snrrange)[0] # randomly distributed SNRs
+snrs = snrrange[0] + np.random.rand(nsigs)*np.diff(snrrange)[0] # randomly distributed SNRs
+
 # generate RA and dec values uniformly over the sky
 ras = 2.*np.pi*np.random.rand(nsigs)
 decs = -(np.pi/2.) + np.arccos(2.*np.random.rand(nsigs) - 1.)
@@ -67,7 +71,7 @@ phi0sincoh = phi0range[0] + np.diff(phi0range)[0]*np.random.rand(nsigs)  # phi0 
 psisincoh = psirange[0] + np.diff(psirange)[0]*np.random.rand(nsigs)     # psi value
 cisincoh = cirange[0] + np.diff(cirange)[0]*np.random.rand(nsigs)        # cos(iota) value
 
-f0 = 5. # "heterodyne frequency" (low so that different sky positions still stay in band
+f0 = 5. # "heterodyne frequency" (low so that different sky positions still stay in band)
 deltaf0incoh = 1./2048. # standard deviation of f0 offset
 
 nlive = 1024 # number of live points
@@ -127,7 +131,7 @@ for i in range(nsigs):
   d, m, s = pppu.rad_to_dms(decs[i])
   decstr = pppu.coord_to_string(d, m, s)
 
-  cprun.set('run', 'hetparams', json.dumps({'RAJ': rastr, 'DECJ': decstr}))
+  cprun.set('run', 'hetparams', json.dumps({'RAJ': rastr, 'DECJ': decstr, 'F0': f0}))
 
   # set simulated data parameters
   cprun.add_section('data')

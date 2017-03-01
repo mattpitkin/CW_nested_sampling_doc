@@ -314,7 +314,11 @@ is
  C(X_0) &= \int_0^{X_0} \frac{1}{\sigma\ln{\left(1+e^{r} \right)}}\left(e^{(x-\mu)/\sigma} + 1\right)^{-1} {\rm d}x, \nonumber \\
  &= \frac{1}{\ln{\left(1+e^{r}\right)}}\left[\frac{X_0}{\sigma} + \ln{\left(1+e^{-r} \right)} - \ln{\left( 1+e^{(X_0-\mu)/\sigma}\right)} \right],
 \iflatexml
+
+\else
 \end{align}
+\fi
+
 which can be inverted to give
 \begin{equation}
 X_0 = -\sigma \ln{}\left(-e^{-r} + \left(1+e^{r} \right)^{-C(X_0)} + e^{1-r}\left(1+e^{r} \right)^{-C(X_0)} \right).

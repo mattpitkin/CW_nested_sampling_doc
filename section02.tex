@@ -306,8 +306,11 @@ for a selection of $\mu$ and $\sigma$ values.
 The sampling from the prior uses inverse transform sampling. The cumulative distribution function (CDF) of Equation~\ref{eq:fermidirac}
 is
 \begin{widetext}
-
+\iflatexml
+\begin{equation}
+\else
 \begin{align}
+
  C(X_0) &= \int_0^{X_0} \frac{1}{\sigma\ln{\left(1+e^{r} \right)}}\left(e^{(x-\mu)/\sigma} + 1\right)^{-1} {\rm d}x, \nonumber \\
  &= \frac{1}{\ln{\left(1+e^{r}\right)}}\left[\frac{X_0}{\sigma} + \ln{\left(1+e^{-r} \right)} - \ln{\left( 1+e^{(X_0-\mu)/\sigma}\right)} \right],
 \end{align}

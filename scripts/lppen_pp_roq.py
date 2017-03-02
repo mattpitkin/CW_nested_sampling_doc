@@ -22,7 +22,8 @@ from ConfigParser import ConfigParser
 import lalapps.pulsarpputils as pppu
 
 # range of (multi-detector) SNRs to use
-snrrange = [0., 20.]
+#snrrange = [0., 20.]
+snrrange = [7., 7.01]
 # set flat prior ranges on other parameters
 h0range = [0., 1e-20]
 phi0range = [0., np.pi]
@@ -41,13 +42,14 @@ if not os.path.isdir(logdir):
   os.makedirs(logdir)
 
 # detectors to use
-dets = ['H1', 'L1']
+#dets = ['H1', 'L1']
+dets = ['H1']
 
 #nsigs = 2000 # total number of signals
 nsigs = 1
 
 # generate signal parameters
-snrs = np.random.rand(nsigs)*np.diff(snrrange)[0] # randomly distributed SNRs
+snrs = snrrange[0] + np.random.rand(nsigs)*np.diff(snrrange)[0] # randomly distributed SNRs
 # generate RA and dec values uniformly over the sky
 ramean = np.pi # central right ascension
 rasigma = (10./(60.*60.*24))*2.*np.pi # 10 seconds
@@ -73,7 +75,8 @@ phi0s = phi0range[0] + np.diff(phi0range)[0]*np.random.rand(nsigs)  # phi0 value
 psis = psirange[0] + np.diff(psirange)[0]*np.random.rand(nsigs)     # psi value
 cis = cirange[0] + np.diff(cirange)[0]*np.random.rand(nsigs)        # cos(iota) value
 
-nlive = 1024 # number of live points
+#nlive = 1024 # number of live points
+nlive = 256
 nruns = 2    # number of parallel runs for each analysis
 
 # create sub file for running run_lppen.py

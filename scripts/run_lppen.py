@@ -508,7 +508,7 @@ PHI0 {PHI0}\\n'"""
       tinjpars = []
       for vp in varpars:
         vpa = vp
-        if vp == 'RAJ' or vp == 'DECJ':
+        if vp == 'RAJ' or vp == 'DECJ' or vp == 'RA' or vp == 'DEC':
           vpa = vp.strip('J') + '_RAD'
 
         tinjpars.append(ainjpars[dets[0]][vpa]) # get from first detector as all values should be the same for coherent injections

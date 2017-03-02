@@ -22,8 +22,8 @@ from ConfigParser import ConfigParser
 import lalapps.pulsarpputils as pppu
 
 # range of (multi-detector) SNRs to use
-#snrrange = [0., 20.]
-snrrange = [7., 7.01]
+snrrange = [0., 20.]
+
 # set flat prior ranges on other parameters
 h0range = [0., 1e-20]
 phi0range = [0., np.pi]
@@ -34,19 +34,19 @@ cirange = [-1., 1.]
 h0fixed = 1e-24
 
 # run base directory (on RAVEN)
-#basedir = '/home/sismp2/projects/testing/pp_roq'
-basedir = '/home/matthew/testing/lalapps_knope_O2/outdir'
+basedir = '/home/sismp2/projects/testing/pp_roq'
+#basedir = '/home/matthew/testing/lalapps_knope_O2/outdir'
 
 logdir = os.path.join(basedir, 'log')
 if not os.path.isdir(logdir):
   os.makedirs(logdir)
 
 # detectors to use
-#dets = ['H1', 'L1']
-dets = ['H1']
+dets = ['H1', 'L1']
+#dets = ['H1']
 
-#nsigs = 2000 # total number of signals
-nsigs = 1
+nsigs = 500 # total number of signals
+#nsigs = 1
 
 # generate signal parameters
 snrs = snrrange[0] + np.random.rand(nsigs)*np.diff(snrrange)[0] # randomly distributed SNRs
@@ -75,15 +75,15 @@ phi0s = phi0range[0] + np.diff(phi0range)[0]*np.random.rand(nsigs)  # phi0 value
 psis = psirange[0] + np.diff(psirange)[0]*np.random.rand(nsigs)     # psi value
 cis = cirange[0] + np.diff(cirange)[0]*np.random.rand(nsigs)        # cos(iota) value
 
-#nlive = 1024 # number of live points
-nlive = 256
+nlive = 1024 # number of live points
+#nlive = 256
 nruns = 2    # number of parallel runs for each analysis
 
 # create sub file for running run_lppen.py
 subfile = os.path.join(basedir, 'lppen.sub')
 subdata = """universe = vanilla
 executable = /home/sismp2/repositories/CW_nested_sampling_doc/scripts/run_lppen.py
-arguments = " $(macroinifile) "
+arguments = " -r $(macroinifile) "
 getenv = True
 log = %s
 error = %s

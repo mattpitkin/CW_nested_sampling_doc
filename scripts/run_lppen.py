@@ -420,7 +420,13 @@ PHI0 {PHI0}\\n'"""
 
       fp = open(injpar[i].format(dets[i]), 'w')
       for key in injd:
-        fp.write('{} {}\n'.format(key, injd[key]))
+        if '_ORIGINAL' in key:
+          continue
+        else:
+          if key+'_ORIGINAL' in injd: # output 'ORIGINAL' (non-unit-converted) version if present
+            fp.write('{} {}\n'.format(key, injd[key+'_ORIGINAL']))
+          else:
+            fp.write('{} {}\n'.format(key, injd[key]))
       fp.close()
 
     if ndets > 1:

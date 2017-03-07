@@ -191,7 +191,7 @@ F1 {F1}\\n\
 PEPOCH {PEPOCH}'"""
 
   if not os.path.isfile(parfile):
-    parparams = "{'RAJ': '00:00:00.0', 'DECJ': '00:00:00.0', 'F0': 100, 'F1': -1e-9, 'PEPOCH', 54660}"
+    parparams = "{'RAJ': '00:00:00.0', 'DECJ': '00:00:00.0', 'F0': 100, 'F1': -1e-9, 'PEPOCH': 54660}"
     hetpars = ast.literal_eval(get_with_default(cp, 'run', 'hetparams', parparams)) 
   
     if not isinstance(hetpars, dict):

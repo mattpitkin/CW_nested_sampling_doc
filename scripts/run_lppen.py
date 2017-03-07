@@ -188,10 +188,10 @@ RAJ {RAJ}\\n\
 DECJ {DECJ}\\n\
 F0 {F0}\\n\
 F1 {F1}\\n\
-PEPOCH 54660'"""
+PEPOCH {PEPOCH}'"""
 
   if not os.path.isfile(parfile):
-    parparams = "{'RAJ': '00:00:00.0', 'DECJ': '00:00:00.0', 'F0': 100, 'F1': -1e-9}"
+    parparams = "{'RAJ': '00:00:00.0', 'DECJ': '00:00:00.0', 'F0': 100, 'F1': -1e-9, 'PEPOCH', 54660}"
     hetpars = ast.literal_eval(get_with_default(cp, 'run', 'hetparams', parparams)) 
   
     if not isinstance(hetpars, dict):
@@ -325,12 +325,12 @@ RAJ {RAJ}\\n\
 DECJ {DECJ}\\n\
 F0 {F0}\\n\
 F1 {F1}\\n\
-PEPOCH 54660\\n\
+PEPOCH {PEPOCH}\\n\
 H0 {H0}\\n\
 COSIOTA {COSIOTA}\\n\
 PSI {PSI}\\n\
 PHI0 {PHI0}\\n'"""
-  defaultinjparams = "[{'RAJ': '00:00:00.0', 'DECJ': '00:00:00.0', 'F0': 100, 'F1': -1e-9, 'H0': 1e-24, 'COSIOTA': 0.0, 'PSI': 0.5, 'PHI0': 1.4}]"
+  defaultinjparams = "[{'RAJ': '00:00:00.0', 'DECJ': '00:00:00.0', 'F0': 100, 'F1': -1e-9, 'PEPOCH': 54660, 'H0': 1e-24, 'COSIOTA': 0.0, 'PSI': 0.5, 'PHI0': 1.4}]"
   injparfe = [False for i in range(ndets)]
 
   # get injection values

@@ -25,7 +25,7 @@ import lalapps.pulsarpputils as pppu
 
 # range of (multi-detector) SNRs to use
 snrrange = [0., 30.]
-#snrrange = [20.,20.1]
+
 # set flat prior ranges on other parameters
 h0range = [0., 1e-20]
 phi0range = [0., np.pi]
@@ -37,7 +37,6 @@ h0fixed = 1e-24
 
 # run base directory (on RAVEN)
 basedir = '/home/sismp2/projects/testing/pp_incoherent'
-#basedir = '/home/matthew/testing/lalapps_knope_O2/outdir'
 
 logdir = os.path.join(basedir, 'log')
 if not os.path.isdir(logdir):
@@ -47,7 +46,6 @@ if not os.path.isdir(logdir):
 dets = ['H1', 'L1']
 
 nsigs = 2000 # total number of signals
-#nsigs = 1
 
 # generate signal parameters
 snrs = snrrange[0] + np.random.rand(nsigs)*np.diff(snrrange)[0] # randomly distributed SNRs
@@ -73,6 +71,11 @@ cisincoh = cirange[0] + np.diff(cirange)[0]*np.random.rand(nsigs)        # cos(i
 
 f0 = 5. # "heterodyne frequency" (low so that different sky positions still stay in band)
 deltaf0incoh = 1./2048. # standard deviation of f0 offset
+f1 = -1e-9 # heterodyne fdot value
+deltaf1incoh = 1e-10    # standard deviation of f1 offset
+
+pepoch = 54660        # epoch of frequency
+deltapepoch = 365.25  # standard deviation of epoch offset
 
 nlive = 1024 # number of live points
 nruns = 2    # number of parallel runs for each analysis
@@ -131,7 +134,7 @@ for i in range(nsigs):
   d, m, s = pppu.rad_to_dms(decs[i])
   decstr = pppu.coord_to_string(d, m, s)
 
-  cprun.set('run', 'hetparams', json.dumps({'RAJ': rastr, 'DECJ': decstr, 'F0': f0}))
+  cprun.set('run', 'hetparams', json.dumps({'RAJ': rastr, 'DECJ': decstr, 'F0': f0, 'F1': f1, 'PEPOCH': pepoch}))
 
   # set simulated data parameters
   cprun.add_section('data')
@@ -149,7 +152,7 @@ for i in range(nsigs):
   cprun.set('injection', 'snr', str(snrs[i]))
 
   injparams = []
-  injparams.append({'RAJ': rastr, 'DECJ': decstr, 'H0': h0s[i], 'PHI0': phi0s[i], 'PSI': psis[i], 'COSIOTA': cis[i], 'F0': f0})
+  injparams.append({'RAJ': rastr, 'DECJ': decstr, 'H0': h0s[i], 'PHI0': phi0s[i], 'PSI': psis[i], 'COSIOTA': cis[i], 'F0': f0, 'F1': f1, 'PEPOCH': pepoch})
   
   # incoherent sky position
   h, m, s = pppu.rad_to_hms(rasincoh[i])
@@ -158,7 +161,7 @@ for i in range(nsigs):
   decstr = pppu.coord_to_string(d, m, s)
   
   # incoherent signal parameters
-  injparams.append({'RAJ': rastr, 'DECJ': decstr, 'H0': h0sincoh[i], 'PHI0': phi0sincoh[i], 'PSI': psisincoh[i], 'COSIOTA': cisincoh[i], 'F0': f0+deltaf0incoh*np.random.randn()})
+  injparams.append({'RAJ': rastr, 'DECJ': decstr, 'H0': h0sincoh[i], 'PHI0': phi0sincoh[i], 'PSI': psisincoh[i], 'COSIOTA': cisincoh[i], 'F0': f0+deltaf0incoh*np.random.randn(), 'F1': f1+deltaf1incoh*np.random.randn(), 'PEPOCH': pepoch+deltapepoch*np.random.randn()})
   
   cprun.set('injection', 'injparams', json.dumps(injparams))
   cprun.set('injection', 'coherent', 'False')

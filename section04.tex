@@ -24,7 +24,7 @@ $\Phi_{22}^C$ (this is for consistency with the old code which uses $\Phi_{22}^C
 rotational phase). The simulated data in all cases 
 will be generated as the complex heterodyned
 time series sampled once per minute. When comparisons between the current code and previous codes are 
-made we run the current code in a way that splits datasets into 30 point chunks, rather than using the algorithm described in \S{sec:splitting},
+made we run the current code in a way that splits datasets into 30 point chunks, rather than using the algorithm described in \S\ref{sec:splitting},
 as this makes it consistent with the old code (\lppe). We also purely use the uniform prior ranges for the amplitude parameter to be
 consistent between codes.
 
@@ -48,7 +48,7 @@ the variations in evidence values in \S\ref{sec:proposaltesting}).
 
 A {\tt jupyter} notebook with this test can be found \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/noise/SimulatedNoiseTestsPaper.ipynb}{here}.
 
-\begin{table*}[h]
+\begin{table*}[hptb]
 \caption{Consistency tests between outputs of the new code, \lppen, and the old code, \lppe, when running on simulated data
 and searching over the four parameters $\{h_0, \cos{\iota}, \psi, \Phi_{22}^C\}$.\label{tab:codeeval}}
 \begin{center}
@@ -56,7 +56,7 @@ and searching over the four parameters $\{h_0, \cos{\iota}, \psi, \Phi_{22}^C\}$
 \hline
 \multirow{2}{*}{Simulation} & \multirow{2}{*}{$\ln{\left(\frac{Z_{\rm nested}}{Z_{\rm grid}}\right)}$} & \multirow{2}{*}{$\frac{(h_0^{95\%})_{\rm nested}}{(h_0^{95\%})_{\rm grid}}$} & 
 \multicolumn{4}{c}{K-S $p$-value} \\ \cline{4-7}
- &  &  & $p(h_0)$ & $p(\phi_0)$ & $p(\cos{\iota})$ & $p(\psi)$ \\                      
+ &  &  & $p(h_0)$ & $p(\Phi_C^{22})$ & $p(\cos{\iota})$ & $p(\psi)$ \\                      
 \hline
 \hline
 Noise (single detector)  & $-0.07$ & $1.009$ & 0.404 & 0.026 & 0.010 & 0.703 \\
@@ -72,16 +72,51 @@ We see a very similar situation, in terms of agreement between the codes, when r
 H1 and L1 sites) as shown in Figure~\ref{fig:simnoise_single} and the second line of Table~\ref{tab:codeeval}. A {\tt jupyter} notebook with this test
 can be found \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/noise_multidet/SimulatedNoiseTestsMultidetPaper.ipynb}{here}.
 
+The above tests using simulated noise and with searches covering the four standard unknown \gw parameter show that the code appears to
+be working as expected, and is in agreement with our previously used code. However, more generally we can perform parameter estimation
+over a larger number of signal parameters, and can again check for consistency with the previous code. We produce one day of Gaussian
+noise for a single detector and search over the four \gw parameter with the same priors as before, but then also use a multi-variate Gaussian prior (\S\ref{sec:gaussianprior})
+over the {\it phase} parameters: rotational frequency and first frequency derivative, and binary parameters of binary period, time of periastron, angle of
+periastron and its first derivative, projected semi-major axis, and eccentricity ($\{f,\dot{f},P_{\text{b}}, T_0, \omega_0, \dot{\omega}_0, a\sin{i}, e\}$).
+This gives a total of 12 parameters in the search. The multi-variate prior is defined such that all parameters are uncorrelated except, in this case,
+the parameter pairs $[T_0, \omega_0]$ and $[P_{\text{b}}, \dot{\omega}_0]$ for which we use a very high correlation of $0.9999$ (we do not set them to
+be fully correlated due to numerical issues inverting such matrices).
+
+The one-and-two dimensional posteriors output for this case when run with both \lppe and \lppen can be seen in Figure~\ref{fig:noise_multiparam},
+which also overlays the marginalised priors on top. It can be seen qualititavely that the codes are consistent\footnote{It is worth mentioning that in performing
+these tests a bug was discovered in \lppe in which Equation~\ref{eq:deltaphi} was being applied with the wrong sign, leading to parameter estimates
+having the wrong sign. However, this bug was fixed for the example shown here.} and for the {\it phase} parameter priors are recovered, except for
+$\dot{f}$, which has some structure due to the specifics of the noise realisation. The Kolmogorov-Smirnov test $p$-values testing the null hypothesis
+that the posterior samples from each code are drawn from the same distribution are shown in Table~\ref{tab:noisemultiks}, and suggest that the
+distributions are consistent.
+
+\begin{table*}[hptb]
+\caption{Kolmogorov-Smirnov test $p$-values testing the null hypothesis that the samples output by \lppen and \lppe, when running on simulated
+noise data and searching over the twelve parameters $\{h_0, \cos{\iota}, \psi, \Phi_{22}^C, f,\dot{f},P_{\text{b}}, T_0, \omega_0, \dot{\omega}_0, a\sin{i}, e\}$,
+are drawn from the same distributions.\label{tab:noisemultiks}}
+\begin{center}
+\begin{tabular}{l | c c c c c c c c c c c c}
+\hline
+Parameter & $h_0$ & $\Phi_C^{22}$ & $\cos{\iota}$ & $\psi$ & $f$ & $\dot{f}$ & $P_{\text{b}}$ & $T_0$ & $\omega_0$ & $\dot{\omega}_0$ & $a\sin{i}$ & $e$ \\                      
+\hline
+\hline
+$p$-value  & 0.13 & 0.04 & 0.78 & 0.23 & 0.44 & 0.26 & 0.85 & 0.28 & 0.29 & 0.86 & 0.52 & 0.28 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table*}
+
 \subsubsection{Simulated signal}
 
 The next test is checking how the codes compare when there is a signal present in the data. When generating the simulated signals we initially
 assume that the signal's phase evolution is perfectly known and has been removed via the heterodyne described in \S\ref{sec:model}, and therefore
 $\Delta\phi_2 = 0$ from Equation~\ref{eq:deltaphi}. As in \S\ref{sec:simnoise} then will search over the four-dimensional parameter space of
-$\vec{\theta} = \{h_0, \cos{\iota}, \psi, \phi_{22}^C\}$.
+$\vec{\theta} = \{h_0, \cos{\iota}, \psi, \Phi_{22}^C\}$.
 
 We create a simulated signal in the H1 detector spanning ten days of data with parameters ($h_0 = 6.2\ee{-23}$, $\Phi_{22}^C = 2.4$\,rad, $\cos{\iota} = 0.3$
 and $\psi = 0.1$\,rad) that produce a signal-to-noise ratio of 8 when injected into
-Gaussian noise. The posterior probability distributions estimated for the parameters are shown in Figure~\ref{fig:simsignal_single}, which show consistency
+Gaussian noise. The posterior probability distributions estimated for the parameters (expressed as offsets from the assumed heterodyne parameter values) are
+shown in Figure~\ref{fig:simsignal_single}, which show consistency
 between the old and new codes and with the injected signal parameters. The quantitative consistency between the codes can be seen in Table~\ref{tab:codeeval},
 where is should be noted that the evidence ratio between the codes is larger than statistical uncertainty would expect, although the fractional difference between
 the values ($\lesssim 1\%$) is still small enough to not greatly effect conclusions drawn from either values if used in model selection.

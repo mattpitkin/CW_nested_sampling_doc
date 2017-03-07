@@ -235,7 +235,7 @@ uninformative choice for such as scale parameter of the log-uniform prior (see \
 result was in producing upper limits, and wanting these to be primarily based on the data (i.e. the likelihood) rather than being reduced
 by the prior.
 
-\subsubsection{Gaussian prior}
+\subsubsection{Gaussian prior}\label{sec:gaussianprior}
 
 A parameter can be given a prior with a Gaussian distribution, defined by its mean $\mu_x$ and standard deviation $\sigma_x$, i.e.
 \begin{equation}
@@ -244,6 +244,13 @@ A parameter can be given a prior with a Gaussian distribution, defined by its me
 
 A histogram of a set of samples produced by the code when drawing from a Gaussian prior distribution are shown in Figure~\ref{fig:priorgaussian},
 along with the true prior function.
+
+As well as single parameters being given Gaussian priors, we can define a set of $k$ parameters, $\vec{x}$, to have a multi-variate Gaussian prior
+\begin{equation}
+ p(\vec{x}|I) = \frac{\exp{\left([\vec{x}-\vec{\mu_x}]'C^{-1}[\vec{x}-\vec{\mu_x}] \right)}}{(2\pi)^{k/2}|C|^{1/2}},
+\end{equation}
+where $\vec{\mu_x}$ are the means and $C$ is the covariance matrix. In reality we input the correlation coefficient matrix and individual
+parameter variances rather than the covariance matrix, but it is easy to convert between the two.
 
 \subsubsection{Gaussian Mixture Model prior}
 

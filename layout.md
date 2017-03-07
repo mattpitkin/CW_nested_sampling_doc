@@ -17,6 +17,7 @@ figures/proptesting/walk_uniform_prop/kstest/collate_plots_wup_ks.png
 section04.tex
 figures/codeeval/simulations/noise/simulatednoisetest.png
 figures/codeeval/simulations/noise_multidet/simulatednoisemultidettest.png
+figures/codeeval/simulations/noise_multiparam/noise_multiparam.png
 figures/codeeval/simulations/signal/simulatedsignaltest.png
 figures/codeeval/simulations/signal_multidet/simulatedsignalmultitest.png
 section05.tex

@@ -7,8 +7,8 @@ defined by a set of parameter $\vec{\theta}$ and Gaussian noise with zero mean a
 $\sigma$, then the standard deviation can be included as an unknown parameter in the likelihood function and
 marginalised over. The likelihood can therefore be given by
 \begin{equation}\label{eq:likesigma}
-p(\mathbf{B}|\vec{\theta}) = \int_0^{\infty} p(\mathbf{B},\sigma|\vec{\theta}) {\rm d}\sigma =
-\int_0^{\infty} p(\mathbf{B}|\vec{\theta},\sigma)p(\sigma) {\rm d}\sigma,
+p(\mathbf{B}|\vec{\theta}) = \int_0^{\infty} p(\mathbf{B},\sigma|\vec{\theta}) \text{d}\sigma =
+\int_0^{\infty} p(\mathbf{B}|\vec{\theta},\sigma)p(\sigma) \text{d}\sigma,
 \end{equation}
 where $p(\mathbf{B}|\vec{\theta},\sigma)$ is the likelihood function for the data given the unknown signal
 parameters and the noise standard deviation, and $p(\sigma)$ is the prior on $\sigma$.
@@ -31,7 +31,7 @@ u = \sqrt{\frac{\sum_{k=1}^m|B_k-y(\vec{\theta})_k|^2}{2\sigma^2}},
 \end{equation}
 giving
 \begin{equation}\label{eq:du}
-\frac{{\rm d}u}{{\rm d}\sigma} = -\sqrt{\frac{\sum_{k=1}^m|B_k-y(\mathbf{a})_k|^2}{2}}\sigma^{-2}.
+\frac{\text{d}u}{\text{d}\sigma} = -\sqrt{\frac{\sum_{k=1}^m|B_k-y(\mathbf{a})_k|^2}{2}}\sigma^{-2}.
 \end{equation}
 Here we note that Eqn.~\ref{eq:du} is different from the equivalent Eqn.~2.28 in \citet{Dupuisthesis} by a
 factor of two. Rearranging Eqns.~\ref{eq:u} and~\ref{eq:du}, and for simplicity using the substitution $X =
@@ -41,29 +41,29 @@ factor of two. Rearranging Eqns.~\ref{eq:u} and~\ref{eq:du}, and for simplicity 
 \end{equation}
 and
 \begin{align}
-{\rm d}\sigma = & -\sigma^2 \left(\frac{2}{X}\right)^{1/2} {\rm d}u
+\text{d}\sigma = & -\sigma^2 \left(\frac{2}{X}\right)^{1/2} \text{d}u
 \nonumber \\
- = & -\frac{X}{2u^2} \left(\frac{2}{X}\right)^{1/2} {\rm d}u \nonumber \\
- = & - 2^{-1/2} X^{1/2} u^{-2} {\rm d}u.
+ = & -\frac{X}{2u^2} \left(\frac{2}{X}\right)^{1/2} \text{d}u \nonumber \\
+ = & - 2^{-1/2} X^{1/2} u^{-2} \text{d}u.
 \end{align}
 Putting everything into Eqn.~\ref{eq:likesigma} gives
 %\begin{widetext}
 \begin{align}
 p(\mathbf{B}|\vec{\theta})= & -(2\pi)^{-m} \int_{\infty}^0 2^{(m+\frac{1}{2})}
-X^{-(m+\frac{1}{2})} u^{2m+1} e^{-u^2} 2^{-1/2} X^{1/2} u^{-2} {\rm d}u, \nonumber \\
- = & -\pi^{-m} X^{-m} \int_{\infty}^0 u^{2m-1} e^{-u^2} {\rm d}u, \label{eq:integral1}
+X^{-(m+\frac{1}{2})} u^{2m+1} e^{-u^2} 2^{-1/2} X^{1/2} u^{-2} \text{d}u, \nonumber \\
+ = & -\pi^{-m} X^{-m} \int_{\infty}^0 u^{2m-1} e^{-u^2} \text{d}u, \label{eq:integral1}
 \end{align}
 %\end{widetext}
 where the substitution has changed the integral from being $\int_0^{\infty}$ to $\int_{\infty}^0$. The
-integral in Eqn.~\ref{eq:integral1} can then be performed by making the substitutions $x = u^2$ and ${\rm d}x
-= 2u\,{\rm d}u$, giving
+integral in Eqn.~\ref{eq:integral1} can then be performed by making the substitutions $x = u^2$ and $\text{d}x
+= 2u\,\text{d}u$, giving
 \begin{equation}
 p(\mathbf{B}|\vec{\theta}) = - \pi^{-m} X^{-m} \int_{\infty}^0 \frac{1}{2} x^{m-1} e^{-x}
-{\rm d}x.
+\text{d}x.
 \end{equation}
 This integral is the definition of the Gamma function
 \begin{equation}
- \int_{\infty}^0 x^{m-1} e^{-x} {\rm d}x = -\Gamma(m).
+ \int_{\infty}^0 x^{m-1} e^{-x} \text{d}x = -\Gamma(m).
 \end{equation}
 For positive integers Stirling's formula shows that the Gamma function is given by $\Gamma(n+1) = n!$, so our
 likelihood becomes

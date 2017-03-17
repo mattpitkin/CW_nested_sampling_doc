@@ -1,14 +1,17 @@
 \section{Evaluating the code}
 
 In this section we will show how the posterior parameter distributions that we can generate from the output
-of our nested sampling code compare to evaluating them on a grid, or with a previous implementation of the analysis code
-\citep[\lppe used in e.g.][]{2014ApJ...785..119A} using a (generally inefficient) MCMC algorithm. We will show this for
-simulated data containing purely Gaussian noise and containing fake signals added to Gaussian noise.
+of our nested sampling code compare to evaluating them with a previous implementation of the analysis code
+\citep[\lppe used in e.g.][]{2014ApJ...785..119A} using a (generally inefficient) MCMC algorithm and over a grid in parameters.
+We will show comparisons of the codes in two different regimes: no signal is present in the data, and an obvious signal is
+present in the data. We do this using simulated data both containing purely Gaussian noise and containing simulated signals
+added to Gaussian noise.
 
-Finally, we show how the odds comparing a signal model and a noise only model change with signal-to-noise ratio, along
-with comparing coherent verses incoherent signals (for coherent simulated signal and incoherent simulations).
+Using a selection of many simulated signals we also show how the odds comparing a signal model and a noise only model change with
+signal-to-noise ratio, along with comparing coherent verses incoherent signals (for coherent simulated signal and incoherent simulations).
 
-Add p-p plots!
+The simulations also allow us to evaluate the posterior probabilty distributions produced by the code using what is colloquially known,
+in ground-based \gw parameter estimate circles at least, as ``P-P plots'' (see \S\ref{sec:ppplots})
 
 \subsection{Simulated data}
 
@@ -101,7 +104,7 @@ $p$-value  & 0.13 & 0.04 & 0.78 & 0.23 & 0.44 & 0.26 & 0.85 & 0.28 & 0.29 & 0.86
 \end{center}
 \end{table*}
 
-\subsubsection{Simulated signal}\label{sec:simsignal}
+\subsubsection{Simulated signals}\label{sec:simsignal}
 
 The next test is checking how the codes compare when there is a signal present in the data. When generating the simulated signals we initially
 assume that the signal's phase evolution is perfectly known and has been removed via the heterodyne described in \S\ref{sec:model}, and therefore
@@ -122,3 +125,23 @@ and L1) we see the posteriors shown in Figure~\ref{fig:simsignal_multi}, and con
 
 The notebooks for the above two tests can be found \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/signal/SimulatedSignalTestsPaper.ipynb}{here} and 
 \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/signal_multidet/SimulatedSignalMultidetTestsPaper.ipynb}{here}.
+
+\subsubsection{Evaluating the posterior distributions}\label{sec:ppplots}
+
+In \citet{2014PhRvD..89h4060S} a method was developed for evaluating whether sky location credible intervals for compact binary coalescence signals, produced
+from posterior distribution output by \lalinf codes \citep{2015PhRvD..91d2003V}, behaved self-consistently. The approach uses injected signal, with parameters
+drawn from the prior distributions used when reconstructing them\footnote{In this case the amplitudes of the simulations are not drawn from the full prior range,
+but given that they are drawn from a flat}, and sees if the credible intervals 
+effectively behave as frequentist
+confidence intervals, i.e.\ do 50\% of the known parameter values fall within some pre-specified definition (like the minimal credible region, or credible
+region bounded by the lower extent to the prior) of the 50\%
+credible region. This can test whether the underlying \lalinf parameter sampling is working as expected, or if there are biases to wider or narrow
+credible regions. The method, and the ``P-P plots'' it produces by evaluating over a range of credible intervals, has now become commonly used to assess
+the \lalinf parameter estimation codes \citep{2015PhRvD..91d2003V} as a way of showing up any problems.
+
+We have used this method here to evaluate our parameters posteriors produced from the simulations performed for \S\label{sec:simsignal}. We have used all
+the simulations with coherent SNRs above 10, and, for each, calculated the minimal credible region from the one-dimensional marginalised posterior samples
+(using a greedy-binning approach) that the injected value falls within. The cumulative histogram of these values, for each parameter, can be seen in
+Figure~\ref{fig:pp_standard}. Also, shown for each parameter is a Kolmogorov-Smirnov test $p$-value comparing our observed distribution to a uniform distribution,
+and a ``cloud'' of cumulative distributions that are random realisations of the expected cumulative distribution. We see that, overall, our posteriors seem
+to produce posteriors that behave as expected, without any large deviations.

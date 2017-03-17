@@ -4,6 +4,8 @@
 Script to generate p-p plots for standard parameters
 """
 
+from __future__ import division
+
 import os
 import sys
 import json
@@ -57,7 +59,7 @@ detectors = ['H1', 'L1', 'H1,L1']
 dcolors = ['red', 'green', 'black']
 
 # snrs to use
-snrlim = 10 # use signals with SNRs greater than this
+snrlim = 0 # use signals with SNRs greater than this
 
 injcreds = []
 
@@ -66,6 +68,9 @@ recsnrs = []
 
 sigev = []
 noiseev = []
+
+injh0s = []
+injcis = []
 
 # COHERENT: loop through directories and grab required data (for SNRs above limit)
 for m in tar.getmembers():
@@ -77,6 +82,10 @@ for m in tar.getmembers():
       # get injection credible intervals for joint analysis
       if d['Injected SNR'][detectors[-1]] > snrlim:
         injcreds.append(d['Injection credible intervals'][detectors[-1]])
+        
+        #print(d['Injection parameters'])
+        injh0s.append(d['Injection parameters'][detectors[0]]['H0'])
+        injcis.append(d['Injection parameters'][detectors[0]]['COSIOTA'])
     
       # injected and recovered SNRs
       injsnrs.append(d['Injected SNR'])
@@ -87,6 +96,23 @@ for m in tar.getmembers():
       noiseev.append(d['Noise evidence'])
 
 tar.close() # close tarball
+
+fig = pl.figure()
+#pl.plot(injh0s, injcis, '.')
+n, binedges = np.histogram(injh0s, bins=len(injh0s))
+n = np.cumsum(n)/len(injh0s)
+#print(n)
+newinjh0s = []
+ratv = []
+injh0s.sort()
+h0srange = np.linspace(0., 1., len(injh0s))
+for i, injh0 in enumerate(injh0s):
+    ratv.append(h0srange[i]/n[i])
+    if np.random.rand() < h0srange[i]/n[i]:
+        newinjh0s.append(injh0)
+pl.hist(injh0s, bins=100, normed=True)
+fig.savefig('h0vsci.png', dpi=300)
+sys.exit(0)
 
 # INCOHERENT: loop through directories and grab required data (for SNRs above limit)
 isigev = []

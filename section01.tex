@@ -44,7 +44,7 @@ sum
 \mathcal{Z}_M = \sum_i^N L_i w_i,
 \end{equation}
 where $L_i$ is the likelihood and $w_i = p(\vec{\theta}|M,I) \Delta\vec{\theta}$ is the ``prior weight''
-(i.e.\ inverse prior volume occupied by point $i$).
+(i.e.\ the fraction of the prior occupied by point $i$).
 
 As a default the signal model evidence is compared to the
 evidence that the data consists of Gaussian noise to form an odds ratio for the two models
@@ -66,7 +66,6 @@ accepted with the probability
 \begin{equation}
 P_{\text{accept}} = \frac{L_i w_i}{(L_iw_i)_{\rm max}}.
 \end{equation}
-
 
 In our case the data $d$ in the above equations is heterodyned, low-pass filtered and down-sampled data
 for a detector, or set of detectors, each giving a single data stream or two data streams depending on

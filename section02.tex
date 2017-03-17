@@ -11,7 +11,7 @@ pulsar and the other produced with a heterodyne at the rotation frequency.
 
 Our code assumes that the rotational phase evolution of a pulsar is defined by the Taylor expansion in phase
 \begin{equation}
-\phi(t) = 2\pi\left(fT + \frac{1}{2}\dot{f}T^2 + \frac{1}{6}\ddot{f}T^3  \ldots\right)
+\phi(t) = 2\pi\left(fT + \frac{1}{2}\dot{f}T^2 + \frac{1}{6}\ddot{f}T^3 \ldots \right)
 \end{equation}
 where $T$ is the time corrected to an inertial reference frame (the solar system barycentre
 for isolated pulsars, or the binary system barycentre for pulsars in binaries), and the $f$'s give
@@ -391,12 +391,69 @@ Whether a signal is found or not the code will output a signal-to-noise ratio (S
 parameters, $\vec{\theta}_{\text{ML}}$, that give the maximum value for the likelihood, which are then used to create the best-fit
 complex signal template $y(\vec{\theta}_{\text{ML}})$. We then use calculations of the
 noise standard deviation for each data chunk after removal of a running median from the data (the splitting and running median are
-described in \S\ref{sec:splitting}). The SNR is then calculated as
+described in \S\ref{sec:splitting}). The {\it coherent} SNR is then calculated as
 \begin{equation}\label{eq:snr}
- \rho = \sqrt{\sum_{i=1}^{N_{\text{dets}}} \sum_{j=1}^{N_{\text{s}}}
+ \rho_{\text{coh}} = \sqrt{\sum_{i=1}^{N_{\text{dets}}} \sum_{j=1}^{N_{\text{s}}}
 \sum_{k=1}^{M_{i,j}} \sum_{n=n_{i,j,0}}^{n_{i,j,0}+(m_{i,j,k}-1)}\left(\frac{|y(\vec{\theta}_{\text{ML}})_{i,j,n}|^2}{\sigma_{i,j,k}^2}\right)},
 \end{equation}
 using the notation given in \S\ref{sec:likelihood}.\footnote{If using data input from the spectral interpolation code \citep{2017CQGra..34a5010D}
 the noise standard deviations are actually passed to the code (see \S\ref{app:examples}), so in Equation~\ref{eq:snr} $M_{i,j}$ is replaced
 by $L_{i,j}$ and $y(\vec{\theta}_{\text{ML}})_{i,j,n}$ is replace by $y(\vec{\theta}_{\text{ML}})_{i,j,k}$ as in \S\ref{sec:glikelihood}.}
 
+A plot of true signal SNR versus recovered single-detector and joint detector SNRs, as calculated from Equation~\ref{eq:snr}, for
+a set of simulated singals (described in \S\ref{sec:simsignal}) are shown in Figure~\ref{fig:snrplot}.
+
+\subsection{Odds values}\label{sec:odds}
+
+This is not explicitly a core function of the code, but here we will define some model selections (odds between competing models)
+\begin{equation}
+ \mathcal{O}_{M_1/M_2} = \frac{\mathcal{Z}_{M_1}}{\mathcal{Z}_{M_2}}\frac{p(M_1|I)}{p(M_2|I)},
+\end{equation}
+that can be produced from the output of the code. The code outputs two (natural logarithm) evidence values: the evidence for a coherent signal
+($\mathcal{Z}_{\text{S}}$)
+in all the datastreams (multi-detector and multi-frequency-band), and the evidence ($\mathcal{Z}_{\text{noise}}$) for the data consisting of
+Gaussian noise (in sets of stationary segments as described in \S\ref{sec:splitting}). These can be combined in various ways for different model
+selection situations, and we will define three such situations here \citep[see e.g.][for two of these]{2017arXiv170107709T}:
+\begin{enumerate}
+ \item the odds for a (multi-detector and multi-frequency-band) coherent signal versus (non-stationary) Gaussian noise, $\mathcal{O}_{\text{S}/\text{N}}$;
+ \item the odds for a (multi-detector and multi-frequency-band) coherent signal versus incoherent (between detector) signals, $\mathcal{O}_{\text{S}/\text{I}_{\text{simple}}}$;
+ \item the odds for a (multi-detector and multi-frequency-band) coherent signal versus comibinations of incoherent (between detector) signals or noise,
+ $\mathcal{O}_{\text{S}/\text{I}}$ \citep[cf.\ Equation~A6 in][]{2017arXiv170107709T}.
+\end{enumerate}
+
+The first of these (actually also given in Equation~\ref{eq:oddsratio}) just requires the two evidence values, $\mathcal{Z}_{\text{S}}$ and $\mathcal{Z}_{\text{noise}}$
+\begin{align}\label{eq:sigvsnoise}
+ \mathcal{O}_{\text{S}/\text{N}} &= \frac{\mathcal{Z}_{\text{S}}}{\mathcal{Z}_{\text{noise}}}, \nonumber \\
+ \ln{\left(\mathcal{O}_{\text{S}/\text{N}}\right)} &= \ln{\left(\mathcal{Z}_{\text{S}}\right)} - \ln{\left({\mathcal{Z}_{\text{noise}}}\right)}.
+\end{align}
+The second requires that the code has been run for a multi-detector analysis, and also individually for each detector, $i$, to give $\mathcal{Z}_{\text{S}_i}$
+and $\mathcal{Z}_{\text{N}_i}$, and is given by
+\begin{align}\label{eq:cohvincoh1}
+ \mathcal{O}_{\text{S}/\text{I}_{\text{simple}}} &= \frac{\mathcal{Z}_{\text{S}}}{\prod_i^{N_{\text{dets}}} \mathcal{Z}_{\text{S}_i}}, \nonumber \\
+ \ln{\left(\mathcal{O}_{\text{S}/\text{I}_{\text{simple}}}\right)} &= \ln{\left(\mathcal{Z}_{\text{S}}\right)} - \sum_i^{N_{\text{dets}}}\ln{\left(\mathcal{Z}_{\text{S}_i}\right)}.
+\end{align}
+Such an odds is useful in vetoing strong incoherent signals that are therefore not astrophysical, e.g.\ instrumental lines \citep[see, e.g., the similar
+line-robust statistic defined in][]{2014PhRvD..89f4023K}. In both these cases it is assumed
+that the prior odds ($p(M_1|I)/p(M_2|I)$) between the two models are set to be equal and therefore are not explicitly given.
+
+The third odds makes use of a compound model in the denominator with all evidences for all permutations of Gaussian noise or incoherent signal being used.
+If we have the set of single detector Gaussian noise and signal models $M_i = \{\text{S}_i, \text{N}_i\}$, and the set of (potentially
+multi-frequency-band) data for each detector $\{d_1, \ldots, d_{N_{\text{dets}}}\}$, then\footnote{we use the notation
+$\sum_{m_1, \ldots, m_{N_{\text{dets}}}\in\{M_1, \ldots, M_{N_{\text{dets}}}\}}$ as the nested summation $\sum_{m_1 \in M_1}\ldots\sum_{m_{N_{\text{dets}}}\in M_{N_{\text{dets}}}}$.}
+\begin{widetext}
+\begin{equation}\label{eq:cohvincoh2}
+ \mathcal{O}_{\text{S}/\text{I}} = \frac{\mathcal{Z}_{\text{S}}p(\text{S}|I)}{\sum_{m_1, \ldots, m_{N_{\text{dets}}}\in\{M_1, \ldots, M_{N_{\text{dets}}} \} } 
+p(m_1,\ldots,m_{N_{\text{dets}}}|I)\prod_{j=1}^{N_{\text{dets}}} \mathcal{Z}_{m_j}},
+\end{equation}
+\end{widetext}
+where $p(\text{S}|I)$ is the prior on the coherent signal model and $p(m_1,\ldots,m_{N_{\text{dets}}}|I)$ are the priors for each sub-hypothesis in the
+compound incoherent-{\it or}-noise model. As there are two possible models for data in each detector, signal or noise, the number of sub-hypotheses
+in the compound model is just given by $2^{N_{\text{dets}}}$. In \citet{2017arXiv170107709T}, and later in this 
+document, we have assigned the equal the coherent signal prior
+and to to each of the sub-hypothesis priors in the denominator, so that they cancel out. However, other priors could be used.
+
+It is also worth noting that in all the above cases the models (and sub-hypotheses) are mutually exclusive. This may not at first seem obvious, as,
+for example, the Gaussian noise model is contained within the signal model provided the prior on the signal amplitude allowed a value of zero. But, as noted in
+\citet{2012PhRvD..85h2003L, MaxCWpolariations}, within the signal noise hypothesis having an amplitude of exactly zero (as in the Gaussian
+noise hypothesis) occupies an infinitesimally thin slice of the parameter space, and therefore has no weight. The same can be said for the a coherent
+signal within the incoherent signal model.

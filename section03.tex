@@ -6,10 +6,10 @@ the reader to \citet{Veitch:2010}. We also refer the reader to \citet{2015PhRvD.
 of some of the concepts we will discuss below.
 
 One main point about the nested sampling algorithm is that it starts by randomly drawing a certain number of samples (the number of
-which we call the number of live points, $N_{\rm live}$, which will be the constant number of ``active'', or ``live'', samples),  
+which we call the number of live points, $N_{\text{live}}$, which will be the constant number of ``active'', or ``live'', samples),  
 where a sample is a vector containing a value for each parameter $\vec{\theta}$, from the prior distribution (see \S\ref{sec:priorfuncs}).
-The samples must be independent draws. For each of these samples the likeihood will be calculated and the sample $\vec{\theta}_{\rm min}$
-corresponding to the minimum likelihood, $L_{\rm min} = p(\mathbf{B}|\vec{\theta}_{\rm min})$, will be noted. As the algorithm
+The samples must be independent draws. For each of these samples the likeihood will be calculated and the sample $\vec{\theta}_{\text{min}}$
+corresponding to the minimum likelihood, $L_{\text{min}} = p(\mathbf{B}|\vec{\theta}_{\text{min}})$, will be noted. As the algorithm
 progresses the number of live points stays the
 same, but at each iteration a new sample will be added in place of the one with the minimum likelihood, and therefore the
 minimum likelihood will continuously be updated to be the minimum value for the current set of points.
@@ -19,11 +19,11 @@ minimum likelihood will continuously be updated to be the minimum value for the 
 The nested sampling algorithm requires a way to draw new samples from the parameter space that is being explored. The
 particular requirement for nested sampling is that any new sample is an independent draw from a constrained version
 of prior probabilty function for each parameter. The constraint is that the new sample's likelihood must be greater
-than the current value of $L_{\rm min}$, e.g. for a single parameter $x$, the probability of drawing a point at $x_i$ 
+than the current value of $L_{\text{min}}$, e.g. for a single parameter $x$, the probability of drawing a point at $x_i$ 
 would be
 \begin{equation}
- p(x=x_i|I)_{\rm constrained} = \begin{cases}
-             p(x=x_i|I) & \text{if~} p(\mathbf{B}|x_i) > L_{\rm min}, \\
+ p(x=x_i|I)_{\text{constrained}} = \begin{cases}
+             p(x=x_i|I) & \text{if~} p(\mathbf{B}|x_i) > L_{\text{min}}, \\
              0 & \text{otherwise},
             \end{cases}
 \end{equation}
@@ -61,8 +61,8 @@ only updated on iterations of the algorithm that are a factor of 10\% of the num
 
 The length of each MCMC run can be chosen by the user, but by default it is automatically set within the code. To do this,
 at the same rate as the cache is updated, the autocorrelation length of the parameters is calculated. A random sample from the current
-live points in chosen, and evolved via the MCMC, and the autocorrelation length of each parameter is calculated, $\vec{{\rm acl}}$. The number
-of MCMC iterations, $n_{\rm MCMC}$, is then chosen as $n_{\rm MCMC} = {\rm min}({\rm max}(\vec{{\rm acl}}), 5000)$, where 5000 is
+live points in chosen, and evolved via the MCMC, and the autocorrelation length of each parameter is calculated, $\vec{{\text{acl}}}$. The number
+of MCMC iterations, $n_{\text{MCMC}}$, is then chosen as $n_{\text{MCMC}} = \text{min}(\text{max}(\vec{\text{acl}}), 5000)$, where 5000 is
 a hardcoded maximum length.
 
 \subsubsection{Testing the proposals}\label{sec:proposaltesting}
@@ -73,22 +73,22 @@ much larger than the posterior volume (or in other words, as the information gai
 code has the option of setting a one-dimensional Gaussian distribution as the likelihood function, and using a flat prior bounded between $A$ and $B$,
 and working out the evidence. Analytically the evidence is given by
 \begin{align}\label{eq:testgaussev}
- Z &= \int_A^B \frac{1}{\sqrt{2\pi}\sigma}\exp{\left(-\frac{(x-\mu)}{2\sigma^2} \right)}\frac{1}{(B-A)} {\rm d}x, \nonumber \\
+ \mathcal{Z} &= \int_A^B \frac{1}{\sqrt{2\pi}\sigma}\exp{\left(-\frac{(x-\mu)}{2\sigma^2} \right)}\frac{1}{(B-A)} \text{d}x, \nonumber \\
    &= \frac{1}{2(B-A)}\left(\erf{\left[\frac{(\mu-A)}{\sqrt{2}\sigma}\right]}-\erf{\left[\frac{(\mu-B)}{\sqrt{2}\sigma}\right]}\right).
 \end{align}
 As we are often interested in setting upper limits of, for example, the \gw amplitude $h_0$, we can also use the test to see if the
 upper limits we obtain from the posterior samples match the expected upper limit obtained (via root finding) from the CDF of the distribution
 \begin{equation}\label{eq:testcdf}
- {\rm UL(x)} = \frac{1}{2a}\left(\erf{\left[\frac{(\mu-A)}{\sqrt{2}\sigma}\right]} - \erf{\left[\frac{(\mu-x)}{\sqrt{2}\sigma}\right]}\right),
+ \text{UL}(x) = \frac{1}{2a}\left(\erf{\left[\frac{(\mu-A)}{\sqrt{2}\sigma}\right]} - \erf{\left[\frac{(\mu-x)}{\sqrt{2}\sigma}\right]}\right),
 \end{equation}
 where $a = (\erf{\left[(\mu - A)/\sqrt{2}\sigma\right]} - \erf{\left[(\mu - B)/\sqrt{2}\sigma\right]})/2$ is the area under the distribution.
 We can calculate the true Kullback-Leibler divergence for via
 \begin{widetext}
 \begin{align}\label{eq:kldiv}
-D_{\rm KL} =& \int_A^B p(x|\mu,\sigma,I) \ln{\left(\frac{p(x|\mu,\sigma,I)}{p(x|I)}\right)} {\rm d}x, \nonumber \\ 
- =& \int_A^B \frac{p(\mu,\sigma|x,I)p(x|I)}{Z} \ln{\left(\frac{p(\mu,\sigma|x,I)p(x|I)}{Zp(x|I)}\right)} {\rm d}x, \nonumber \\
- =& \frac{p(x|I)}{Z} \int_A^B p(\mu,\sigma|x,I) \left[\ln{\left( p(\mu,\sigma|x,I) \right)} - \ln{Z}\right] {\rm d}x, \nonumber \\
- =& -\frac{p(x|I)}{4Z}\Bigg[ \left(1+2\left(\ln{Z} 
+D_{\text{KL}} =& \int_A^B p(x|\mu,\sigma,I) \ln{\left(\frac{p(x|\mu,\sigma,I)}{p(x|I)}\right)} \text{d}x, \nonumber \\ 
+ =& \int_A^B \frac{p(\mu,\sigma|x,I)p(x|I)}{\mathcal{Z}} \ln{\left(\frac{p(\mu,\sigma|x,I)p(x|I)}{\mathcal{Z}p(x|I)}\right)} \text{d}x, \nonumber \\
+ =& \frac{p(x|I)}{\mathcal{Z}} \int_A^B p(\mu,\sigma|x,I) \left[\ln{\left( p(\mu,\sigma|x,I) \right)} - \ln{\mathcal{Z}}\right] \text{d}x, \nonumber \\
+ =& -\frac{p(x|I)}{4\mathcal{Z}}\Bigg[ \left(1+2\left(\ln{\mathcal{Z}} 
 +\ln{\left[\sqrt{2\pi}\sigma\right]}\right)\right)\left(\erf{\left(\frac{\mu-A}{\sqrt{2}\sigma}\right)}-\erf{\left(\frac{\mu-B}{\sqrt{2}\sigma}\right)} \right) + \nonumber \\
  & \frac{2}{\sqrt{2\pi}\sigma}\left((A-\mu)\exp{\left(-\frac{(A-\mu)^2}{2\sigma^2}\right)} - (B-\mu)\exp{\left(-\frac{(B-\mu)^2}{2\sigma^2}\right)}  \right) \Bigg]
 \end{align}
@@ -97,7 +97,7 @@ where $p(x|\mu,\sigma,I)$ is the posterior, $p(\mu,\sigma|x,I)$ the likelihood, 
 evidence calculated via Equation~\ref{eq:testgaussev}. For the case of $\mu=0$ and $A=0$, and provided $B \gg \sigma$, this generally simplifies
 to
 \begin{equation}
-D_{\rm KL} \approx -\frac{1}{4ZB}\left[1+2\left(\ln{Z} +\ln{\left(\sqrt{2\pi\sigma^2}\right)}\right)\right].
+D_{\text{KL}} \approx -\frac{1}{4\mathcal{Z}B}\left[1+2\left(\ln{\mathcal{Z}} +\ln{\left(\sqrt{2\pi\sigma^2}\right)}\right)\right].
 \end{equation}
 A final thing that we can check, on top of the upper limit value, is whether the posterior samples appear to be drawn from the expected
 posterior distribution. To do this we use a Kolmogorov-Smirnov test comparing the CDF of the samples with the analytical CDF and calculating the
@@ -111,24 +111,24 @@ run the code on the test Gaussian likelihood 100 times to see the statistical sp
 
 In the first test we check how just using the ensemble walk proposal (which is {\it not} the default configuration described above) fairs at
 estimating the evidence, upper limit, and posterior distribution. Figure~\ref{fig:walkpropevs} shows a variety of information, but it
-primarily shows the distribution of the ratio of evidence output from our code, $Z$, to the true evidence calculated via
+primarily shows the distribution of the ratio of evidence output from our code, $\mathcal{Z}$, to the true evidence calculated via
 Equation~\ref{eq:testgaussev} as a function of the value of the upper prior bound $B$ (or equivalently on the top axis the
 information gain, in nats, calculated via Equation~\ref{eq:kldiv}). This is shown for the range of different numbers of live points used.
 It is clear that as the information gain increases (i.e.\ the posterior is constrained within a successively smaller part of the
 prior range) we are systematically more biased towards overestimating the evidence. It can also be seen that the bias increases with
-increasing number of live points. Linear fits (in $\ln{(Z/Z_{\rm true})}$ and $D_{\rm KL}$, the information gain) for different numbers
+increasing number of live points. Linear fits (in $\ln{(\mathcal{Z}/\mathcal{Z}_{\text{true}})}$ and $D_{\text{KL}}$, the information gain) for different numbers
 of live points are shown in Table~\ref{tab:klvsz}. It is interesting to note that the statistical spread of values (if ignoring the
-systematic offset) are consistent with the expected range given by the error bars, and calculated using $\sqrt{H/N_{\rm live}}$, where
+systematic offset) are consistent with the expected range given by the error bars, and calculated using $\sqrt{H/N_{\text{live}}}$, where
 $H$ is the mean of the {\it information gain} (in nats) returned by the nested sampling algorithm for each run.
 
 \begin{table}[h]
-\caption{Linear coefficients in fits of $\ln{(Z/Z_{\rm true})} = mD_{\rm KL} + c$ from the results
+\caption{Linear coefficients in fits of $\ln{(\mathcal{Z}/\mathcal{Z}_{\text{true}})} = mD_{\text{KL}} + c$ from the results
 shown in Figure~\ref{fig:walkpropevs} for differing numbers of live points.\label{tab:klvsz}}
 \begin{center}
 \begin{tabular}{l c c}
 \hline
 \hline
-$N_{\rm live}$ & $c$ & $m$ \\
+$N_{\text{live}}$ & $c$ & $m$ \\
 \hline
 512 & $-0.27$ & 0.04 \\
 1024 & $-0.24$ & 0.06 \\
@@ -141,7 +141,7 @@ $N_{\rm live}$ & $c$ & $m$ \\
 \end{table}
 
 Figure~\ref{fig:walkpropuls} shows the distribution of 95\% upper limits on the $x$ parameter in Equation~\ref{eq:testcdf} (calculated by solving
-the equation for ${\rm UL}(x) = 0.95$). It can be seen that, other than for the narrowest prior range, there is a systematic bias towards the
+the equation for $\text{UL}(x) = 0.95$). It can be seen that, other than for the narrowest prior range, there is a systematic bias towards the
 upper limit being underestimated by $\sim 2\%$. Figure~\ref{fig:walkpropks} show the distribution of two-sided $p$-values from a Kolmogorov-Smirnov
 test comparing the CDF of posterior samples against the analytical CDF in Equation~\ref{eq:testcdf}. The $p$-value null hypothesis is that both
 distributions are the same, and it should be noted that we performed 100 trials for each prior range value and number of live points. For the
@@ -157,7 +157,7 @@ of the time and the uniform proposal 25\% of the time. It should be noted that t
 similar to these when just using the ensemble walk proposal.
 
 Figure~\ref{fig:walkunipropevs} shows the evidence distributions equivalent to those in Figure~\ref{fig:walkpropevs}. However, what can
-be seen in this case is that there is no obvious systematic bias as a function of $D_{\rm KL}$, and the statistical uncertainty is
+be seen in this case is that there is no obvious systematic bias as a function of $D_{\text{KL}}$, and the statistical uncertainty is
 consistent with expectations (as shown by the error bars). Similarly, the upper limits and Kolmogorov-Smirnov $p$-values shown in
 Figures~\ref{fig:walkunipropuls} and \ref{fig:walkunipropks} respectively are consistent. The reason why this combination of proposals
 seems to work whereas the ensemble walk proposal on its own does not is currently not understood, but we plan more work on figuring this

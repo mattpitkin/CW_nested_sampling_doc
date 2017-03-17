@@ -20,6 +20,11 @@ figures/codeeval/simulations/noise_multidet/simulatednoisemultidettest.png
 figures/codeeval/simulations/noise_multiparam/noise_multiparam.png
 figures/codeeval/simulations/signal/simulatedsignaltest.png
 figures/codeeval/simulations/signal_multidet/simulatedsignalmultitest.png
+figures/codeeval/stats/snrs/snr_plot.png
+figures/codeeval/stats/odds/odds_plot.png
+figures/codeeval/stats/snr_vs_odds/snr_v_odds_plot.png
 section05.tex
 appendix01.tex
 appendix02.tex
+appendix03.tex
+figures/appendix3/approx_odds.png

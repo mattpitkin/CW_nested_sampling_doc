@@ -23,7 +23,6 @@ figures/codeeval/simulations/signal_multidet/simulatedsignalmultitest.png
 figures/codeeval/stats/snrs/snr_plot.png
 figures/codeeval/stats/odds/odds_plot.png
 figures/codeeval/stats/snr_vs_odds/snr_v_odds_plot.png
-section05.tex
 appendix01.tex
 appendix02.tex
 appendix03.tex

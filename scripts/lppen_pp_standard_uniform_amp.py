@@ -44,7 +44,7 @@ dets = ['H1', 'L1']
 nsigs = 2000 # total number of signals
 
 # generate signal parameters
-snrs = np.zeros(nigs) # no SNR scalings (just using uniform amplitude ranges)
+snrs = np.zeros(nsigs) # no SNR scalings (just using uniform amplitude ranges)
 # generate RA and dec values uniformly over the sky
 ras = 2.*np.pi*np.random.rand(nsigs)
 decs = -(np.pi/2.) + np.arccos(2.*np.random.rand(nsigs) - 1.)

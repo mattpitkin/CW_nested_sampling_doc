@@ -27,8 +27,8 @@ phi0range = [0., np.pi]
 psirange = [0., np.pi/2.]
 cirange = [-1., 1.]
 
-# set fixed h0 value (that will be scale to SNR)
-h0fixed = 1e-24
+# set range of injected h0 values
+h0injrange = [0., 3.25e-22]
 
 # run base directory (on RAVEN)
 basedir = '/home/sismp2/projects/testing/pp_roq_uniform'

@@ -370,6 +370,8 @@ PHI0 {PHI0}\\n'"""
   # calculate SNRs and scale amplitudes appropriately
   ampscale = 0.
   ampscales = []
+  injsnrs = {}
+  totsnr = 0.
   for i in range(ndets):
     pdict = {}
     injd = pppu.psr_par(injpar[i].format(dets[i])) # read in injection parameter file
@@ -403,10 +405,12 @@ PHI0 {PHI0}\\n'"""
       ampscales.append(1.)
       ampscale = 1.
 
-  if injsnr == 0.:
-    injsnrs = 0.
-  else:
-    injsnrs = {} # hold injected SNRs
+    if injsnr == 0.: # hold injected SNRs (calculated from the given amplitude)
+      injsnrs[dets[i]] = thissnr
+      totsnr += thissnr**2
+
+  if injsnr == 0. and ndets > 1:
+    injsnrs[dets[-1]] = np.sqrt(totsnr)
 
   ampscale = injsnr/np.sqrt(ampscale) # overall snr scale factor will be for the multi-detector signal
   for i in range(ndets):
@@ -429,13 +433,13 @@ PHI0 {PHI0}\\n'"""
             fp.write('{} {}\n'.format(key, injd[key]))
       fp.close()
 
-    if ndets > 1:
-      asn = (injsnr/ampscale)**2
-      injsnrs[dets[i]] = np.sqrt((injsnr**2/asn)*(asn-sum([x for j,x in enumerate(ampscales) if j!=i])))
-    else:
-      injsnrs[dets[i]] = injsnr
+      if ndets > 1:
+        asn = (injsnr/ampscale)**2
+        injsnrs[dets[i]] = np.sqrt((injsnr**2/asn)*(asn-sum([x for j,x in enumerate(ampscales) if j!=i])))
+      else:
+        injsnrs[dets[i]] = injsnr
 
-  if ndets > 1:
+  if injsnr != 0. and ndets > 1:
     injsnrs[dets[-1]] = injsnr
 
   injcoh = ast.literal_eval(get_with_default(cp, 'injection', 'coherent', 'True')) # check whether injection is coherent between detectors

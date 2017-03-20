@@ -33,15 +33,18 @@ mplparams = { \
 mpl.rcParams.update(mplparams)
 
 # tarball containing (coherent) data
-tarball = 'pp_standard.tar.gz'
+tarball = 'pp_standard.tar.gz' # analysis with values uniform in SNR (uniform in cos(iota), but not h0)
+utarball = 'pp_standard_uniform.tar.gz' # analysis with values uniform in h0 and cos(iota) (but not SNR) - use this for P-P plots
 
 # tarball containing (incoherent) data
 itarball = 'pp_incoherent.tar.gz'
 
 # tarball containing (coherent) higher dimensional runs
-htarball = 'pp_roq.tar.gz'
+#htarball = 'pp_roq.tar.gz'
+htarball = 'pp_roq_uniform.tar.gz'
 
 tar = tarfile.open(tarball, "r:gz")
+utar = tarfile.open(utarball, "r:gz")
 itar = tarfile.open(itarball, "r:gz")
 htar = tarfile.open(htarball, "r:gz")
 
@@ -58,21 +61,13 @@ hlabels = ['$h_0$', '$\Phi_{22}^C$', '$\cos{\iota}$', '$\psi$', '$f$', '$\dot{f}
 detectors = ['H1', 'L1', 'H1,L1']
 dcolors = ['red', 'green', 'black']
 
-# snrs to use
-snrlim = 0 # use signals with SNRs greater than this
-
-injcreds = []
-
 injsnrs = []
 recsnrs = []
 
 sigev = []
 noiseev = []
 
-injh0s = []
-injcis = []
-
-# COHERENT: loop through directories and grab required data (for SNRs above limit)
+# COHERENT (uniform SNR): loop through directories and grab required data
 for m in tar.getmembers():
   if m.isfile():
     if statsfile in m.name:
@@ -82,10 +77,6 @@ for m in tar.getmembers():
       # get injection credible intervals for joint analysis
       if d['Injected SNR'][detectors[-1]] > snrlim:
         injcreds.append(d['Injection credible intervals'][detectors[-1]])
-        
-        #print(d['Injection parameters'])
-        injh0s.append(d['Injection parameters'][detectors[0]]['H0'])
-        injcis.append(d['Injection parameters'][detectors[0]]['COSIOTA'])
     
       # injected and recovered SNRs
       injsnrs.append(d['Injected SNR'])
@@ -97,22 +88,36 @@ for m in tar.getmembers():
 
 tar.close() # close tarball
 
-fig = pl.figure()
-#pl.plot(injh0s, injcis, '.')
-n, binedges = np.histogram(injh0s, bins=len(injh0s))
-n = np.cumsum(n)/len(injh0s)
-#print(n)
-newinjh0s = []
-ratv = []
-injh0s.sort()
-h0srange = np.linspace(0., 1., len(injh0s))
-for i, injh0 in enumerate(injh0s):
-    ratv.append(h0srange[i]/n[i])
-    if np.random.rand() < h0srange[i]/n[i]:
-        newinjh0s.append(injh0)
-pl.hist(injh0s, bins=100, normed=True)
-fig.savefig('h0vsci.png', dpi=300)
-sys.exit(0)
+injcreds = [] # injection credible intervals for uniform amplitude analysis
+# snrs to use
+snrlim = 0. # use signals with SNRs greater than this
+
+uinjsnrs = []
+urecsnrs = []
+
+usigev = []
+unoiseev = []
+
+# COHERENT (uniform amplitude)
+for m in utar.getmembers():
+  if m.isfile():
+    if statsfile in m.name:
+      fp = utar.extractfile(m)
+      d = json.load(fp)
+
+      # get injection credible intervals for joint analysis
+      if d['Injected SNR'][detectors[-1]] > snrlim:
+        injcreds.append(d['Injection credible intervals'][detectors[-1]])
+    
+      # injected and recovered SNRs
+      uinjsnrs.append(d['Injected SNR'])
+      urecsnrs.append(d['Recovered SNR'])
+
+      # noise evidences and signal evidences
+      usigev.append(d['Signal evidence'])
+      unoiseev.append(d['Noise evidence'])
+
+utar.close()
 
 # INCOHERENT: loop through directories and grab required data (for SNRs above limit)
 isigev = []

@@ -9,11 +9,10 @@ added to Gaussian noise.
 
 Using a selection of many simulated signals we also show how the odds comparing a signal model and a noise only model change with
 signal-to-noise ratio, along with comparing coherent verses incoherent signals (for coherent simulated signal and incoherent simulations).
-
 The simulations also allow us to evaluate the posterior probabilty distributions produced by the code using what is colloquially known,
 in ground-based \gw parameter estimate circles at least, as ``P-P plots'' (see \S\ref{sec:ppplots})
 
-\subsection{Simulated data}
+\subsection{Code comparison}
 
 In each of the tests below we will be running our code (\lppen) using the default proposal distributions discussed in \S\ref{sec:proposals}
 and with the number of live points fixed to be 2048. We will also assume a source at a fixed sky position and that the signal model is purely
@@ -126,22 +125,79 @@ and L1) we see the posteriors shown in Figure~\ref{fig:simsignal_multi}, and con
 The notebooks for the above two tests can be found \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/signal/SimulatedSignalTestsPaper.ipynb}{here} and 
 \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/signal_multidet/SimulatedSignalMultidetTestsPaper.ipynb}{here}.
 
+\hl{Show results from an S5 hardware injection, an S6 software injection, and an S6 Sco X1 software injection.}
+
+\subsection{Monte-Carlo studies}
+
+In this section we will assess the outputs of \lppen using a range of simulated signals. We have created two sets of 2000 signal parameters to
+injected simulated signals into Gaussian noise (with the same standard deviation of $1\ee{-22}$) for the H1 and L1 detectors. Both sets have been generated
+with $\Phi_{22}^C$, $\psi$ and $\cos{\iota}$ drawn from uniform distributions over their minimal allowed ranges \citep[Table~1 of][]{2015MNRAS.453.4399P},
+but the first set
+calculates $h_0$ such that the coherent SNR (Equation~\ref{eq:snr}) is drawn uniformly between 0 and 20; the second set draws the $h_0$ uniformly between
+0 and $3.25\ee{-22}$, such that the maximum coherent SNR (given the known noise level) is $\sim 55$. This latter set is used to evaluate the posterior
+distributions as described below in \S\ref{sec:ppplots}. The source's sky locations are drawn uniformly from over the sky-sphere. For these analyses each
+simulated data set is one solar day long, consisting of 1440 complex data points (generated as if heterodyned at precisely the known source phase evolution)
+sampled once per minute. This data has been used to estimate the four parameters $h_0$, $\cos{\iota}$, $\Phi_{22}^C$ and $\psi$, with each being given
+a flat prior: the angles and cosine of orientation angle over their minimal ranges, and $h_0$ between zero and $1\ee{-20}$ (well above the extent of the
+bulk of the likelihood). When running \lppen on these, two parallel runs with 1024 live points where used, along with the default sampler proposals described
+in \S\ref{sec:proposals}, and with the samples from both runs being combined to produce posterior samples and evidence estimates.
+
+Another set of 2000 simulations has been created that again create simulated signals and add them to Gaussian noise for the H1 and L1 detectors. In this
+case the total SNR shared between the detector has be drawn from a uniform distribution between 0 and 30, however, the signals have been purposely created
+to be incoherent between detectors. The parameters $\Phi_{22}^C$, $\psi$ and $\cos{\iota}$ are drawn from their minimal allowed ranges, but are different for
+the signals input into the two detectors, whilst the sky positions are also independent for both detectors. The signal rotational frequency and frequency
+derivative are also offset between detectors, such that the offsets are drawn from Gaussian distributions of $1/2048$\,Hz and $1\ee{-10}$\,Hz$\,s^{-1}$
+respectively. The length of the data is the same as in the previous case, but it is assumed that the data for both detectors was heterodyned using the
+known phase evolution for the signal in the just H1 detector. The same prior and run settings as above were used. These simulations have been used for
+assessing the odds for a coherent versus incoherent signal (see \S\ref{sec:odds}).
+
+Finally, two sets of simulations of 500 signals have been created to assess the code when estimating additional phase parameters: in this case
+the rotational frequency $f_0$, frequency derivative $\dot{f}_0$, and right ascension $\alpha$. Gaussian priors on these three parameters have been
+used, with parameters given in Table~\ref{tab:gaussianpriors}. These Gaussian priors are used when generating signals and when estimating them
+using \lppen, whilst the simulated data is created such that it was heterodyned using the means values. As above, one set of these simulations has amplitude 
+calculated such that the coherent SNRs are drawn uniformly between 0 and 20, whilst the other has amplitude drawn uniformly between 0 and $3.25\ee{-22}$.
+Again, the angles are drawn uniformly from their minimal ranges and sky positions are drawn uniformly over the sky-sphere.
+
+\begin{table}[!hptb]
+\caption{Gaussian prior parameters for rotational frequency, frequency derivative and right ascension for a set of simulated signals.
+\label{tab:gaussianpriors}}
+\begin{center}
+\begin{tabular}{l | c c}
+\hline
+Parameter & mean & standard deviation \\                      
+\hline
+\hline
+$f_0$ (Hz) & 100 & $5\ee{-5}$ \\
+$\dot{f}_0$ & $-1\ee{-9}$ & $2\ee{-10}$ \\
+$\alpha$ (rads) & $\pi$ & $0.0007272$ ($10^{\text{s}}$) \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
 \subsubsection{Evaluating the posterior distributions}\label{sec:ppplots}
 
-In \citet{2014PhRvD..89h4060S} a method was developed for evaluating whether sky location credible intervals for compact binary coalescence signals, produced
+In \citet{2014PhRvD..89h4060S} a method was developed for evaluating whether sky location credible intervals for compact binary coalescence \gw signals, produced
 from posterior distribution output by \lalinf codes \citep{2015PhRvD..91d2003V}, behaved self-consistently. The approach uses injected signal, with parameters
 drawn from the prior distributions used when reconstructing them\footnote{In this case the amplitudes of the simulations are not drawn from the full prior range,
-but given that they are drawn from a flat}, and sees if the credible intervals 
-effectively behave as frequentist
+but are drawn from a flat distribution within that range, so are valid for this comparison.}, and sees if the credible intervals effectively behave as frequentist
 confidence intervals, i.e.\ do 50\% of the known parameter values fall within some pre-specified definition (like the minimal credible region, or credible
-region bounded by the lower extent to the prior) of the 50\%
-credible region. This can test whether the underlying \lalinf parameter sampling is working as expected, or if there are biases to wider or narrow
-credible regions. The method, and the ``P-P plots'' it produces by evaluating over a range of credible intervals, has now become commonly used to assess
-the \lalinf parameter estimation codes \citep{2015PhRvD..91d2003V} as a way of showing up any problems.
+region bounded by the lower extent to the prior) of the 50\% credible region. This can test whether the underlying \lalinf parameter sampling is working as
+expected, or if there are biases to wider, or narrower, credible regions. The method, and the ``P-P plots'' it produces through evaluation over a range of credible
+intervals, has now become commonly used to assess the \lalinf parameter estimation codes \citep{2015PhRvD..91d2003V} as a way of showing up any problems.
 
-We have used this method here to evaluate our parameters posteriors produced from the simulations performed for \S\label{sec:simsignal}. We have used all
-the simulations with coherent SNRs above 10, and, for each, calculated the minimal credible region from the one-dimensional marginalised posterior samples
-(using a greedy-binning approach) that the injected value falls within. The cumulative histogram of these values, for each parameter, can be seen in
-Figure~\ref{fig:pp_standard}. Also, shown for each parameter is a Kolmogorov-Smirnov test $p$-value comparing our observed distribution to a uniform distribution,
-and a ``cloud'' of cumulative distributions that are random realisations of the expected cumulative distribution. We see that, overall, our posteriors seem
-to produce posteriors that behave as expected, without any large deviations.
+We have used this method here to evaluate our parameter posteriors produced from the simulations described above for which the amplitudes were drawn from
+a uniform distribution. For each simulation we have calculated the minimal credible region from the one-dimensional marginalised posterior samples that the
+injected value falls within (using a greedy-binning approach). The cumulative histogram of these values, for each parameter when using the simulations that
+just estimate the four \gw parameters, can be seen in Figure~\ref{fig:pp_standard}. Also, shown for each parameter is a Kolmogorov-Smirnov test $p$-value
+comparing our observed distribution to a uniform distribution, and a ``cloud'' of cumulative distributions that are random realisations of the expected
+cumulative distribution. We see that, overall, our posteriors seem to produce posteriors that give credible intervals that behave as expected, without any
+large deviations.
+
+Similarly, we have done the same thing for the posteriors produced from the simulations that included searches over $f_0$, $\dot{f}_0$, and $\alpha$. These
+P-P plots can be seen in Figure~\ref{fig:pp_extra}, where generally we see posterior credible intervals behaving as expected. However, we do find that the
+initial phase parameter, $\Phi_{22}^C$, distributions are maybe broader than we would expect. This is most likely due to this parameter being highly
+correlated with the frequency and not being well constrained, so the true distribution is not sampled well enough due to our finite number of posterior samples.
+\hl{Maybe re-run with increased numbers of live points or parallel runs.}
+
+\subsubsection{Evaluating the odds}\label{sec:evalodds}

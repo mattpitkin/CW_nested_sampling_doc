@@ -73,10 +73,6 @@ for m in tar.getmembers():
     if statsfile in m.name:
       fp = tar.extractfile(m)
       d = json.load(fp)
-
-      # get injection credible intervals for joint analysis
-      if d['Injected SNR'][detectors[-1]] > snrlim:
-        injcreds.append(d['Injection credible intervals'][detectors[-1]])
     
       # injected and recovered SNRs
       injsnrs.append(d['Injected SNR'])
@@ -192,7 +188,7 @@ for i, ax in enumerate(axs.flatten()):
   # create p-p plot histogram
   nb, binedges = np.histogram(parcreds, bins=len(parcreds), normed=True)
   cn = np.cumsum(nb)/len(parcreds)
-  ax.step(binedges[:-1], cn, color='k', label='KS $p$-value: %.3f' % pv)
+  ax.step(binedges[:-1], cn, color='k', label='KS $p$-value: %.2f' % pv)
   ax.plot([0., 1.], [0., 1.], color='darkred', ls='--', lw=0.5)
   ax.set_xlim([0., 1.])
   ax.set_ylim([0., 1.])
@@ -225,15 +221,18 @@ fp.close()
 # produce larger p-p plots
 pl.clf()
 
-fig, axs = pl.subplots(3,3, figsize=(13,13))
+#fig, axs = pl.subplots(3,3, figsize=(13,13))
+fig = pl.figure(figsize=(9,18))
 
 # loop over parameters and produce p-p plots
-counter = 0
-axf = axs.flatten()
-axi = 1
-axf[0].axis('off')
-axf[2].axis('off')
 for i in range(len(hpars)):
+  if i == 0:
+    gp = (0, 1)
+  else:
+    gp = (int(np.ceil(i/2.)), -2*(i%2-1))
+    
+  axf = pl.subplot2grid((4,4), gp, colspan=2)
+  
   parcreds = np.array([inj[hpars[i]] for inj in hinjcreds])/100.
   parcreds.sort() # sort into order
 
@@ -244,7 +243,7 @@ for i in range(len(hpars)):
     x.sort()
     nb, binedges = np.histogram(x, bins=len(x), normed=True)
     cn = np.cumsum(nb)/len(x)
-    axf[axi].step(binedges[:-1], cn, color='g', alpha=0.02)
+    axf.step(binedges[:-1], cn, color='g', alpha=0.02)
 
   # perform K-S test (conparing to uniform distribution)
   D, pv = kstest(parcreds, lambda y: y)
@@ -252,28 +251,23 @@ for i in range(len(hpars)):
   # create p-p plot histogram
   nb, binedges = np.histogram(parcreds, bins=len(parcreds), normed=True)
   cn = np.cumsum(nb)/len(parcreds)
-  axf[axi].step(binedges[:-1], cn, color='k', label='KS $p$-value: %.2f' % pv)
-  axf[axi].plot([0., 1.], [0., 1.], color='darkred', ls='--', lw=0.5)
-  axf[axi].set_xlim([0., 1.])
-  axf[axi].set_ylim([0., 1.])
-  axf[axi].text(0.85, 0.1, hlabels[i])
+  axf.step(binedges[:-1], cn, color='k', label='KS $p$-value: %.2f' % pv)
+  axf.plot([0., 1.], [0., 1.], color='darkred', ls='--', lw=0.5)
+  axf.set_xlim([0., 1.])
+  axf.set_ylim([0., 1.])
+  axf.text(0.85, 0.1, hlabels[i])
 
-  if axi > 5:
-    axf[axi].set_xlabel('Credible interval')
+  if i > 4:
+    axf.set_xlabel('Credible interval')
   else:
-    axf[axi].tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
-  if axi == 3 or axi == 6:
-    axf[axi].set_ylabel('Fraction of true values within CI')
+    axf.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
+  if i == 0 or i == 1 or i == 3 or i ==5:
+    axf.set_ylabel('Fraction of true values within CI')
   else:
-    axf[axi].tick_params(axis='y', which='both', left='off', right='off', labelleft='off')
+    axf.tick_params(axis='y', which='both', left='off', right='off', labelleft='off')
 
-  axf[axi].legend(loc='upper left')
+  axf.legend(loc='upper left')
 
-  if i==0:
-    axi += 2
-  else:
-    axi += 1
-  
 fig.tight_layout()
 
 

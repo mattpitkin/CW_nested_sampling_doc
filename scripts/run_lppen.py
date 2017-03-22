@@ -20,10 +20,17 @@ from scipy import stats
 import subprocess as sp
 from ConfigParser import ConfigParser
 from copy import copy
+from multiprocessing.dummy import Pool
 
 import lalapps.pulsarpputils as pppu
 from lalapps.pulsarpputils import pulsar_nest_to_posterior as pn2p
 from lalapps.pulsarpputils import upper_limit_greedy as ulg
+
+
+def run_process(commands):
+  p = sp.Popen(commands, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
+  out, err = p.communicate()
+  return 0
 
 
 def get_with_default(config, section, name, default):
@@ -162,6 +169,9 @@ if __name__=='__main__':
   if nruns < 1:
     print("Warning... number of nested sample runs is less than 1, default to 1 run", file=sys.stderr)
     nruns = 1
+
+  # get number of CPUs to run on
+  ncpus = ast.literal_eval(get_with_default(cp, 'run', 'ncpus', '1'))
 
   # get the detectors to use
   dets = ast.literal_eval(get_with_default(cp, 'run', 'detectors', "['H1']"))
@@ -468,12 +478,18 @@ PHI0 {PHI0}\\n'"""
 
     snrs = []
 
+    # run on multiple CPUs
+    npools = ncpus if nruns > ncpus else nruns
+    pool = Pool(npools) # ncpu concurrent commands at a time
+    commands = []
     for i in range(nruns):
-      # run lalapps_pulsar_parameter_estimation_nested
-      print(ppencodecall.format(ppen, dets[j], datafilesdict[dets[j]], priorfile, parfile, uniformprop, walkprop, stretchprop, outnest[j][i], nlive, extraargs), file=sys.stdout)
-      p = sp.Popen(ppencodecall.format(ppen, dets[j], datafilesdict[dets[j]], priorfile, parfile, uniformprop, walkprop, stretchprop, outnest[j][i], nlive, extraargs), stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
-      out, err = p.communicate()
-    
+      commands.append(ppencodecall.format(ppen, dets[j], datafilesdict[dets[j]], priorfile, parfile, uniformprop, walkprop, stretchprop, outnest[j][i], nlive, extraargs))
+
+    # run pool for lalapps_pulsar_parameter_estimation_nested
+    pool.map(run_process, commands)
+    pool.close()
+
+    for i in range(nruns):    
       # get SNRs
       snrfile = os.path.splitext(outnest[j][i])[0]+'_SNR'
       snr = get_snr(snrfile)

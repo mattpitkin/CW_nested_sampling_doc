@@ -72,23 +72,25 @@ phi0s = phi0range[0] + np.diff(phi0range)[0]*np.random.rand(nsigs)  # phi0 value
 psis = psirange[0] + np.diff(psirange)[0]*np.random.rand(nsigs)     # psi value
 cis = cirange[0] + np.diff(cirange)[0]*np.random.rand(nsigs)        # cos(iota) value
 
-nlive = 1024 # number of live points
+nlive = 2048 # number of live points
 #nlive = 256
 nruns = 2    # number of parallel runs for each analysis
+ncpus = 2    # number of cores required
 
 # create sub file for running run_lppen.py
 subfile = os.path.join(basedir, 'lppen.sub')
-subdata = """universe = vanilla
+subdata = """universe = parallel
 executable = /home/sismp2/repositories/CW_nested_sampling_doc/scripts/run_lppen.py
 arguments = " -r $(macroinifile) "
 getenv = True
 log = %s
 error = %s
 output = %s
+request_cpus = %d
 notification = never
 accounting_group = ligo.dev.o1.cw.targeted.bayesian
 queue 1
-""" % (os.path.join(logdir, 'run-$(cluster).log'), os.path.join(logdir,'run-$(cluster).err'), os.path.join(logdir,'run-$(cluster).out'))
+""" % (os.path.join(logdir, 'run-$(cluster).log'), os.path.join(logdir,'run-$(cluster).err'), os.path.join(logdir,'run-$(cluster).out'), ncpus)
 
 fp = open(subfile, 'w')
 fp.write(subdata)
@@ -123,6 +125,7 @@ for i in range(nsigs):
   cprun.set('run', 'outname', 'nest_%04d' % i)
   cprun.set('run', 'detectors', json.dumps(dets))
   cprun.set('run', 'nruns', str(nruns))
+  cprun.set('run', 'ncpus', str(ncpus))
 
   # set RA
   h, m, s = pppu.rad_to_hms(ras[i])

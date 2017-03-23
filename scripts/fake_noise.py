@@ -117,7 +117,7 @@ fp.close()
 # set the executables (this assumes that you are using virtual environments with virtualenvwrapper.sh and
 # have a WORKON_HOME environment variable set, but you can change the path as required)
 try:
-  virenv = 'production_gmm' # name of your virtual environment
+  virenv = 'lalapps_knope_O2' # name of your virtual environment
   execpath = os.path.join(os.environ['WORKON_HOME'], virenv)
   execpath = os.path.join(execpath, 'bin')
   ppenexec = os.path.join(execpath, 'lalapps_pulsar_parameter_estimation_nested')

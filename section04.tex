@@ -131,9 +131,17 @@ we have recovered one of these signals using approximately 1.4 days of simulated
 with values of several of the phase parameters ($f_0$, $\alpha$, $T_0$, $a\sin{i}$ and $P_{\text{b}}$) set to {\it not} match the known simulated signal
 values. Therefore, to recover the signal, in addition to the four \gw parameters we have had to allow the code to search over these extra parameters.
 For these additional parameters Gaussian priors were used, with the prior means set to be the parameter values used for heterodyning (not those for
-the actual signal), with standard devaitions wide enough to encompass the true signal values. The recovered signal posterior distributions can be seen
+the actual signal), with standard devaitions wide enough to encompass the true signal values. For $h_0$ a Fermi-Dirac prior was used, whilst the other
+angle parameters used priors covering their minimal allowed ranges. The recovered signal posterior distributions can be seen
 in Figure~\ref{fig:scox1_inj}, which show that the true parameters are correctly recovered (the plot show recovered phase parameters as offsets from
-the heterodyne parameter values, i.e.\ the centres of the Gaussian priors).
+the heterodyne parameter values, i.e.\ the centres of the Gaussian priors). It can be seen that for $f_0$ and $P_{\text{b}}$ the posteriors contain the
+correct value, but are peaked well away from the value used for heterodyning (which would be a zero in the plots), showing the codes ability to explore
+the prior space in these parameters. The one-dimensional marginal distribution for $\phi_0$ spans the full prior range, however, this is due to it being
+highly correlated with $f_0$, and, although not visible on the plot, this very strong correlation is present in the two-dimensional posterior for these
+parameters. Finally, for $\alpha$ and $T_0$ it can be seen that the posteriors just fill the prior ranges as the data give not additional information
+about these parameters. For completeness, we find that the the signal was recovered with SNRs of $\sim 20$ in both H1 and L1 individually, with a coherent
+SNR of $\sim 28$, and odds values for the multi-detector analysis of $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{N}}\right) = 152$
+and $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{I}}\right) = 7.8$.
 
 \subsection{Injections into real data}
 

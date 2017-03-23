@@ -79,14 +79,14 @@ ncpus = 2    # number of cores required
 
 # create sub file for running run_lppen.py
 subfile = os.path.join(basedir, 'lppen.sub')
-subdata = """universe = parallel
+subdata = """universe = vanilla
 executable = /home/sismp2/repositories/CW_nested_sampling_doc/scripts/run_lppen.py
 arguments = " -r $(macroinifile) "
 getenv = True
 log = %s
 error = %s
 output = %s
-request_cpus = %d
+machine_count = %d
 notification = never
 accounting_group = ligo.dev.o1.cw.targeted.bayesian
 queue 1

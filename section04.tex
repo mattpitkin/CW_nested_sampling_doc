@@ -126,7 +126,14 @@ The notebooks for the above two tests can be found \href{https://github.com/matt
 \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/signal_multidet/SimulatedSignalMultidetTestsPaper.ipynb}{here}.
 
 A set of simulated signals with sky location and orbital parameters set to those of the Low-mass X-ray binary Sco X-1 were injected into
-Gaussian noise for the study in \citet{2015PhRvD..92b3006M}. 
+Gaussian noise for the study in \citet{2015PhRvD..92b3006M}. As a test of our code when recovering a signal from a source in a binary system
+we have recovered one of these signals using approximately 1.4 days of simulated data. We have purposely performed the heterodyne data processing stage
+with values of several of the phase parameters ($f_0$, $\alpha$, $T_0$, $a\sin{i}$ and $P_{\text{b}}$) set to {\it not} match the known simulated signal
+values. Therefore, to recover the signal, in addition to the four \gw parameters we have had to allow the code to search over these extra parameters.
+For these additional parameters Gaussian priors were used, with the prior means set to be the parameter values used for heterodyning (not those for
+the actual signal), with standard devaitions wide enough to encompass the true signal values. The recovered signal posterior distributions can be seen
+in Figure~\ref{fig:scox1_inj}, which show that the true parameters are correctly recovered (the plot show recovered phase parameters as offsets from
+the heterodyne parameter values, i.e.\ the centres of the Gaussian priors).
 
 \subsection{Injections into real data}
 

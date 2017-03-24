@@ -6,6 +6,8 @@ some set prior ranges for the four main GW parameters (h0, phi0, cosiota and psi
 with the same declination, but with RA drawn from a Gaussian over a small range. f0 and f1 will also be drawn from Gaussian
 distributions over a small range.
 
+As we are searching over f0 we can just hold phi0 fixed at zero as the parameters are completely degenerate.
+
 Everything will be hardcoded in this script.
 
 These will be run as a Condor DAG.
@@ -23,7 +25,6 @@ import lalapps.pulsarpputils as pppu
 
 # set flat prior ranges on other parameters
 h0range = [0., 1e-20]
-phi0range = [0., np.pi]
 psirange = [0., np.pi/2.]
 cirange = [-1., 1.]
 
@@ -68,11 +69,10 @@ f1s = f1mean + f1sigma*np.random.randn(nsigs)
 
 # set injection parameters
 h0s = h0injrange[0] + np.diff(h0injrange)[0]*np.random.rand(nsigs)
-phi0s = phi0range[0] + np.diff(phi0range)[0]*np.random.rand(nsigs)  # phi0 value
 psis = psirange[0] + np.diff(psirange)[0]*np.random.rand(nsigs)     # psi value
 cis = cirange[0] + np.diff(cirange)[0]*np.random.rand(nsigs)        # cos(iota) value
 
-nlive = 2048 # number of live points
+nlive = 1024 # number of live points
 #nlive = 256
 nruns = 2    # number of parallel runs for each analysis
 ncpus = 2    # number of cores required
@@ -100,8 +100,8 @@ fp.close()
 dagfile = os.path.join(basedir, 'lppen.dag')
 fp = open(dagfile, 'w')
 
-priorstr = """'H0 uniform {} {}\\nPHI0 uniform {} {}\\nPSI uniform {} {}\\nCOSIOTA uniform {} {}\\nF0 gaussian {} {}\\nF1 gaussian {} {}\\nRA gaussian {} {}'
-""".format(h0range[0], h0range[1], phi0range[0], phi0range[1], psirange[0], psirange[1], cirange[0], cirange[1], f0mean, f0sigma, f1mean, f1sigma, ramean, rasigma)
+priorstr = """'H0 uniform {} {}\\nPSI uniform {} {}\\nCOSIOTA uniform {} {}\\nF0 gaussian {} {}\\nF1 gaussian {} {}\\nRA gaussian {} {}'
+""".format(h0range[0], h0range[1], psirange[0], psirange[1], cirange[0], cirange[1], f0mean, f0sigma, f1mean, f1sigma, ramean, rasigma)
 
 lppenexec = '/home/sismp2/lscsoft/.virtualenvs/lalapps_knope_O2/bin/lalapps_pulsar_parameter_estimation_nested'
 n2pexec = '/home/sismp2/lscsoft/.virtualenvs/lalapps_knope_O2/bin/lalapps_nest2pos'
@@ -152,7 +152,7 @@ for i in range(nsigs):
 
   cprun.add_section('injection')
   cprun.set('injection', 'snr', str(snrs[i]))
-  cprun.set('injection', 'injparams', json.dumps([{'RAJ': rastr, 'DECJ': decstr, 'H0': h0s[i], 'PHI0': phi0s[i], 'PSI': psis[i], 'COSIOTA': cis[i], 'F0': f0s[i], 'F1': f1s[i]}]))
+  cprun.set('injection', 'injparams', json.dumps([{'RAJ': rastr, 'DECJ': decstr, 'H0': h0s[i], 'PHI0': 0.0, 'PSI': psis[i], 'COSIOTA': cis[i], 'F0': f0s[i], 'F1': f1s[i]}]))
   cprun.set('injection', 'coherent', 'True')
 
   # write out configuration file

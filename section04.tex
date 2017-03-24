@@ -145,9 +145,24 @@ and $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{I}}\right) = 7.8$.
 
 \subsection{Injections into real data}
 
-\hl{Show results from an S5 hardware injection, an S6 software injections.}
+During all bar the first initial LIGO science run, simulated signals from a variety of sources have been physically ``injected'' into the detector
+datastreams. These are known as ``hardware injections'' \citep[see][for a general discussion of hardware injections, in particular relating to their
+use, and extraction, in advanced LIGO's first obersving run]{2016arXiv161207864B}. These have included a range of continuous wave signals of the form given
+by, e.g., Equation~2 of \citet{2017arXiv170107709T}, which in past have been searched for using a variety of analysis pipelines, including the one
+described in this document using \lppe \citep[see, e.g., Appendix~B of][]{2007PhRvD..76d2001A}.
 
-Here we look recovering both hardware and software simulated signals injected into real LIGO data.
+Here we have used \lppen to perform parameter estimation on the parameters $\vec{\theta} = \{h_0, \cos{\iota}, \psi, \phi_{0}\}$\footnote{$\phi_0$ is
+being used here as opposed to $\Phi_{22}^C$ as we are not having to compare to the previous code.} for two hardware injections added to intial LIGO
+data from the sixth science run (S6). These are two out of the thirteen total continuous wave injections and where called ``Pulsar03'' and ``Pulsar05''
+respectively. The data have been heterodyned with the known phase evolution of the signals. The extracted posterior distributions can be seen in
+Figures~\ref{fig:hwinj03} and \ref{fig:hwinj05} and are in very good agreement with the injection parameters.\footnote{For these hardware injections
+exact agreement between the expected injection parameters and those recovered, or between detectors, is not entirely expected. This is due to the
+injections needing to be performed using actuation functions (converting the expected \gw strain into a force required to be exerted in the
+interferometer test mass) that may not exactly match the actuations functions later required for calibrating the detectors.} For ``Pulsar03''
+the signal is recovered with SNRs of 164 and 96 in H1 and L1 respectively, and a coherent SNR of 190, and with
+$\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{N}}\right) = 6729$ and $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{I}}\right) = 9.1$. For ``Pulsar05''
+the signal is recovered with SNRs of 9.9 amd 6.4 in H1 and L1 respectively, and a coherent SNR of 11.8, and with
+$\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{N}}\right) = 22.5$ and $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{I}}\right) = 4.6$.
 
 \subsection{Monte-Carlo studies}
 
@@ -217,9 +232,10 @@ cumulative distribution. We see that, overall, our posteriors seem to produce po
 large deviations.
 
 Similarly, we have done the same thing for the posteriors produced from the simulations that included searches over $f_0$, $\dot{f}_0$, and $\alpha$. These
-P-P plots can be seen in Figure~\ref{fig:pp_extra}, where generally we see posterior credible intervals behaving as expected. However, we do find that the
-initial phase parameter, $\Phi_{22}^C$, distributions are maybe broader than we would expect. This is most likely due to this parameter being highly
-correlated with the frequency and not being well constrained, so the true distribution is not sampled well enough due to our finite number of posterior samples.
-\hl{Maybe re-run with increased numbers of live points or parallel runs.}
+``P-P plots'' can be seen in Figure~\ref{fig:pp_extra}, where generally we see posterior credible intervals behaving as expected. However, we do find that the
+initial phase parameter, $\phi_0$, distributions are broader than we would expect. We speculate that this is likely due to this parameter being very highly
+correlated with the frequency and this causing sampling issues that are more evident for for $\phi_0$ as it is unconstrained over its prior. So, the true
+distribution is not sampled well enough due to our finite number of posterior samples. A future alternative would be to work with initial and end phase values
+rather than frequency and $\phi_0$, which would be uncorrelated. \hl{Re-run with $\phi_0$ held fixed, as with fully degenerate parameters we can do this.}
 
 \subsubsection{Evaluating the odds}\label{sec:evalodds}

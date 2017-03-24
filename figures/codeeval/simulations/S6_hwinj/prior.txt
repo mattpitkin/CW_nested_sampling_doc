@@ -1,0 +1,4 @@
+H0 uniform 0 1e-20
+PHI0 uniform 0 3.14159265359
+PSI uniform 0 1.57079632679
+COSIOTA uniform -1 1

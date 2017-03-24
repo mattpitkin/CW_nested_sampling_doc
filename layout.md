@@ -21,6 +21,8 @@ figures/codeeval/simulations/noise_multiparam/noise_multiparam.png
 figures/codeeval/simulations/signal/simulatedsignaltest.png
 figures/codeeval/simulations/signal_multidet/simulatedsignalmultitest.png
 figures/codeeval/simulations/scox1_inj/scox1_inj.png
+figures/codeeval/simulations/S6_hwinj/hwinj03/hwinj03.png
+figures/codeeval/simulations/S6_hwinj/hwinj05/hwinj05.png
 figures/codeeval/stats/snrs/snr_plot.png
 figures/codeeval/stats/odds/odds_plot.png
 figures/codeeval/stats/snr_vs_odds/snr_v_odds_plot.png

@@ -54,9 +54,9 @@ ndirs = 2000
 statsfile = 'stats.json'
 
 pars = ['H0', 'PHI0', 'COSIOTA', 'PSI'] # parameters to pp-plot
-labels = ['$h_0$', '$\Phi_{22}^C$', '$\cos{\iota}$', '$\psi$']
+labels = ['$h_0$', '$\phi_0$', '$\cos{\iota}$', '$\psi$']
 hpars = ['H0', 'PHI0', 'COSIOTA', 'PSI', 'F0', 'F1', 'RA'] # parameters to pp-plot
-hlabels = ['$h_0$', '$\Phi_{22}^C$', '$\cos{\iota}$', '$\psi$', '$f$', '$\dot{f}$', r'$\alpha$']
+hlabels = ['$h_0$', '$\phi_0$', '$\cos{\iota}$', '$\psi$', '$f$', '$\dot{f}$', r'$\alpha$']
 
 detectors = ['H1', 'L1', 'H1,L1']
 dcolors = ['red', 'green', 'black']

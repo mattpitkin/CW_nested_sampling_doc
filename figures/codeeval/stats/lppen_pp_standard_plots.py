@@ -55,8 +55,8 @@ statsfile = 'stats.json'
 
 pars = ['H0', 'PHI0', 'COSIOTA', 'PSI'] # parameters to pp-plot
 labels = ['$h_0$', '$\phi_0$', '$\cos{\iota}$', '$\psi$']
-hpars = ['H0', 'PHI0', 'COSIOTA', 'PSI', 'F0', 'F1', 'RA'] # parameters to pp-plot
-hlabels = ['$h_0$', '$\phi_0$', '$\cos{\iota}$', '$\psi$', '$f$', '$\dot{f}$', r'$\alpha$']
+hpars = ['H0', 'COSIOTA', 'PSI', 'F0', 'F1', 'RA'] # parameters to pp-plot
+hlabels = ['$h_0$', '$\cos{\iota}$', '$\psi$', '$f$', '$\dot{f}$', r'$\alpha$']
 
 detectors = ['H1', 'L1', 'H1,L1']
 dcolors = ['red', 'green', 'black']
@@ -192,8 +192,16 @@ for i, ax in enumerate(axs.flatten()):
   ax.plot([0., 1.], [0., 1.], color='darkred', ls='--', lw=0.5)
   ax.set_xlim([0., 1.])
   ax.set_ylim([0., 1.])
-  ax.set_xlabel('Credible interval (%s)' % labels[i])
-  ax.set_ylabel('Fraction of true values within CI')
+  ax.text(0.85, 0.1, hlabels[i])
+  
+  if i > 1:
+    ax.set_xlabel('Credible interval (%s)' % labels[i])
+  else:
+    ax.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
+  if not i%2:
+    ax.set_ylabel('Fraction of true values within CI')
+  else:
+    ax.tick_params(axis='y', which='both', left='off', right='off', labelleft='off')
 
   ax.legend()
   
@@ -221,18 +229,10 @@ fp.close()
 # produce larger p-p plots
 pl.clf()
 
-#fig, axs = pl.subplots(3,3, figsize=(13,13))
-fig = pl.figure(figsize=(9,18))
+fig, axs = pl.subplots(3,2, figsize=(8,12))
 
 # loop over parameters and produce p-p plots
-for i in range(len(hpars)):
-  if i == 0:
-    gp = (0, 1)
-  else:
-    gp = (int(np.ceil(i/2.)), -2*(i%2-1))
-    
-  axf = pl.subplot2grid((4,4), gp, colspan=2)
-  
+for i, ax in enumerate(axs.flatten()):
   parcreds = np.array([inj[hpars[i]] for inj in hinjcreds])/100.
   parcreds.sort() # sort into order
 
@@ -243,33 +243,32 @@ for i in range(len(hpars)):
     x.sort()
     nb, binedges = np.histogram(x, bins=len(x), normed=True)
     cn = np.cumsum(nb)/len(x)
-    axf.step(binedges[:-1], cn, color='g', alpha=0.02)
+    ax.step(binedges[:-1], cn, color='g', alpha=0.02)
 
-  # perform K-S test (conparing to uniform distribution)
+  # perform K-S test (comparing to uniform distribution)
   D, pv = kstest(parcreds, lambda y: y)
 
   # create p-p plot histogram
   nb, binedges = np.histogram(parcreds, bins=len(parcreds), normed=True)
   cn = np.cumsum(nb)/len(parcreds)
-  axf.step(binedges[:-1], cn, color='k', label='KS $p$-value: %.2f' % pv)
-  axf.plot([0., 1.], [0., 1.], color='darkred', ls='--', lw=0.5)
-  axf.set_xlim([0., 1.])
-  axf.set_ylim([0., 1.])
-  axf.text(0.85, 0.1, hlabels[i])
+  ax.step(binedges[:-1], cn, color='k', label='KS $p$-value: %.2f' % pv)
+  ax.plot([0., 1.], [0., 1.], color='darkred', ls='--', lw=0.5)
+  ax.set_xlim([0., 1.])
+  ax.set_ylim([0., 1.])
+  ax.text(0.85, 0.1, hlabels[i])
 
-  if i > 4:
-    axf.set_xlabel('Credible interval')
+  if i > 3:
+    ax.set_xlabel('Credible interval')
   else:
-    axf.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
-  if i == 0 or i == 1 or i == 3 or i ==5:
-    axf.set_ylabel('Fraction of true values within CI')
+    ax.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
+  if not i%2:
+    ax.set_ylabel('Fraction of true values within CI')
   else:
-    axf.tick_params(axis='y', which='both', left='off', right='off', labelleft='off')
+    ax.tick_params(axis='y', which='both', left='off', right='off', labelleft='off')
 
-  axf.legend(loc='upper left')
+  ax.legend(loc='upper left')
 
 fig.tight_layout()
-
 
 # output P-P plots
 ppdir = os.path.join(os.getcwd(), 'pp_extra')

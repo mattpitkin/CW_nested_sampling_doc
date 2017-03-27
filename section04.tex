@@ -233,13 +233,13 @@ large deviations.
 
 Similarly, we have done the same thing for the posteriors produced from the simulations that included searches over $f_0$, $\dot{f}_0$, and $\alpha$. 
 In this case we know that the parameters are $f_0$ and $\phi_0$ are completely correlated (i.e.\ there is a degeneracy), so we have held the value of $\phi_0$
-fixed at zero.\footnote{In case where there is a degeneracy between parameters the samplers used in the code can have problems leading to observable effects in
+fixed at zero.\footnote{In cases where there is a degeneracy between parameters the samplers used in the code can have problems, leading to observable effects in
 the ``P-P plots''. In certain cases, where the degeneracies are known, there are ways to deal with this: one parameter of a degenerate pair can be held fixed,
-a custom proposal distribution can be hard codes for degenerate parameters that deals with the correlations, or, reparameterisations can be found that do not
-have the degeneracies. The latter of these may be implemented in our code to deal with strong degeneracies between the initial phase and derivatives of it
+a custom proposal distribution can be hard coded for degenerate parameters that deals with the correlations, or, reparameterisations can be found that do not
+have the degeneracies. In the future the latter of these may be implemented in our code to deal with strong degeneracies between the initial phase and derivatives of it
 (frequency, and further frequency derivatives). Such a parameterisation could involve using, e.g.\ the start and end phase, rather than $\phi_0$ and $f_0$,
 with further derivatives being incorporated through additional phase parameters at fixed times throughout the model. So, as another example, rather than
-internally sampling in $\phi_0$, $f_0$ and $\dot{f}_0$, one could use $\phi_{\text{start}}$, $\phi_{\text{mid}}$ and $\phi_{\text{end}}$, and convert between
+internally sampling in $\phi_0$, $f_0$, and $\dot{f}_0$, one could use $\phi_{\text{start}}$, $\phi_{\text{mid}}$, and $\phi_{\text{end}}$, and convert between
 the two using linear algebra.} These ``P-P plots'' can be seen in Figure~\ref{fig:pp_extra}, where generally we see posterior credible intervals behaving as
 expected.
 

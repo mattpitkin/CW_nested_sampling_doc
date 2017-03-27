@@ -14,12 +14,15 @@ figures/proptesting/walk_prop/kstest/collate_plots_wp_ks.png
 figures/proptesting/walk_uniform_prop/evidences/collate_plots_wup_evidences.png
 figures/proptesting/walk_uniform_prop/upperlimits/collate_plots_wup_uls.png
 figures/proptesting/walk_uniform_prop/kstest/collate_plots_wup_ks.png
+figures/codeeval/stats/numposts/numposts.png
 section04.tex
 figures/codeeval/simulations/noise/simulatednoisetest.png
 figures/codeeval/simulations/noise_multidet/simulatednoisemultidettest.png
 figures/codeeval/simulations/noise_multiparam/noise_multiparam.png
 figures/codeeval/simulations/signal/simulatedsignaltest.png
 figures/codeeval/simulations/signal_multidet/simulatedsignalmultitest.png
+figures/codeeval/stats/nest_evs/nest_evs.png
+figures/codeeval/stats/uls/uls.png
 figures/codeeval/simulations/scox1_inj/scox1_inj.png
 figures/codeeval/simulations/S6_hwinj/hwinj03/hwinj03.png
 figures/codeeval/simulations/S6_hwinj/hwinj05/hwinj05.png

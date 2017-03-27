@@ -143,6 +143,34 @@ about these parameters. For completeness, we find that the the signal was recove
 SNR of $\sim 28$, and odds values for the multi-detector analysis of $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{N}}\right) = 152$
 and $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{I}}\right) = 7.8$.
 
+\subsubsection{Results evaluation}\label{sec:reseval}
+
+The above results have shown good qualititive, and quantitative, agreement between the old and new codes for individual cases, but it is also useful
+to see how they compare for a large number of noise realisations when assessing two important quantities: the 95\% upper limit on \gw amplitude $h_0$,
+and the signal model evidence. It is also useful to see how these compare as a function of the number of live points used by the code. To this end we
+have choosen numbers of live points from 256 to 16384, increasing in a power of two for each step, and for each number generated 500 reaslisations of
+complex Gaussian noise with 1440 points over one day. Choosing a random source sky location for each realisation, and using uniform priors for the
+parameters $h_0$, $\cos{\iota}$, $\Phi_{22}^C$ and $\psi$, we have performed parameter estimation using both \lppen and \lppe in its grid-based mode.
+For \lppe the integrals required for calculating the signal evidence and 95\% upper limit on $h_0$ are performed using the trapezium rule, whilst
+for the output of \lppen the upper limit has been calculated used a greedy-binning approach bounded from zero. This assessment is very similar to what
+we did in \S\ref{sec:proposaltesting}, but has not just used a fixed Gaussian likelihood function in each case. We will make the assumption that the
+grid-based results are a representation of the true values for the evidence and upper limit, however, it should be noted that there will in fact be
+errors (and potentially biases) from the trapezium rule approximation.
+
+In Figure~\ref{fig:nest_evs} we see a comparison between the signal evidences evaluation using nested sampling and the trapezium rule. The left-hand
+axis shows the logarithm of the ratio of the two value, whilst the right hand axis shows the actual percentage difference between the evidences. These
+are plotted as a function of the number of live points used in the nested sampling evaluation by \lppen. We find that the distribution of evidences
+very closely follows the theoretically expected distribution calculated as $\sigma_{\mathcal{Z}} = \sqrt{H/N_{\text{live}}}$ (see
+\S\ref{sec:proposaltesting}), where given our prior range set up we found $\langle H \rangle \approx 2.45$. It can also be seen that there is a slight
+bias towards the nested sampling evidence being underestimated by a few percent, as was also observed for the simple Gaussian likelihood function case
+in Figure~\ref{fig:walkunipropevs}.
+
+In Figure~\ref{fig:uls} we see a comparison between the 95\% upper limits on $h_0$ as a function of the number of live points. The core distribution of upper
+limits produced via nested sampling are centred around the true (or grid-based) values, with the distribution decreasing with increasing numbers of live points.
+The standard deviation on the distribution roughly follows $2^{6.8}N_{\text{live}}^{-1/2}$. The figure shows some extreme outliers in the distributions, but it
+if found that these outliers occur in the cases when the number of posterior samples drawn from the nested samples is extremely low (the lower tails of the
+distributions in Figure~\ref{fig:numposts}).
+
 \subsection{Injections into real data}
 
 During all bar the first initial LIGO science run, simulated signals from a variety of sources have been physically ``injected'' into the detector
@@ -168,7 +196,7 @@ $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{N}}\right) = 22.5$ and $\log{}_{10
 
 In this section we will assess the outputs of \lppen using a range of simulated signals. We have created two sets of 2000 signal parameters to
 injected simulated signals into Gaussian noise (with the same standard deviation of $1\ee{-22}$) for the H1 and L1 detectors. Both sets have been generated
-with $\Phi_{22}^C$, $\psi$ and $\cos{\iota}$ drawn from uniform distributions over their minimal allowed ranges \citep[Table~1 of][]{2015MNRAS.453.4399P},
+with $\phi_0$, $\psi$ and $\cos{\iota}$ drawn from uniform distributions over their minimal allowed ranges \citep[Table~1 of][]{2015MNRAS.453.4399P},
 but the first set
 calculates $h_0$ such that the coherent SNR (Equation~\ref{eq:snr}) is drawn uniformly between 0 and 20; the second set draws the $h_0$ uniformly between
 0 and $3.25\ee{-22}$, such that the maximum coherent SNR (given the known noise level) is $\sim 55$. This latter set is used to evaluate the posterior
@@ -181,7 +209,7 @@ in \S\ref{sec:proposals}, and with the samples from both runs being combined to 
 
 Another set of 2000 simulations has been created that again create simulated signals and add them to Gaussian noise for the H1 and L1 detectors. In this
 case the total SNR shared between the detector has be drawn from a uniform distribution between 0 and 30, however, the signals have been purposely created
-to be incoherent between detectors. The parameters $\Phi_{22}^C$, $\psi$ and $\cos{\iota}$ are drawn from their minimal allowed ranges, but are different for
+to be incoherent between detectors. The parameters $\phi_0$, $\psi$ and $\cos{\iota}$ are drawn from their minimal allowed ranges, but are different for
 the signals input into the two detectors, whilst the sky positions are also independent for both detectors. The signal rotational frequency and frequency
 derivative are also offset between detectors, such that the offsets are drawn from Gaussian distributions of $1/2048$\,Hz and $1\ee{-10}$\,Hz$\,s^{-1}$
 respectively. The length of the data is the same as in the previous case, but it is assumed that the data for both detectors was heterodyned using the
@@ -244,3 +272,28 @@ the two using linear algebra.} These ``P-P plots'' can be seen in Figure~\ref{fi
 expected.
 
 \subsubsection{Evaluating the odds}\label{sec:evalodds}
+
+It is useful to see how the odds values, described in \S\ref{sec:odds}, look when calculated for our simulations. As mentioned above, along with coherent
+signals between two detectors, we have purposely created incoherent signals to see how the odds look. Firstly, just considering the coherent simulations,
+we can see in Figure~\ref{fig:snrvsodds} how the odds $\mathcal{O}_{\text{S}/\text{N}}$, $\mathcal{O}_{\text{S}/\text{I}}$ and
+$\mathcal{O}_{\text{S}/\text{I}_{\text{simple}}}$ (Equations~\ref{eq:sigvsnoise}, \ref{eq:cohvincoh2} and \ref{eq:cohvincoh1}, respectively) vary as a function
+of coherent SNR. We see that $\mathcal{O}_{\text{S}/\text{N}}$ rapidly increases, $\mathcal{O}_{\text{S}/\text{I}_{\text{simple}}}$ has a shallow growth,
+whilst $\mathcal{O}_{\text{S}/\text{I}}$ transitions between following $\mathcal{O}_{\text{S}/\text{N}}$ at very low SNR to matching 
+$\mathcal{O}_{\text{S}/\text{I}_{\text{simple}}}$ at higher SNR. This behaviour is consistent with our expectations described in Appendix~\ref{app:oddratios} with
+$\ln{\mathcal{O}_{\text{S}/\text{N}}} \propto \rho_{\text{coh}}^2$ and $\mathcal{O}_{\text{S}/\text{I}_{\text{simple}}} \propto \rho_{\text{coh}}$.
+We note that the locations of these distributions on the y-axis can be strongly effected by the prior volume, changes to which will move the distributions
+up or down, and can affect where they intersect. However, the general shape of the distributions should be very similar.
+
+In Figure~\ref{fig:oddsplot} there are two panels showing $\mathcal{O}_{\text{S}/\text{I}}$ as a function of $\mathcal{O}_{\text{S}/\text{N}}$. In the upper
+panel a hexagon-binned histogram has been used to plot the distribution for the coherent injections, with the bin colours showing the average
+coherent SNR. The plateauing of $\mathcal{O}_{\text{S}/\text{I}}$ is just that seen in Figure~\ref{fig:snrvsodds}. The bottom panel show the coherent signals
+as red circles, with the incoherent signals as dark circles (these are also seen in the lower left of the upper panel). Here we see that for incoherent signals
+the value of $\mathcal{O}_{\text{S}/\text{I}}$ between the coherent and incoherent signals diverges quite quickly, with $\ln{\mathcal{O}_{\text{S}/\text{I}}}$
+falling off roughly linearly with $\mathcal{O}_{\text{S}/\text{N}}$. This shows that, hopefully, for reasonable strength signals the value of
+$\mathcal{O}_{\text{S}/\text{I}}$ will be useful for distinguishing a coherent from an incoherent (and therefore not astrophyical) signal.\footnote{The caveats
+to this are that the way we created our incoherent signals may not well match true signals caused by instrumental (non-astrophysical) effects in \gw detectors.
+However, we hope our simulations are extreme, in a conservative way, in that one detector is actually containing an unadulterated signal, and is therefore
+potentially producing a far larger $\mathcal{O}_{\text{S}/\text{N}}$ value than might be expected.}
+
+These simulations were all performed with signal searches over only $h_0$, $\cos{\iota}$, $\phi_0$ and $\psi$. Uncertainties on other parameter will
+likely cause things to change, but it is expected that the distributions would look broadly similar with the main changes being slight rescalings of the axes.

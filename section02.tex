@@ -207,7 +207,7 @@ and twice the rotation frequency: if searching for a signal from a biaxial star 
 must either both be positive or both be negative; if using the source model then the two amplitudes $I_{21}$ and $I_{31}$, must
 have $I_{31} \geqslant I_{21}$.
 
-\subsubsection{Uniform prior}
+\subsubsection{Uniform prior}\label{sec:uniformprior}
 
 A parameter can be given a uniform (or flat, or top-hat) prior, in which the probabilty is constant within a given
 range and zero outside that range, i.e.
@@ -252,7 +252,7 @@ As well as single parameters being given Gaussian priors, we can define a set of
 where $\vec{\mu_x}$ are the means and $C$ is the covariance matrix. In reality we input the correlation coefficient matrix and individual
 parameter variances rather than the covariance matrix, but it is easy to convert between the two.
 
-\subsubsection{Gaussian Mixture Model prior}
+\subsubsection{Gaussian Mixture Model prior}\label{sec:gmmprior}
 
 A parameter, or pair of parameters, can be given a prior distribution composed of a superposition of Gaussian distributions (a
 Gaussian Mixture Model), with each component defined by a set of means for each parameter, a covariance matrix, and a weight
@@ -291,7 +291,7 @@ A histogram of a set of samples produced by the code when drawing from a log-uni
 $10^{-3}$ and 1 are shown in Figure~\ref{fig:priorloguniform},
 along with the true prior function.
 
-\subsubsection{Fermi-Dirac prior}
+\subsubsection{Fermi-Dirac prior}\label{sec:fdprior}
 
 A Fermi-Dirac distribution prior function was inspired by that used in \citet{Middleton_2015}. The prior has a sigmoid, or logistic,
 shape, although starts at large values and slopes downwards and is restricted to positive values. The form of the function, for
@@ -400,8 +400,9 @@ using the notation given in \S\ref{sec:likelihood}.\footnote{If using data input
 the noise standard deviations are actually passed to the code (see \S\ref{app:examples}), so in Equation~\ref{eq:snr} $M_{i,j}$ is replaced
 by $L_{i,j}$ and $y(\vec{\theta}_{\text{ML}})_{i,j,n}$ is replace by $y(\vec{\theta}_{\text{ML}})_{i,j,k}$ as in \S\ref{sec:glikelihood}.}
 
-A plot of true signal SNR versus recovered single-detector and joint detector SNRs, as calculated from Equation~\ref{eq:snr}, for
-a set of simulated singals (described in \S\ref{sec:simsignal}) are shown in Figure~\ref{fig:snrplot}.
+A plot of the residual between the recovered single-detector and joint detector SNRs and the true values versus the true signal SNRs,
+as calculated from Equation~\ref{eq:snr}, for a set of simulated signals (described in \S\ref{sec:simsignal}) are shown in Figure~\ref{fig:snrplot}.
+The standard deviation of the resisduals is found to be one, with a mean around zero, and does not appear to change as a function of SNR.
 
 \subsection{Odds values}\label{sec:odds}
 

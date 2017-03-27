@@ -155,7 +155,7 @@ for evs, evstrue, errs, info in zip(allevs_nest.values(), allevs_grid.values(), 
     evstds.append(np.std(np.array(evs)-np.array(evstrue))/np.log(10.))
     infos.append(np.mean(info))
 
-#print infos
+print np.mean(infos)
 
 ax.violinplot((np.array(allevs_nest.values())-np.array(allevs_grid.values())).T/np.log(10.), np.log2(nli), showextrema=False, showmeans=True)
 ax.errorbar(np.log2(nli), evmeans, yerr=everrs, fmt='o', capsize=3, capthick=1, color='r', markersize=3, label=r'$\sigma = \sqrt{H/N_{\rm live}}$')
@@ -191,7 +191,7 @@ p.communicate()
 
 caption = r"""\label{fig:nest_evs}
 The distributions of ratios of evidence values calculated as a function of the number of live points used, based on searches over $h_0$, $\cos{\iota}$,
-$\psi$ and $\phi0$ on 500 simulated Gaussian noise realisations for each $N_{\text{live}}$ value. The ratio compares the evidence produced by the
+$\psi$ and $\Phi_{22}^C$ on 500 simulated Gaussian noise realisations for each $N_{\text{live}}$ value. The ratio compares the evidence produced by the
 nested sampling algorithm in \lppen to that produced from a grid over the parameter space with \lppe (which we assume is a representation of the
 true value). A comparison of the estimated error on the evidence value using the information gain, $H$ (which is $\sim 2.4$ here), with the measured
 standard deviation of the distributions is also plotted and agree rather well.
@@ -240,7 +240,7 @@ p.communicate()
 
 caption = r"""\label{fig:uls}
 The distributions of ratios 95\% upper limits on $h_0$ as a function of the number of live points used, based on searches over $h_0$, $\cos{\iota}$,
-$\psi$ and $\phi0$ on 500 simulated Gaussian noise realisations for each $N_{\text{live}}$ value. The ratio compares the upper limits produced from the
+$\psi$ and $\Phi_{22}^C$ on 500 simulated Gaussian noise realisations for each $N_{\text{live}}$ value. The ratio compares the upper limits produced from the
 output of the nested sampling algorithm in \lppen to that produced from a grid over the parameter space with \lppe (which we assume is a representation of the
 true value). The dark horizontal bars show the minimum and maximum outliers of the distributions.
 """

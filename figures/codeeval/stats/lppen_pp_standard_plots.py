@@ -293,23 +293,35 @@ fp.close()
 #################################################
 # Create a plot of injected SNR versus recovered SNR for each detector
 pl.clf()
-fig = pl.figure(figsize=(6,5))
-ax = pl.gca()
+fig = pl.figure(figsize=(8,5))
+gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1], wspace=0.0)
+ax1 = pl.subplot(gs[0])
+ax2 = pl.subplot(gs[1])
 msizes = [4, 4, 2]
 labels = [detectors[0], detectors[1], 'Coherent']
 for i, det in enumerate(detectors):
-  ax.plot([isv[det] for isv in injsnrs], [rsv[det] for rsv in recsnrs], color=dcolors[i], ls='none', marker='o', ms=msizes[i], alpha=0.2, label=labels[i])
+  res = np.array([isv[det] for isv in injsnrs])-np.array([rsv[det] for rsv in recsnrs])
+  sigmas = np.std(res)
+  ax1.plot([isv[det] for isv in injsnrs], res, color=dcolors[i], ls='none', marker='o', ms=msizes[i], alpha=0.2, label=labels[i])
+  ax2.hist(res, bins=20, histtype='step', orientation='horizontal', edgecolor=dcolors[i], label=r'$\sigma = %.1f$' % sigmas, normed=True)
+  ax2.hist(res, bins=20, histtype='stepfilled', orientation='horizontal', facecolor=dcolors[i], alpha=0.1, edgecolor='none', normed=True)
 
 # make sure axes start at zero
 xlims = ax.get_xlim()
 ylims = ax.get_ylim()
-ax.set_xlim([0., 20.])
-ax.set_ylim([0., ylims[-1]])
+ax1.set_xlim([0., 20.])
+ax1.set_ylim([-5., 5.])
+ax2.set_ylim([-5., 5.])
 
-ax.set_xlabel('Injected SNR')
-ax.set_ylabel('Recovered SNR')
+ax1.set_xlabel(r'$\rho_{\rm inj}$')
+ax1.set_ylabel(r'$\rho_{\rm inj} - \rho_{\rm rec}$')
 
-ax.legend(loc='upper left')
+ax1.legend(loc='upper left')
+
+ax2.xaxis.set_visible(False)
+ax2.legend(loc='upper right')
+ax2.set_yticklabels([])
+ax2.get_yaxis().set_tick_params(which='both', direction='out')
 
 fig.tight_layout()
 
@@ -331,6 +343,12 @@ where the recovered values where calculated from the maximum likelihood signal t
 fp = open(os.path.join(ppdir, 'caption.tex'), 'w')
 fp.write(caption)
 fp.close()
+
+pl.clf()
+fig = pl.figure(figsize=(6,5))
+ax = pl.gca()
+ax.plot(np.array([isv['H1,L1'] for isv in injsnrs])-np.array([rsv['H1,L1'] for rsv in recsnrs]), '.')
+fig.savefig(os.path.join(ppdir, 'snr_plot_residual.png'), dpi=300)
 
 
 #################################################

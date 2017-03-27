@@ -162,3 +162,19 @@ consistent with expectations (as shown by the error bars). Similarly, the upper 
 Figures~\ref{fig:walkunipropuls} and \ref{fig:walkunipropks} respectively are consistent. The reason why this combination of proposals
 seems to work whereas the ensemble walk proposal on its own does not is currently not understood, but we plan more work on figuring this
 out.
+
+\subsection{Posterior sample generation}\label{sec:postsamps}
+
+As discussed in \S\ref{sec:general} nested sampling codes, such as \lppen, do not intrinsically output samples that can be histogrammed to give
+representations of marginalised posterior distributions for the model parameters. They instead output an ascending likelihood order list of samples,
+each of which occupies a known approximate amount prior volume. New samples must be drawn from these, with appropriate weighting (see Equation~\ref{eq:postaccept}),
+to give a new set of samples that does represent the posterior distribution. During this process it is also possible to appropriately combine samples from parallel
+independent nested sampling runs (weighting each based on their calculated evidences) to recalculate the evidence and generate posterior samples.
+
+What is described above is not a core function of the \lppen code, but is an integral part to generating results with it, and has been used to
+produce posterior distributions discussing earlier in the section, and later in this document. Due to the probablistic
+way that posterior samples are generated there will only be a finite number of samples, and the number of samples is dependent on the number
+of live points used when running nested sampling. The actual dependence of the number of posterior samples on $N_{\text{live}}$ can be seen in
+Figure~\ref{fig:numposts} (this uses the simulations discussed in \S\ref{sec:reseval}). It can be seen empirically that the mean number of posterior
+samples goes roughly as $\langle N_{\text{post}} \rangle \approx 2.4N_{\text{live}}$, although there is a lower tail extending to $N_{\text{post}} \approx
+0.01N_{\text{live}}^{1.14}$.

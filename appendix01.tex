@@ -280,17 +280,59 @@ allowed prior types (for descriptive purposed only) is:
 \begin{verbatim}
 H0      fermidirac 4.316e-24 9.1625
 PHI0    uniform    0.0       3.141593
-COSIOTA gmm        2  1.5896  0.0219  1.0  1.5519  0.0219  1.0
 PSI     gaussian   0.6764    0.16532
 A1      loguniform 1e-3      1e6
+F0:F1   gmm        2  [[123.4,-1e-9],[123.4,-1.5e-9]] [[[1e-16,1e-18],[1e-18,1e-10]],[[1e-16,1e-18],[1e-18,1e-10]]] [0.5,1]
+COSIOTA gmm        2  [[1.5896]]  [[[0.0219]]]  [1.0]  [[1.5519]]  [[[0.0219]]]  [1.0] [-1,1]
 \end{verbatim}
 
 The units required for parameters in a prior file are all SI units, whereas for the {\tt .par} file they often follow a different
 convention (see Table~\ref{tab:paramlist}).
 
-\hl{Describe each example and refer back to decriptions to be added in Section~\ref{sec:priorfuncs}.}
+Going through each line we have:
+\begin{description}
+ \item[{\tt{H0}}] this parameter has been assigned a Fermi-Dirac prior (\S\ref{sec:fdprior}) using the {\tt fermidirac} tag, which requires two values: $\sigma$ and $r$.
+ \item[{\tt{PHI0}}] this parameter has been assigned a uniform prior (\S\ref{sec:uniformprior}) using the {\tt uniform} tag, which requires two values: a lower limit and an upper limit.
+ \item[{\tt{PSI}}] this parameter has been assigned a Gaussian prior (\S\ref{sec:gaussianprior}) using the {\tt gaussian} tag, which requires two values: a mean and a standard deviation.
+ \item[{\tt{A1}}] this parameter has been assigned a prior uniform in the logarithm of the parameter (\S\ref{sec:loguniform}) using the {\tt loguniform} tag, which
+ required two values: a lower limit and an upper limit on the parameter ({\it not} the logarithm of the parameter).
+ \item[{\tt{F0:F1}}] this pair of parameters has been assigned a Gaussian mixture model prior (\S\ref{sec:gmmprior}). This prior can be used for any number of
+ parameters if given as a colon seperated list in the prior file. Following the {\tt gmm} assigment, a number gives the number of modes for the model. This is then
+ followed by a square-bracketed list of lists, with each mode giving a comma separated main list entry containing a sublist of comma separated means for each parameter 
+ (no additional whitespace is allowed in the lists). The list of means is then followed by a similar list of parameter covariance matrices for each mode (again no
+ additional whitespace is allowed). This is then followed by a final bracketed list giving the relative weights for each mode (the weights do not have to be
+ normalised to unity, as the code will automatically normalise them). If required this can then be followed by pairs of bracketed, comma separted value, for each
+ parameter giving their mimumum and maximum allowed ranges. If these are given then they have to be given for all parameters, not just some subset. These are not
+ given in this example.
+ \item[{\tt{COSIOTA}}] this single parameter has been assigned a Gaussian mixture model prior (\S\ref{sec:gmmprior}). This shows how to input a Gaussian mixture
+ mode for a single parameter, and also shows at the end mimumum and maximum ranges for the parameter have also been input.
+\end{description}
+
+If parameters in the prior file are specified with the {\tt gaussian} tag then a multivariate Gaussian prior may also be used for them if a correlation matrix
+is passed to \lppen (using the {\tt --cor-file} flag) containing correlation coefficients for the required parameters. Only the lower diagonal of the
+correlation matrix is required, e.g.\ if we wanted a multivariate prior on $f_0$ and $\dot{f}$ we could have a correlation coefficient file containing:
+\begin{verbatim}
+      F0   F1
+F0    1
+F1    0.5  1
+\end{verbatim}
+where the whitespace can be tabs of spaces, whilst the prior file contains the means and standard deviations of the parameters as noted above. It is worth noting
+that for fully (anti)correlated parameters correlation coefficients of one can lead to numerical issues during matrix inversion. So, in such cases the
+(anti)correlation could be reduced to, say, 99.99\%. However, better solutions to such a degeneracy would be to fix one of the correlated values (i.e.\ do not include
+it in the prior file) and only search over the other, or finding a non-degenerate re-parameterisation.
 
 \subsubsection{Example 1: single detector, single harmonic}
 
 One of the simplest cases for running the code is on data from a single detector and at a single frequncy harmonic (in this
 case at twice the rotation frequency).
+
+\subsection{The pipeline}
+
+The process of performing searches for known pulsars using does not just used \lppen. It actually requires a whole pipeline of code to: gather the \gw detector
+data and operational segments (``science mode'');  pre-processing the raw data via heterodyning (or spectral interpolation) to give the complex down-sampled
+time series; setting up the required prior distribution files; passing the data and priors to \lppen; converting the output nested samples into posterior samples;
+and, finally, displaying those results (including odds values) in a useful fashion, e.g.\ on a webpage. This process can be performed manually in a step by step
+manner, but there also exists a pipeline script called {\tt lalapps\_knope} that gathers together all these operations in a way that can be run on a computer
+cluster running the HTCondor\footnote{\url{https://research.cs.wisc.edu/htcondor/}} job management system.
+
+To run this pipeline requires just a single configuration file to be written.

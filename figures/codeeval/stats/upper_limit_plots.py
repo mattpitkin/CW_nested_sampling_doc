@@ -94,19 +94,27 @@ tar.close() # close tarball
 # plot number of posterior samples as a function of number of live points
 outdir = 'numposts'
 
-fig = pl.figure(figsize=(7,5))
+fig = pl.figure(figsize=(6,5))
 ax = pl.gca()
 
 npmeds = []
 npmeans = [] 
+npmins = []
+npmaxs = []
 for npvals in allnposts.values():
     npmeds.append(np.median(npvals))
     npmeans.append(np.mean(npvals))
+    npmins.append(np.min(npvals))
+    npmaxs.append(np.max(npvals))
 
 f = np.polyfit(np.log2(nli), np.log2(npmeans), 1)
+fmi = np.polyfit(np.log2(nli), np.log2(npmins), 1)
+fma = np.polyfit(np.log2(nli), np.log2(npmaxs), 1)
 
 ax.violinplot(allnposts.values(), np.log2(nli), showextrema=False, showmeans=True)
-ax.text(8, 70000, r'$\langle N_{\rm post} \rangle \approx %.1f N_{\rm live}$' % (2**f[1])) 
+ax.text(8, 70000, r'$\langle N_{\rm post} \rangle \approx %.1f N_{\rm live}$' % (2**f[1]))
+ax.text(8, 62000, r'$\left(N_{\rm post}\right)_{\rm min} \approx %.2f N_{\rm live}^{%.2f}$' % (2**fmi[1], fmi[0]))
+ax.text(8, 54000, r'$\left(N_{\rm post}\right)_{\rm max} \approx %.2f N_{\rm live}^{%.2f}$' % (2**fma[1], fma[0]))
 ax.set_xlabel(r'No. live points $(N_{\rm live})$')
 ax.set_ylabel(r'No. posterior samples $(N_{\rm post})$')
 
@@ -132,7 +140,7 @@ fp.close()
 pl.clf()
 
 # plot the distribution of signal versus noise odds as a function of number of live points used
-fig = pl.figure(figsize=(7,5))
+fig = pl.figure(figsize=(6,5))
 ax = pl.gca()
 
 outdir = 'nest_evs'
@@ -147,7 +155,7 @@ for evs, evstrue, errs, info in zip(allevs_nest.values(), allevs_grid.values(), 
     evstds.append(np.std(np.array(evs)-np.array(evstrue))/np.log(10.))
     infos.append(np.mean(info))
 
-print infos
+#print infos
 
 ax.violinplot((np.array(allevs_nest.values())-np.array(allevs_grid.values())).T/np.log(10.), np.log2(nli), showextrema=False, showmeans=True)
 ax.errorbar(np.log2(nli), evmeans, yerr=everrs, fmt='o', capsize=3, capthick=1, color='r', markersize=3, label=r'$\sigma = \sqrt{H/N_{\rm live}}$')
@@ -197,7 +205,7 @@ fp.close()
 pl.clf()
 
 # plot distributions of 95% h0 upper upper_limit
-fig = pl.figure(figsize=(7,5))
+fig = pl.figure(figsize=(6,5))
 ax = pl.gca()
 
 outdir = 'uls'
@@ -206,15 +214,22 @@ r = ax.violinplot(allh0s_diff.values(), np.log2(nli), showextrema=True, showmean
 ax.set_xlabel(r'No. live points $(N_{\rm live})$')
 ax.set_ylabel(r'$\left(\{h_0^{95\%}\}_{\rm nest} - \{h_0^{95\%}\}_{\rm grid}\right)/\{h_0^{95\%}\}_{\rm grid} \%$')
 
+ax.set_xticks(np.log2(nli))
+ax.set_xticklabels([r'$2^{%d}$' % int(nl) for nl in np.log2(nli)])
+
 yv = np.max([np.max(np.abs(hd)) for hd in allh0s_diff.values()])
 ax.set_ylim([-1.1*yv, 1.1*yv])
 
-r['cmaxes'].set_linewidth(0.5)
+r['cmaxes'].set_linewidth(1.5)
 r['cmaxes'].set_color('darkmagenta')
-r['cmins'].set_linewidth(0.5)
+r['cmins'].set_linewidth(1.5)
 r['cmins'].set_color('darkmagenta')
-r['cbars'].set_linewidth(1.0)
+r['cbars'].set_linewidth(0)
 r['cbars'].set_color('darkmagenta')
+
+# work out error as a function of Nlive
+fe = np.polyfit(np.log2(nli), np.log2(np.std(np.array(allh0s_diff.values()).T, axis=0)), 1)
+ax.text(12, 45, r'$\sigma_{h_0^{95\%%}} \approx 2^{%.1f} / N_{\rm live}^{%.1f} \%%$' % (fe[1], -fe[0]))
 
 fig.tight_layout()
 
@@ -227,5 +242,13 @@ caption = r"""\label{fig:uls}
 The distributions of ratios 95\% upper limits on $h_0$ as a function of the number of live points used, based on searches over $h_0$, $\cos{\iota}$,
 $\psi$ and $\phi0$ on 500 simulated Gaussian noise realisations for each $N_{\text{live}}$ value. The ratio compares the upper limits produced from the
 output of the nested sampling algorithm in \lppen to that produced from a grid over the parameter space with \lppe (which we assume is a representation of the
-true value).
+true value). The dark horizontal bars show the minimum and maximum outliers of the distributions.
 """
+
+#pl.clf()
+
+#fig = pl.figure(figsize=(6,5))
+#ax = pl.gca()
+#for i in range(3):
+#  ax.plot(allnposts.values()[i], allh0s_diff.values()[i], '.')
+#fig.savefig(os.path.join(outdir, 'ulserr.png'), dpi=300)

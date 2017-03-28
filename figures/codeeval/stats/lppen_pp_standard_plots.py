@@ -40,13 +40,14 @@ utarball = 'pp_standard_uniform.tar.gz' # analysis with values uniform in h0 and
 itarball = 'pp_incoherent.tar.gz'
 
 # tarball containing (coherent) higher dimensional runs
-#htarball = 'pp_roq.tar.gz'
+htarball1 = 'pp_roq.tar.gz'
 htarball = 'pp_roq_uniform.tar.gz'
 
 tar = tarfile.open(tarball, "r:gz")
 utar = tarfile.open(utarball, "r:gz")
 itar = tarfile.open(itarball, "r:gz")
 htar = tarfile.open(htarball, "r:gz")
+htar1 = tarfile.open(htarball1, "r:gz")
 
 # number of sub-directories
 ndirs = 2000
@@ -67,52 +68,31 @@ recsnrs = []
 sigev = []
 noiseev = []
 
-# COHERENT (uniform SNR): loop through directories and grab required data
-for m in tar.getmembers():
-  if m.isfile():
-    if statsfile in m.name:
-      fp = tar.extractfile(m)
-      d = json.load(fp)
-    
-      # injected and recovered SNRs
-      injsnrs.append(d['Injected SNR'])
-      recsnrs.append(d['Recovered SNR'])
-
-      # noise evidences and signal evidences
-      sigev.append(d['Signal evidence'])
-      noiseev.append(d['Noise evidence'])
-
-tar.close() # close tarball
-
 injcreds = [] # injection credible intervals for uniform amplitude analysis
 # snrs to use
 snrlim = 0. # use signals with SNRs greater than this
 
-uinjsnrs = []
-urecsnrs = []
-
-usigev = []
-unoiseev = []
-
-# COHERENT (uniform amplitude)
-for m in utar.getmembers():
-  if m.isfile():
-    if statsfile in m.name:
-      fp = utar.extractfile(m)
-      d = json.load(fp)
-
-      # get injection credible intervals for joint analysis
-      if d['Injected SNR'][detectors[-1]] > snrlim:
-        injcreds.append(d['Injection credible intervals'][detectors[-1]])
+# COHERENT (uniform SNR): loop through directories and grab required data
+for k, tf in enumerate([tar, utar]):
+  for m in tf.getmembers():
+    if m.isfile():
+      if statsfile in m.name:
+        fp = tf.extractfile(m)
+        d = json.load(fp)
     
-      # injected and recovered SNRs
-      uinjsnrs.append(d['Injected SNR'])
-      urecsnrs.append(d['Recovered SNR'])
+        # get injection credible intervals for joint analysis
+        if d['Injected SNR'][detectors[-1]] > snrlim and k == 0:
+          injcreds.append(d['Injection credible intervals'][detectors[-1]])
+    
+        # injected and recovered SNRs
+        injsnrs.append(d['Injected SNR'])
+        recsnrs.append(d['Recovered SNR'])
 
-      # noise evidences and signal evidences
-      usigev.append(d['Signal evidence'])
-      unoiseev.append(d['Noise evidence'])
+        # noise evidences and signal evidences
+        sigev.append(d['Signal evidence'])
+        noiseev.append(d['Noise evidence'])
 
+tar.close() # close tarball
 utar.close()
 
 # INCOHERENT: loop through directories and grab required data (for SNRs above limit)
@@ -144,25 +124,27 @@ hinjsnrs = []
 hrecsnrs = []
 hinjcreds = []
 
-for m in htar.getmembers():
-  if m.isfile():
-    if statsfile in m.name:
-      fp = htar.extractfile(m)
-      d = json.load(fp)
+for k, tf in enumerate([htar, htar1]):
+  for m in tf.getmembers():
+    if m.isfile():
+      if statsfile in m.name:
+        fp = tf.extractfile(m)
+        d = json.load(fp)
 
-      # get injection credible intervals for joint analysis
-      if d['Injected SNR'][detectors[-1]] > snrlim:
-        hinjcreds.append(d['Injection credible intervals'][detectors[-1]])
+        # get injection credible intervals for joint analysis
+        if d['Injected SNR'][detectors[-1]] > snrlim and k == 0:
+          hinjcreds.append(d['Injection credible intervals'][detectors[-1]])
 
-      # injected and recovered SNRs
-      hinjsnrs.append(d['Injected SNR'])
-      hrecsnrs.append(d['Recovered SNR'])
+        # injected and recovered SNRs
+        hinjsnrs.append(d['Injected SNR'])
+        hrecsnrs.append(d['Recovered SNR'])
 
-      # noise evidences and signal evidences
-      hsigev.append(d['Signal evidence'])
-      hnoiseev.append(d['Noise evidence'])
+        # noise evidences and signal evidences
+        hsigev.append(d['Signal evidence'])
+        hnoiseev.append(d['Noise evidence'])
 
 htar.close() # close tarball
+htar1.close()
 
 fig, axs = pl.subplots(2,2, figsize=(9,9))
 
@@ -309,7 +291,7 @@ for i, det in enumerate(detectors):
 # make sure axes start at zero
 xlims = ax.get_xlim()
 ylims = ax.get_ylim()
-ax1.set_xlim([0., 20.])
+ax1.set_xlim([0., 30.])
 ax1.set_ylim([-5., 5.])
 ax2.set_ylim([-5., 5.])
 
@@ -345,10 +327,6 @@ fp.write(caption)
 fp.close()
 
 pl.clf()
-fig = pl.figure(figsize=(6,5))
-ax = pl.gca()
-ax.plot(np.array([isv['H1,L1'] for isv in injsnrs])-np.array([rsv['H1,L1'] for rsv in recsnrs]), '.')
-fig.savefig(os.path.join(ppdir, 'snr_plot_residual.png'), dpi=300)
 
 
 #################################################
@@ -395,16 +373,33 @@ for se, ne in zip(isigev, inoiseev):
     incoherentcombs = np.logaddexp(incoherentcombs, combsum)
   ibcins.append(se[detectors[-1]] - incoherentcombs)
 
+# LARGER PARAMETER SPACE SIGNALS
+lbcins = []
+lbcis = []
+lcohO = []
+for se, ne in zip(hsigev, hnoiseev):
+  ifossn = []
+  idd = 0.
+  for j in range(nifos):
+    ifossn.append({'s': se[detectors[j]], 'n': ne[detectors[j]]})
+    idd += se[detectors[j]]
+  lcohO.append(se[detectors[-1]] - ne[detectors[-1]])
+
+  combs = [list(i) for i in itertools.product(['s', 'n'], repeat=nifos)]
+  incoherentcombs = -np.inf
+  for comb in combs:
+    combsum = 0.
+    for i, cval in enumerate(comb):
+      combsum += ifossn[i][cval]
+    incoherentcombs = np.logaddexp(incoherentcombs, combsum)
+  lbcins.append(se[detectors[-1]] - incoherentcombs)
+  lbcis.append(se[detectors[-1]] - idd)
+
 pl.clf()
 
 fig = pl.figure(figsize=(10,8))
 
-gs = gridspec.GridSpec(2, 2, width_ratios=[25,1], height_ratios=[1,1], wspace=0.03, hspace=0.03)
-
-ax1 = pl.subplot(gs[0])
-
-#fig, axs = pl.subplots(2,1, figsize=(10,8))
-#ax = pl.gca()
+fig, axs = pl.subplots(2, 1, figsize=(10,8))
 
 # on left plot just plot coherent results and incoherent ones with log(O_S/I) greater than range of plot. 
 cohO = np.array(cohO)/np.log(10.)
@@ -414,33 +409,34 @@ bcis = np.array(bcis)/np.log(10.)
 icohO = np.array(icohO)/np.log(10.)
 ibcins = np.array(ibcins)/np.log(10.)
 
+lcohO = np.array(lcohO)/np.log(10.)
+lbcins = np.array(lbcins)/np.log(10.)
+lbcis = np.array(lbcis)/np.log(10.)
+
 cohsnrs = np.array([isv[detectors[-1]] for isv in injsnrs])
-#hb = ax.scatter(cohO, bcins, c=cohsnrs, s=cohsnrs, alpha=0.5)
-hb = ax1.hexbin(cohO, bcins, gridsize=75, C=[isv[detectors[-1]] for isv in injsnrs], alpha=0.9)
+hb = axs[0].scatter(cohO, bcins, c=cohsnrs, s=cohsnrs, alpha=0.5)
+#hb = axs[0].hexbin(cohO, bcins, gridsize=75, C=[isv[detectors[-1]] for isv in injsnrs], alpha=0.9)
 
 # set color bar
-axcb = pl.subplot(gs[1])
+axcb = fig.add_axes([0.82, 0.52, 0.01, 0.3]) 
 cb = pl.colorbar(hb, cax=axcb)
-cb.set_label('signal-to-noise ratio')
+cb.set_label(r'$\rho_{\rm coh}$')
+cb.ax.yaxis.set_label_position('left')
 
-xlims = ax1.get_xlim()
-ylims = ax1.get_ylim()
+xlims = axs[0].get_xlim()
+ylims = axs[0].get_ylim()
 
-ax1.plot(icohO, ibcins, 'ko', ms=5, alpha=0.3)
-ax1.set_ylim(ylims)
+axs[0].plot(icohO, ibcins, 'ko', ms=5, alpha=0.15)
+axs[0].set_ylim(ylims)
 
-axty = ax1.twiny()
-axtx = ax1.twinx()
+axty = axs[0].twiny()
+axtx = axs[0].twinx()
 
-ax1.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
-ax1.tick_params(axis='y', which='both', left='off', right='off', labelleft='off')
-ax1.xaxis.grid(False)
-ax1.yaxis.grid(False)
+axs[0].tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
+axs[0].tick_params(axis='y', which='both', left='off', right='off', labelleft='off')
+axs[0].xaxis.grid(False)
+axs[0].yaxis.grid(False)
 
-#axty.set_xlim(10**np.array(xlims))
-#axty.set_xscale('log', nonposx='clip')
-#logpos = np.arange(np.around(xlims[0], decimals=-1)+10, np.around(xlims[1], decimals=-1)+10., 10)
-#axty.set_xticks(np.logspace(logpos[0], logpos[-1], len(logpos)))
 axtx.set_ylim(10**np.array(ylims))
 axtx.set_yscale('log', nonposx='clip')
 
@@ -448,31 +444,42 @@ axty.xaxis.set_ticks_position('bottom')
 axty.tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off')
 axtx.yaxis.set_ticks_position('left')
 
-#axty.set_xlabel(r'$\mathcal{O}_{{\rm S}/{\rm N}}$')
 axtx.set_ylabel(r'$\mathcal{O}_{{\rm S}/{\rm I}}$')
 axty.xaxis.set_label_position('bottom')
 axtx.yaxis.set_label_position('left')
 
 # on right plot show both coherent and incoherent over full ranges
-ax2 = pl.subplot(gs[2]) #, sharex=axty)
-ax2.loglog(10**cohO, 10**bcins, 'ro', ms=5, alpha=0.8, label='Coherent')
+axs[1].scatter(cohO, bcins, c=cohsnrs, s=cohsnrs, alpha=0.5)
 
 # overplot incoherent signal values
-ax2.loglog(10**icohO, 10**ibcins, 'ko', ms=5, alpha=0.3, label='Incoherent')
+axs[1].plot(icohO, ibcins, 'ko', ms=5, alpha=0.15, label='Incoherent')
 
-ax2.set_xlabel(r'$\mathcal{O}_{{\rm S}/{\rm N}}$')
-ax2.set_ylabel(r'$\mathcal{O}_{{\rm S}/{\rm I}}$')
+axs[1].set_xlabel(r'$\mathcal{O}_{{\rm S}/{\rm N}}$')
+axs[1].set_ylabel(r'$\mathcal{O}_{{\rm S}/{\rm I}}$')
 
-ax2.legend(loc='best')
+axs[1].legend(loc='best')
 
 # re-set top plot x-axis to match bottom plot
-xlims = ax2.get_xlim()
+xlims = axs[1].get_xlim()
 axty.set_xlim(xlims)
-axty.set_xscale('log', nonposx='clip')
-logpos = np.arange(np.around(np.log10(xlims[0]), decimals=-1)+10, np.around(np.log10(xlims[1]), decimals=-1), 10)
-axty.set_xticks(np.logspace(logpos[0], logpos[-1], len(logpos)))
-ax2.set_xticks(np.logspace(logpos[0], logpos[-1], len(logpos)))
-ax1.set_xlim(np.log10(xlims))
+
+fig.canvas.draw()
+# change y labels to be of the form 10^{N}
+xlabels = []
+for ticklabel in axs[1].get_xticklabels():
+  xl = ticklabel.get_text()
+  xl = '{' + xl.replace("$", "") + '}'
+  xlabels.append(r'$10^{%s}$' % xl)
+axs[1].set_xticklabels(xlabels)
+
+ylabels = []
+for ticklabel in axs[1].get_yticklabels():
+  xl = ticklabel.get_text()
+  xl = '{' + xl.replace("$", "") + '}'
+  ylabels.append(r'$10^{%s}$' % xl)
+axs[1].set_yticklabels(ylabels)
+
+pl.subplots_adjust(hspace=0.05, wspace=0.15)
 
 #fig.tight_layout()
 
@@ -513,12 +520,12 @@ ax.set_ylim([-5., 12.])
 
 # get fits to the log(O^S_N) distribution as a function of SNR^2
 f = np.polyfit(cohsnrs, cohO, 2)
-csnrs = np.linspace(0.01, 20., 50)
+csnrs = np.linspace(0.01, 30., 80)
 ax.plot(csnrs, f[2] + f[1]*csnrs + f[0]*csnrs**2, 'g-', lw=2)
 
 # get fits to the max of O^S_Isimple (note: not the log) as a function of SNR
-dsnr = 0.1 # steps in SNR
-nsnrs = np.arange(1.5, 20, dsnr)
+dsnr = 0.25 # steps in SNR
+nsnrs = np.arange(1.5, 30, dsnr)
 maxbcis = np.zeros(len(nsnrs))
 snrvals = np.zeros(len(nsnrs))
 for i, nsnr in enumerate(nsnrs):
@@ -532,7 +539,7 @@ ax.plot(csnrs[csnrs>1.5], f[1] + np.log10(csnrs[csnrs>1.5])*f[0], '-', color='or
 ax.set_xlabel(r'$\rho_{\rm coh}$')
 ax.set_ylabel(r'$\mathcal{O}$')
 ax.legend(loc='best')
-ax.set_xlim([0., 20.])
+ax.set_xlim([0., 30.])
 
 fig.canvas.draw()
 # change y labels to be of the form 10^{N}
@@ -562,6 +569,84 @@ in Equation~\ref{eq:cohvincoh1}), more complete coherent signal versus incoheren
 ($\mathcal{O}_{\rm S/N}$ given in Equation~\ref{eq:sigvsnoise}). Also shown are lines with a quadratic fit
 to the $\mathcal{O}_{\rm S/N}$ values, to show the $\log{\mathcal{O}_{\rm S/N}} \propto \rho_{\text{coh}}^2$ relation,
 and a fit to show the $\mathcal{O}_{{\rm S/I}_{\rm simple}} \propto \rho_{\text{coh}}$ relation.
+"""
+
+fp = open(os.path.join(ppdir, 'caption.tex'), 'w')
+fp.write(caption)
+fp.close()
+
+
+# plot standard search SNR vs coherent odds with the larger parameter space ones overlaid
+ppdir = os.path.join(os.getcwd(), 'snr_vs_odds_larger')
+pl.clf()
+
+fig, axs = pl.subplots(1, 2, sharey=True, figsize=(11,8))
+
+hcohsnrs = np.array([isv[detectors[-1]] for isv in hinjsnrs])
+
+axs[0].plot(cohsnrs, bcins, 'o', ms=4, color='blue', alpha=0.05)
+axs[0].plot(cohsnrs, cohO, 'o', ms=4, color='green', alpha=0.05)
+
+axs[0].plot(hcohsnrs, lbcins, '.', ms=6, color='darkblue', label=r'$\mathcal{O}_{\rm S/I}$')
+axs[0].plot(hcohsnrs, lcohO, '.', ms=5, color='yellowgreen', label=r'$\mathcal{O}_{\rm S/N}$')
+
+axs[0].set_xlabel(r'$\rho_{\rm coh}$')
+axs[0].set_ylabel(r'$\mathcal{O}$')
+
+ylims = axs[0].get_ylim()
+axs[0].set_ylim([-55, 25])
+axs[0].set_xlim([0., 50.])
+
+axs[0].legend(loc='best')
+
+#axs[1].plot(cohO, bcins, 'ro', ms=3, alpha=0.2)
+#hb = axs[1].hexbin(lcohO, lbcins, gridsize=75, C=[isv[detectors[-1]] for isv in hinjsnrs], alpha=0.9)
+hb = axs[1].scatter(lcohO, lbcins, c=hcohsnrs, s=hcohsnrs, alpha=0.8)
+axs[1].plot(cohO, bcins, 'bo', ms=4, alpha=0.05)
+
+cbaxes = fig.add_axes([0.85, 0.15, 0.015, 0.55]) 
+cb = pl.colorbar(hb, cax=cbaxes) 
+cb.set_label(r'$\rho_{\rm coh}$')
+cb.ax.yaxis.set_label_position('left')
+
+axs[1].set_xlabel(r'$\mathcal{O}_{\rm S/N}$')
+axs[1].set_ylabel(r'$\mathcal{O}_{\rm S/I}$')
+
+#fig.tight_layout()
+fig.canvas.draw()
+# change y labels to be of the form 10^{N}
+ylabels = []
+for ticklabel in axs[0].get_yticklabels():
+  xl = ticklabel.get_text()
+  xl = '{' + xl.replace("$", "") + '}'
+  ylabels.append(r'$10^{%s}$' % xl)
+axs[0].set_yticklabels(ylabels)
+
+xlabels = []
+for ticklabel in axs[1].get_xticklabels():
+  xl = ticklabel.get_text()
+  xl = '{' + xl.replace("$", "") + '}'
+  xlabels.append(r'$10^{%s}$' % xl)
+axs[1].set_xticklabels(xlabels)
+
+pl.subplots_adjust(wspace=0.11)
+
+if not os.path.isdir(ppdir):
+  os.makedirs(ppdir)
+fig.savefig(os.path.join(ppdir, 'snr_v_odds_larger_plot.png'), dpi=300)
+fig.savefig(os.path.join(ppdir, 'snr_v_odds_larger_plot.pdf'))
+
+p = sp.Popen('pdftops -eps %s' % os.path.join(ppdir, 'snr_v_odds_larger_plot.pdf'), shell=True)
+p.communicate()
+
+caption = r"""\label{fig:snrvsodds_larger}
+Plots showing odds values for a range of simulated signals for searches over the seven parameters of $h_0$, $\phi_0$,
+$\cos{\iota}$, $\psi$, $f_0$, $\dot{f}$, and $\alpha$. The solid points in the left panel shows two odds values
+($\mathcal{O}_{\rm S/I}$ and $\mathcal{O}_{\rm S/N}$) plotted as a function of the injected coherent signal-to-noise ratio
+($\rho_{\text coh}$). Also shown, underplotted as shaded circles, are the value for the four parameter search seen in
+Figure~\ref{fig:snrvsodds}. The right plot shows $\mathcal{O}_{\rm S/I}$ as a function of $\mathcal{O}_{\rm S/N}$, with
+the colour of each point giving the coherent SNR. Also shown, as the light blue circles, are the values for the four
+parameter search seen in Figure~\ref{fig:oddsplot}.
 """
 
 fp = open(os.path.join(ppdir, 'caption.tex'), 'w')

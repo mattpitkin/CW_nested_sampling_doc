@@ -26,11 +26,12 @@ figures/codeeval/stats/uls/uls.png
 figures/codeeval/simulations/scox1_inj/scox1_inj.png
 figures/codeeval/simulations/S6_hwinj/hwinj03/hwinj03.png
 figures/codeeval/simulations/S6_hwinj/hwinj05/hwinj05.png
+figures/codeeval/stats/pp_standard/pp_plots_standard.png
+figures/codeeval/stats/pp_extra/pp_plots_extra.png
 figures/codeeval/stats/snrs/snr_plot.png
 figures/codeeval/stats/odds/odds_plot.png
 figures/codeeval/stats/snr_vs_odds/snr_v_odds_plot.png
-figures/codeeval/stats/pp_standard/pp_plots_standard.png
-figures/codeeval/stats/pp_extra/pp_plots_extra.png
+figures/codeeval/stats/snr_vs_odds_larger/snr_v_odds_larger_plot.png
 appendix01.tex
 appendix02.tex
 appendix03.tex

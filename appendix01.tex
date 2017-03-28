@@ -335,4 +335,7 @@ and, finally, displaying those results (including odds values) in a useful fashi
 manner, but there also exists a pipeline script called {\tt lalapps\_knope} that gathers together all these operations in a way that can be run on a computer
 cluster running the HTCondor\footnote{\url{https://research.cs.wisc.edu/htcondor/}} job management system.
 
-To run this pipeline requires just a single configuration file to be written.
+To run this pipeline requires just a single configuration file to be written in the {\tt INI}\footnote{\url{https://en.wikipedia.org/wiki/INI_file}} format.
+
+Unless specified as otherwise within a {\tt .par} file the pipeline assumes the use of the TCB timing convention (as is the default for TEMPO2), and the DE405
+solar system ephemeris.

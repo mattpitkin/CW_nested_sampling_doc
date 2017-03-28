@@ -194,13 +194,14 @@ $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{N}}\right) = 22.5$ and $\log{}_{10
 
 \subsection{Monte-Carlo studies}
 
-In this section we will assess the outputs of \lppen using a range of simulated signals. We have created two sets of 2000 signal parameters to
-injected simulated signals into Gaussian noise (with the same standard deviation of $1\ee{-22}$) for the H1 and L1 detectors. Both sets have been generated
+In this section we will assess the outputs of \lppen using a range of simulated signals. We have created two sets of 2000 signal parameters with which to
+inject simulated signals into Gaussian noise (with the same standard deviation of $1\ee{-22}$) for the H1 and L1 detectors. Both sets have been generated
 with $\phi_0$, $\psi$ and $\cos{\iota}$ drawn from uniform distributions over their minimal allowed ranges \citep[Table~1 of][]{2015MNRAS.453.4399P},
 but the first set
 calculates $h_0$ such that the coherent SNR (Equation~\ref{eq:snr}) is drawn uniformly between 0 and 20; the second set draws the $h_0$ uniformly between
 0 and $3.25\ee{-22}$, such that the maximum coherent SNR (given the known noise level) is $\sim 55$. This latter set is used to evaluate the posterior
-distributions as described below in \S\ref{sec:ppplots}. The source's sky locations are drawn uniformly from over the sky-sphere. For these analyses each
+distributions as described below in \S\ref{sec:ppplots}, whilst both sets are used to evaluate odds distributions. The source's sky locations are drawn
+uniformly from over the sky-sphere. For these analyses each
 simulated data set is one solar day long, consisting of 1440 complex data points (generated as if heterodyned at precisely the known source phase evolution)
 sampled once per minute. This data has been used to estimate the four parameters $h_0$, $\cos{\iota}$, $\Phi_{22}^C$ and $\psi$, with each being given
 a flat prior: the angles and cosine of orientation angle over their minimal ranges, and $h_0$ between zero and $1\ee{-20}$ (well above the extent of the
@@ -221,7 +222,8 @@ the rotational frequency $f_0$, frequency derivative $\dot{f}_0$, and right asce
 used, with parameters given in Table~\ref{tab:gaussianpriors}. These Gaussian priors are used when generating signals and when estimating them
 using \lppen, whilst the simulated data is created such that it was heterodyned using the means values. As above, one set of these simulations has amplitude 
 calculated such that the coherent SNRs are drawn uniformly between 0 and 20, whilst the other has amplitude drawn uniformly between 0 and $3.25\ee{-22}$.
-Again, the angles are drawn uniformly from their minimal ranges and sky positions are drawn uniformly over the sky-sphere.
+The latter of these is used to evaluate the posterior distributions, whilst both are used for odds distributions assessment. Again, the angles are drawn
+uniformly from their minimal ranges and sky positions are drawn uniformly over the sky-sphere.
 
 \begin{table}[!hptb]
 \caption{Gaussian prior parameters for rotational frequency, frequency derivative and right ascension for a set of simulated signals.
@@ -295,5 +297,15 @@ to this are that the way we created our incoherent signals may not well match tr
 However, we hope our simulations are extreme, in a conservative way, in that one detector is actually containing an unadulterated signal, and is therefore
 potentially producing a far larger $\mathcal{O}_{\text{S}/\text{N}}$ value than might be expected.}
 
-These simulations were all performed with signal searches over only $h_0$, $\cos{\iota}$, $\phi_0$ and $\psi$. Uncertainties on other parameter will
+The above simulations were all performed with signal searches over only $h_0$, $\cos{\iota}$, $\phi_0$ and $\psi$. Uncertainties on other parameter will
 likely cause things to change, but it is expected that the distributions would look broadly similar with the main changes being slight rescalings of the axes.
+
+It is useful to see how these distributions change when the parameter space searched over increases in complexity. So, in Figure~\ref{fig:snrvsodds_larger}
+we see similar plots to those above, but for the simulations that included searches over $f_0$, $\dot{f}$, and $\alpha$ (but fixed $\phi_0$). In the left
+panel we see $\mathcal{O}_{\text{S}/\text{N}}$ and $\mathcal{O}_{\text{S}/\text{I}}$ as a function of $\rho_{\text{coh}}$ for these simulations, with the
+earlier simulations plotted underneath. It is obvious that for these injections that these odds follow the same form as before, however, at low SNR there
+is more scatter in $\mathcal{O}_{\text{S}/\text{I}}$ than seen before. This can be interpreted as finding spikes in $f_0--\dot{f}$-space, that are not related
+to the signal, in individual detectors, which are therefore not coherent. For higher SNRs ($\gtrsim 10$) the $\mathcal{O}_{\text{S}/\text{I}}$ value for
+this more complex search does tend to give higher values than for the simpler search. A hand-wavy explanation for this could be that a truely coherent signal
+found (at large enough SNR) within this larger space is more convincing (more parameters have to match up) than in the simpler case, and this outweights any
+prior Occam factor. The right panel of Figure~\ref{fig:snrvsodds_larger} shows similar information.

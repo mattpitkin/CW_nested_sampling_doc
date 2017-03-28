@@ -1,0 +1,7 @@
+H0 uniform 0.0 1e-20
+PHI0 uniform 0.0 3.14159265359
+PSI uniform 0.0 1.57079632679
+COSIOTA uniform -1.0 1.0
+F0 gaussian 100.0 5e-05
+F1 gaussian -1e-09 2e-10
+RA gaussian 3.14159265359 0.000727220521664

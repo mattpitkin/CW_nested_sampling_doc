@@ -4,7 +4,6 @@
 
 Here we document the various command line options for the code and its use in a variety of situations. All the command
 line options for \lppen, as shown with the \verb|--help| command, are given below.
-
 \begin{lstlisting}[frame=single]
 Usage: lalapps_pulsar_parameter_estimation_nested [options]
 
@@ -145,7 +144,9 @@ files provided they are in a standard location, although these can also be speci
 The {\tt .par} file input should be the same file that was used when performing the heterodyning (or {\it Spectral Interpolation})
 of the data used to produce the input data time series. A {\sc tempo(2)}-style {\tt .par} file could have the following form, e.g.\
 for a pulsar in a binary system:
-\begin{lstlisting}[frame=single]
+\newsavebox{\Lst}
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
 PSRJ    J0234+5612
 RAJ     02:34:12.123485
 DECJ    56:12:05.237474
@@ -159,6 +160,8 @@ OM      12.858534
 PB      9.858345
 A1      3.474743
 \end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
 
 The majority of the parameters that can be in a {\tt .par} file are listed in Table~A1 of \citep{2006MNRAS.372.1549E}.
 Note that the code does not compute effects of dispersion measure (i.e.\ it assumes observations at infinite frequency),
@@ -287,7 +290,6 @@ A1      loguniform 1e-3      1e6
 F0:F1   gmm        2  [[123.4,-1e-9],[123.4,-1.5e-9]] [[[1e-16,1e-18],[1e-18,1e-10]],[[1e-16,1e-18],[1e-18,1e-10]]] [0.5,1]
 COSIOTA gmm        2  [[1.5896]]  [[[0.0219]]]  [1.0]  [[1.5519]]  [[[0.0219]]]  [1.0] [-1,1]
 \end{lstlisting}
-
 The units required for parameters in a prior file are all SI units, whereas for the {\tt .par} file they often follow a different
 convention (see Table~\ref{tab:paramlist}).
 
@@ -313,23 +315,24 @@ Going through each line we have:
 If parameters in the prior file are specified with the {\tt gaussian} tag then a multivariate Gaussian prior may also be used for them if a correlation matrix
 is passed to \lppen (using the {\tt --cor-file} flag) containing correlation coefficients for the required parameters. Only the lower diagonal of the
 correlation matrix is required, e.g.\ if we wanted a multivariate prior on $f_0$ and $\dot{f}$ we could have a correlation coefficient file containing:
-\begin{lstlisting}[frame=single]
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
       F0   F1
 F0    1
 F1    0.5  1
 \end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
 where the whitespace can be tabs of spaces, whilst the prior file contains the means and standard deviations of the parameters as noted above. It is worth noting
 that for fully (anti)correlated parameters correlation coefficients of one can lead to numerical issues during matrix inversion. So, in such cases the
 (anti)correlation could be reduced to, say, 99.99\%. However, better solutions to such a degeneracy would be to fix one of the correlated values (i.e.\ do not include
 it in the prior file) and only search over the other, or finding a non-degenerate re-parameterisation.
 
-\subsubsection{Example 1: single detector, single harmonic, input data}
+\subsubsection{Example 1: single detector, single harmonic, input data}\label{sec:example1}
 
 One of the simplest cases for running the code is on input data from a single detector and at a single frequncy harmonic (in this
 case at twice the rotation frequency). Let us assume a search that is just interested in a signal model described by the four parameters
 $h_0$, $\phi_0$, $\cos{\iota}$ and $\psi$, and set a prior file, called {\tt prior.txt}, containing
-\\[6pt]
-\newsavebox{\Lst}
 \begin{lrbox}{\Lst}
 \begin{lstlisting}
 H0      uniform 0 1e-20
@@ -338,12 +341,12 @@ PSI     uniform 0 1.57079632679
 COSIOTA uniform -1 1
 \end{lstlisting}
 \end{lrbox}
-\indent \fbox{\usebox{\Lst}}
-\\[6pt]
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
 Given a pulsar {\tt .par} file, called, for example, {\tt pulsar.par} containing\footnote{For a search that does not include any phase evolution parameters
 the only required values in the {\tt .par} file are the right ascension and declination, but in general the file passed to the code should be the one used
 to perform the heterodyning that produced the input data file.}
-\begin{lstlisting}[frame=single]
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
 PSRJ   1234+5601
 RAJ    12:24:00.00
 DECJ   56:01:00.00
@@ -352,6 +355,8 @@ F1     -1.1e-10
 PEPOCH 56789
 EPHEM  DE405
 \end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
 and assuming the input data (from the LIGO Hanford detector, H1, in this case) is in a file called {\tt data\_H1.txt}, then one would run:
 \begin{lstlisting}[frame=single]
 $ lalapps_pulsar_parameter_estimation_nested --detectors H1 --input-files data_H1.txt --par-file pulsar.par --prior-file prior.txt --outfile nest_H1.hdf --Nmcmcinitial 0 --Nlive 1024 --tolerance 0.1
@@ -371,21 +376,30 @@ recovered optimal SNR for the maximum likelihood sample. The later contains the 
 harmonics are used as it will contain noise evidences for individual harmonic datastreams, as well as that for the multiple combined streams.
 
 The nested sample file can be converted to a file containing posterior samples, called, say, {\tt post\_H1.hdf}, using:
-\begin{lstlisting}[frame=single]
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
 $ lalapps_nest2pos -p post_H1.hdf nest_H1.hdf
 \end{lstlisting}
-where the {\tt -p} flag give the name of the posterior output file. As well as the posterior samples, this file also contains (as did the {\tt nest\_H1.hdf}),
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+where the {\tt -p} flag give the name of the posterior output file. If the above use of \lppen had been run more than once on the same data and prior file,
+with output names given by e.g.\ {\tt nest\_H1\_01.hdf}...{\tt nest\_H1\_$N$.hdf}, then all these could be listed as input to {\tt lalapps\_nest2pos} to
+combined all the samples and evidence estimates. As well as the posterior samples, this file also contains (as did the {\tt nest\_H1.hdf}),
 the signal model evidence, the noise model evidence, and the information gain (amongst other things).
 
-The posterior samples, and noise and signal model evidences, can be extracted using a python function within {\tt lalapps}, via
-\begin{lstlisting}[frame=single]
+The posterior samples, and noise and signal model (natural logarithm) evidences, can be extracted using a python function within {\tt lalapps}, via
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
 $ python
 >>> from lalapps import pulsarpputils as pppu
 >>> postsamples, sigevidence, noiseevidence = pppu.pulsar_nest_to_posterior('post_H1.hdf')
 \end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
 The {\tt postsamples} variable is an object from which samples from different parameters can be extracted, and plotted as a marginalised posterior
 distribution, e.g.\
-\begin{lstlisting}[frame=single]
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
 >>> from matplotlib import pyplot as pl
 >>> # plot the posterior samples for the H0 parameter
 >>> pl.hist(postsamples['H0'].samples, bins=20, normed=True, histtype='stepfilled')
@@ -393,7 +407,137 @@ distribution, e.g.\
 >>> pl.ylabel('Posterior Probability Density')
 >>> pl.show()
 \end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
 where here, for the $h_0$ parameter it is contained in {\tt postsamples} as the fully uppercase {\tt 'H0'} value. 
+
+Alternatives to extract the (natural logarithm) evidence values are using the {\tt h5py} python module, or HDF5 command line utilities. For the former one could
+use, e.g.\
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+>>> import h5py
+>>> hdf = h5py.File('post_H1.hdf', 'r')
+>>> a = hdf['lalinference']['lalinference_nest']
+>>> sigevidence = a.attrs['log_evidence']
+>>> noiseevidence = a.attrs['log_noise_evidence']
+>>> information = a.attrs['information_nats']
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+or for the latter one could use, e.g.\
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+$ h5ls -v post_H1.hdf/lalinference/ | grep -A2 evidence
+    Attribute: log_evidence scalar
+        Type:      native double
+        Data:  141816
+--
+    Attribute: log_noise_evidence scalar
+        Type:      native double
+        Data:  141822
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+However, note that in this latter example the evidence values are truncated to integer values.
+
+\subsubsection{Example 2: single detector, single harmonic, simulated data}
+
+As well as taking real data as an input the code can simulate Gaussian noise, and/or create and add a simulated signal to the data. To create
+a signal to inject into the data requires a {\tt .par} file for the signal parameters. This can be the same, or different, to the file input
+using the {\tt --par-file} flag, but to produce a non-zero signal it must contain at least a \gw amplitude parameter (any parameters not
+included will be assumed to be zero). Any differences between the phase evolution parameters between the two files will be incorporated into the
+signal via Equation~\ref{eq:deltaphi}. Given an injection par file, called, say, {\tt injection.par}, containing
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+PSRJ    1234+5601
+RAJ     12:24:00.00
+DECJ    56:01:00.00
+F0      100.01
+F1      -1.1e-10
+PEPOCH  56789
+EPHEM   DE405
+H0      1e-25
+COSIOTA -0.43
+PHI0    0.6
+PSI     1.2
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+(which we see is the same as in \S\ref{sec:example1}, but with \gw amplitude parameters), one would run the following (assuming various other
+names are the same as in \S\ref{sec:example1})
+\begin{lstlisting}[frame=single]
+$ lalapps_pulsar_parameter_estimation_nested --fake-data H1 --inject-file injection.par --scale-snr 10 --par-file pulsar.par --prior-file prior.txt --outfile nest_H1.hdf --Nmcmcinitial 0 --Nlive 1024 --tolerance 0.1
+\end{lstlisting}
+Here, rather than inputting a real data file, the {\tt --fake-data} flag has been used to specify fake data from the LIGO Hanford detector, where the
+design sensitivity \citep{SRD}\footnote{\url{https://labcit.ligo.caltech.edu/~jzweizig/distribution/LSC_Data/}} power spectral density noise curve
+would be used to set the Gaussian noise level for an initial LIGO detector at the appropriate \gw frequency (twice the value of {\tt F0} given in the {\tt .par}
+file for the standard search).\footnote{Other
+named detectors that can be provided are L1 for the LIGO Livingston detector, G1 for the GEO600 detector \citep[from Table~IV of][]{2001PhRvD..63d4023D},
+V1 for the initial Virgo detector, and T1 for the TAMA300 detector \citep[from Table~IV of][]{2001PhRvD..63d4023D}. For the two LIGO detectors
+\citep{aLIGOSRD} and Virgo \citep[see Equation~6 of][]{2012arXiv1202.4031M}, design curve noise levels for their Advanced configurations can be obtained
+by prefixing the names with an `A'.} Setting the noise level from the design sensitivity or a given detector can be overridden by also using the
+{\tt --fake-psd} flag to input the required single sided
+power spectral density value. The simulated data will by default start at a GPS time of 900000000, be sampled at a rate of once per minute, and last for
+one solar day. However, each of these can be set with the appropriate flags: {\tt --fake-starts}, {\tt --fake-lengths}, and {\tt --fake-dt} respectively.
+In this example a value is also set for {\tt --scale-snr}, which means that after the creating of a signal with parameters as given in the {\tt injection.par}
+file, it will be re-scaled so that it has the given SNR - in this case a value of 10. This enables signals to be injected with a known SNR without needing to
+know the noise level a priori. If the {\tt --scale-snr} flag is not set, or has a value of zero, then no re-scaling takes place. In this case the output
+{\tt nest\_H1\_SNR} file would also contain the signal's injected SNR and the recovered SNR, e.g.\
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+$ cat nest_H1_SNR
+# Injected SNR
+H1	2.000	2.642255e+01	1.000000e+01
+# Recovered SNR
+H1	2.000	1.092211e+01
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+where, after the detector name the harmonic frequency scaling factor is given, and for the injected signal the two SNR values are the pre-scaled value
+and the actually injected value after rescaling via {\tt --scale-snr} value.
+
+A simulated signal can also be injected into real data in the same way.
+
+\subsubsection{Example 3: multiple detectors, single harmonic}
+
+Running with multiple detectors requires a simple change to the example given in \S\ref{sec:example1}. Given two input files, e.g.\ {\tt data\_H1.txt}
+and {\tt data\_L1.txt}, for the two LIGO detectors H1 and L1, one would simply use, e.g.\
+\begin{lstlisting}[frame=single]
+$ lalapps_pulsar_parameter_estimation_nested --detectors H1,L1 --input-files data_H1.txt,data_L1.txt --par-file pulsar.par --prior-file prior.txt --outfile nest_H1L1.hdf --Nmcmcinitial 0 --Nlive 1024 --tolerance 0.1
+\end{lstlisting}
+where the order of listing the detectors with the {\tt --detectors} flag should match the order of listing the data files with the {\tt --input-files} flag.
+No whitespace is allowed between detector values or input file values, and the must be seperated by a comma. In this case the output {\tt nest\_H1L1\_SNR} file
+will contain the individual detector recovered SNRs and the coherent SNR, whilst the {\tt nest\_H1L1\_Znoise} file will contain both the individual detector
+noise model evidences and the combined noise model evidence.
+
+\subsubsection{Example 4: multiple detectors, two harmonics}
+
+It is simple to extend the analysis to include the two harmonics from the $l=m=2$ mode (with a \gw frequency at twice the rotation rate) and the $l=2$, $m=1$
+harmonic (with a \gw frequency at the rotation rate). To search at these two harmonics requires that the parameters searched over are either the signal, or
+waveform, parameters given in \citet{2015MNRAS.453.4399P}. Using the (simpler and non-degenerate) waveform parameters $C_{21}$, $C_{22}$, $\Phi_{21}^C$ and
+$\Phi_{22}^C$, from Equations~\ref{eq:hf} and \ref{eq:h2f}, could lead to the following ({\tt prior.txt}) prior file
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+C22     uniform 0 1e-20
+C21     uniform 0 1e-20
+PHI22   uniform 0 6.28318530718
+PHI21   uniform 0 6.28318530718
+PSI     uniform 0 1.57079632679
+COSIOTA uniform -1 1
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+Assuming that for each detector (H1 and L1) the data has been heterodyned at both harmonics, leading to files {\tt data\_H1\_1f.txt}, {\tt data\_H1\_2f.txt},
+{\tt data\_L1\_1f.txt}, {\tt data\_L1\_2f.txt}, where {\tt 1f} and {\tt 2f} note the harmonic rotation frequency scaling, then one would use
+\begin{lstlisting}[frame=single]
+$ lalapps_pulsar_parameter_estimation_nested --detectors H1,L1 --harmonics 1,2 --input-files data_H1_1f.txt,data_H1_2f,data_L1_1f.txt,data_L1_2f.txt --par-file pulsar.par --prior-file prior.txt --outfile nest_H1L1.hdf --Nmcmcinitial 0 --Nlive 1024 --tolerance 0.1
+\end{lstlisting}
+Here the ordering of the input files is important, with the files for each harmonic for a given detector listed together, and in the same order as given by the
+{\tt --harmonics} flag.
+
+\subsubsection{Example 4: single detectors, additional parameters}
+
+\hl{Example searching over additional phase evolution parameters.}
 
 \subsection{The pipeline}
 

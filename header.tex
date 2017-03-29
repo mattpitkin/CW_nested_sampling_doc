@@ -24,6 +24,7 @@
 \usepackage{color}
 \usepackage{longtable}
 \usepackage{multirow}
+\usepackage{listings}
 
 \newcommand{\gws}{gravitational waves\xspace}
 \newcommand{\gw}{gravitational wave\xspace}
@@ -38,3 +39,6 @@
 \newcommand{\hms}[4]{#1$^{\mathrm h}$#2$^{\mathrm m}$#3\fs#4}
 
 \DeclareMathOperator{\erf}{erf}
+
+% set font to monospaced for listings
+\lstset{basicstyle=\footnotesize\ttfamily,breaklines=true,breakatwhitespace=true,linewidth=0.93\linewidth,xleftmargin=20pt}

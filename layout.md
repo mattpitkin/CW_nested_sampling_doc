@@ -32,6 +32,8 @@ figures/codeeval/stats/snrs/snr_plot.png
 figures/codeeval/stats/odds/odds_plot.png
 figures/codeeval/stats/snr_vs_odds/snr_v_odds_plot.png
 figures/codeeval/stats/snr_vs_odds_larger/snr_v_odds_larger_plot.png
+figures/codeeval/simulations/signal_freq/one/ffdot_inj1.png
+figures/codeeval/simulations/signal_freq/two/ffdot_inj2.png
 appendix01.tex
 appendix02.tex
 appendix03.tex

@@ -15,6 +15,7 @@ import argparse
 from scipy import stats
 from scipy.special import erf
 import subprocess as sp
+from time import time
 
 from lalapps.pulsarpputils import pulsar_nest_to_posterior as pn2p
 from lalapps.pulsarpputils import upper_limit_greedy as ulg
@@ -120,8 +121,10 @@ if opts.nlive < 1:
 
 # run lalapps_pulsar_parameter_estimation_nested
 ppencodecall = "{} --prior-file {} --uniformprop {} --ensembleWalk {} --ensembleStretch {} --test-gaussian-likelihood --test-gaussian-mean {} --test-gaussian-sigma {} --outfile {} --Nlive {} --Nmcmcinitial 0"
+t0 = time() # time the code
 p = sp.Popen(ppencodecall.format(ppen, priorfile, str(uniformprop), str(walkprop), str(stretchprop), str(opts.mean), str(opts.sigma), outfile, str(opts.nlive)), stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
 out, err = p.communicate()
+t1 = time()
 print(err, file=sys.stderr)
 
 # run lalapps_nest2pos
@@ -163,7 +166,7 @@ except:
 try:
   of = os.path.splitext(outfile)[0]+'_stats.txt'
   fp = open(of, 'w')
-  fp.write("%.12e\t%.6e\t%.6e\t%.6e\n" % (B, ul, onesigerror, ksp))
+  fp.write("%.12e\t%.6e\t%.6e\t%.6e\t%.6e\n" % (B, ul, onesigerror, ksp, (t1-t0)))
   fp.close()
 except:
   print("Error... could not output upper limit and odds to file.", file=sys.stderr)

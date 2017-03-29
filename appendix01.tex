@@ -5,8 +5,7 @@
 Here we document the various command line options for the code and its use in a variety of situations. All the command
 line options for \lppen, as shown with the \verb|--help| command, are given below.
 
-\begin{footnotesize}
-\begin{verbatim}
+\begin{lstlisting}[frame=single]
 Usage: lalapps_pulsar_parameter_estimation_nested [options]
 
  --help              display this message
@@ -108,8 +107,7 @@ Usage: lalapps_pulsar_parameter_estimation_nested [options]
                     appended with "_timings" will contain the timings
  --sampleprior      (UINT4) Set this to be a number of samples generated from the prior. The nested sampling will not
                     be performed
-\end{verbatim}
-\end{footnotesize}
+\end{lstlisting}
 
 \subsection{Examples}\label{app:examples}
 
@@ -137,12 +135,17 @@ contain gaps. However,
  prior file is given below.
 \end{enumerate}
 
+In the examples below we will assume that the LALsuite software package\footnote{\url{https://www.lsc-group.phys.uwm.edu/daswg/projects/lalsuite.html}} has
+been installed and that the executable binaries for \lppen and {\tt lalapps\_nest2pos} are in your path (i.e.\ the directory path containing those
+executables is set in the list of values in your {\tt PATH} environment variable). The code can automatically find solar system ephemeris and timing
+files provided they are in a standard location, although these can also be specified explicitly on the command line.
+
 \subsubsection{An example {\tt .par} file}
 
 The {\tt .par} file input should be the same file that was used when performing the heterodyning (or {\it Spectral Interpolation})
 of the data used to produce the input data time series. A {\sc tempo(2)}-style {\tt .par} file could have the following form, e.g.\
 for a pulsar in a binary system:
-\begin{verbatim}
+\begin{lstlisting}[frame=single]
 PSRJ    J0234+5612
 RAJ     02:34:12.123485
 DECJ    56:12:05.237474
@@ -155,7 +158,7 @@ T0      53424.24435856
 OM      12.858534
 PB      9.858345
 A1      3.474743
-\end{verbatim}
+\end{lstlisting}
 
 The majority of the parameters that can be in a {\tt .par} file are listed in Table~A1 of \citep{2006MNRAS.372.1549E}.
 Note that the code does not compute effects of dispersion measure (i.e.\ it assumes observations at infinite frequency),
@@ -267,7 +270,6 @@ Parameter & Description \\
 \hline
 {\tt CGW}, $c_{\text{gw}}$ & speed of gravitational waves as a fraction of the speed of light \\
 \hline
-
 \hline
 \end{longtable}
 
@@ -277,14 +279,14 @@ Parameter & Description \\
 The prior functions used by the code are decribed in Section~\ref{sec:priorfuncs}. To implement them in the code requires a prior
 file specifying the prior function require for each parameter that will be varied. A an example prior file containing all the
 allowed prior types (for descriptive purposed only) is:
-\begin{verbatim}
+\begin{lstlisting}[frame=single]
 H0      fermidirac 4.316e-24 9.1625
 PHI0    uniform    0.0       3.141593
 PSI     gaussian   0.6764    0.16532
 A1      loguniform 1e-3      1e6
 F0:F1   gmm        2  [[123.4,-1e-9],[123.4,-1.5e-9]] [[[1e-16,1e-18],[1e-18,1e-10]],[[1e-16,1e-18],[1e-18,1e-10]]] [0.5,1]
 COSIOTA gmm        2  [[1.5896]]  [[[0.0219]]]  [1.0]  [[1.5519]]  [[[0.0219]]]  [1.0] [-1,1]
-\end{verbatim}
+\end{lstlisting}
 
 The units required for parameters in a prior file are all SI units, whereas for the {\tt .par} file they often follow a different
 convention (see Table~\ref{tab:paramlist}).
@@ -311,20 +313,87 @@ Going through each line we have:
 If parameters in the prior file are specified with the {\tt gaussian} tag then a multivariate Gaussian prior may also be used for them if a correlation matrix
 is passed to \lppen (using the {\tt --cor-file} flag) containing correlation coefficients for the required parameters. Only the lower diagonal of the
 correlation matrix is required, e.g.\ if we wanted a multivariate prior on $f_0$ and $\dot{f}$ we could have a correlation coefficient file containing:
-\begin{verbatim}
+\begin{lstlisting}[frame=single]
       F0   F1
 F0    1
 F1    0.5  1
-\end{verbatim}
+\end{lstlisting}
 where the whitespace can be tabs of spaces, whilst the prior file contains the means and standard deviations of the parameters as noted above. It is worth noting
 that for fully (anti)correlated parameters correlation coefficients of one can lead to numerical issues during matrix inversion. So, in such cases the
 (anti)correlation could be reduced to, say, 99.99\%. However, better solutions to such a degeneracy would be to fix one of the correlated values (i.e.\ do not include
 it in the prior file) and only search over the other, or finding a non-degenerate re-parameterisation.
 
-\subsubsection{Example 1: single detector, single harmonic}
+\subsubsection{Example 1: single detector, single harmonic, input data}
 
-One of the simplest cases for running the code is on data from a single detector and at a single frequncy harmonic (in this
-case at twice the rotation frequency).
+One of the simplest cases for running the code is on input data from a single detector and at a single frequncy harmonic (in this
+case at twice the rotation frequency). Let us assume a search that is just interested in a signal model described by the four parameters
+$h_0$, $\phi_0$, $\cos{\iota}$ and $\psi$, and set a prior file, called {\tt prior.txt}, containing
+\\[6pt]
+\newsavebox{\Lst}
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+H0      uniform 0 1e-20
+PHI0    uniform 0 3.14159265359
+PSI     uniform 0 1.57079632679
+COSIOTA uniform -1 1
+\end{lstlisting}
+\end{lrbox}
+\indent \fbox{\usebox{\Lst}}
+\\[6pt]
+Given a pulsar {\tt .par} file, called, for example, {\tt pulsar.par} containing\footnote{For a search that does not include any phase evolution parameters
+the only required values in the {\tt .par} file are the right ascension and declination, but in general the file passed to the code should be the one used
+to perform the heterodyning that produced the input data file.}
+\begin{lstlisting}[frame=single]
+PSRJ   1234+5601
+RAJ    12:24:00.00
+DECJ   56:01:00.00
+F0     100.01
+F1     -1.1e-10
+PEPOCH 56789
+EPHEM  DE405
+\end{lstlisting}
+and assuming the input data (from the LIGO Hanford detector, H1, in this case) is in a file called {\tt data\_H1.txt}, then one would run:
+\begin{lstlisting}[frame=single]
+$ lalapps_pulsar_parameter_estimation_nested --detectors H1 --input-files data_H1.txt --par-file pulsar.par --prior-file prior.txt --outfile nest_H1.hdf --Nmcmcinitial 0 --Nlive 1024 --tolerance 0.1
+\end{lstlisting}
+where we have set an output HDF5-format file called {\tt nest\_H1.hdf} in which the nested samples will be output. This setup has used 1024 nested sampling
+live points and a tolerance of 0.1 for stopping the code. The {\tt --Nmcmcinitial 0} flag tells the code that the initial live points drawn do not have to
+be resampled.\footnote{This option is present for cases when the initial live points may not be easily sampled from the prior distributions, and therefore
+an MCMC procedure is required to try and evolve them to be from the actual prior. However, for all our priors there are simple ways to draw the initial
+live points from the prior, so this resampling is not required, and this input argument can be set to zero.} In this case the solar system ephemeris files
+will be found automatically. If the {\tt EPHEM} or {\tt UNITS} parameters are not explicitly set in the {\tt .par} file then these will default to the
+DE405 ephemeris and the TCB time system. The progress of the above code can be monitored by including the {\tt --verbose} flag, and watching how the
+reported {\tt dZ} value approaches the required tolerance.
+
+Along with the file of nested samples two additional files called {\tt nest\_H1\_SNR} and {\tt nest\_H1\_Znoise} will be output. The former contains the
+recovered optimal SNR for the maximum likelihood sample. The later contains the null likelihood, or noise, evidence for the data, described in
+\S\ref{sec:nulllike}. The noise evidence is also contained in the {\tt nest\_H1.hdf} file, but this additional file is useful in cases when multiple
+harmonics are used as it will contain noise evidences for individual harmonic datastreams, as well as that for the multiple combined streams.
+
+The nested sample file can be converted to a file containing posterior samples, called, say, {\tt post\_H1.hdf}, using:
+\begin{lstlisting}[frame=single]
+$ lalapps_nest2pos -p post_H1.hdf nest_H1.hdf
+\end{lstlisting}
+where the {\tt -p} flag give the name of the posterior output file. As well as the posterior samples, this file also contains (as did the {\tt nest\_H1.hdf}),
+the signal model evidence, the noise model evidence, and the information gain (amongst other things).
+
+The posterior samples, and noise and signal model evidences, can be extracted using a python function within {\tt lalapps}, via
+\begin{lstlisting}[frame=single]
+$ python
+>>> from lalapps import pulsarpputils as pppu
+>>> postsamples, sigevidence, noiseevidence = pppu.pulsar_nest_to_posterior('post_H1.hdf')
+\end{lstlisting}
+The {\tt postsamples} variable is an object from which samples from different parameters can be extracted, and plotted as a marginalised posterior
+distribution, e.g.\
+\begin{lstlisting}[frame=single]
+>>> from matplotlib import pyplot as pl
+>>> # plot the posterior samples for the H0 parameter
+>>> pl.hist(postsamples['H0'].samples, bins=20, normed=True, histtype='stepfilled')
+>>> pl.xlabel('$h_0$')
+>>> pl.ylabel('Posterior Probability Density')
+>>> pl.show()
+\end{lstlisting}
+where here, for the $h_0$ parameter it is contained in {\tt postsamples} as the fully uppercase {\tt 'H0'} value. 
 
 \subsection{The pipeline}
 

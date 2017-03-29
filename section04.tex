@@ -203,7 +203,7 @@ calculates $h_0$ such that the coherent SNR (Equation~\ref{eq:snr}) is drawn uni
 distributions as described below in \S\ref{sec:ppplots}, whilst both sets are used to evaluate odds distributions. The source's sky locations are drawn
 uniformly from over the sky-sphere. For these analyses each
 simulated data set is one solar day long, consisting of 1440 complex data points (generated as if heterodyned at precisely the known source phase evolution)
-sampled once per minute. This data has been used to estimate the four parameters $h_0$, $\cos{\iota}$, $\Phi_{22}^C$ and $\psi$, with each being given
+sampled once per minute. This data has been used to estimate the four parameters $h_0$, $\cos{\iota}$, $\phi_0$ and $\psi$, with each being given
 a flat prior: the angles and cosine of orientation angle over their minimal ranges, and $h_0$ between zero and $1\ee{-20}$ (well above the extent of the
 bulk of the likelihood). When running \lppen on these, two parallel runs with 1024 live points where used, along with the default sampler proposals described
 in \S\ref{sec:proposals}, and with the samples from both runs being combined to produce posterior samples and evidence estimates.
@@ -309,3 +309,18 @@ to the signal, in individual detectors, which are therefore not coherent. For hi
 this more complex search does tend to give higher values than for the simpler search. A hand-wavy explanation for this could be that a truely coherent signal
 found (at large enough SNR) within this larger space is more convincing (more parameters have to match up) than in the simpler case, and this outweights any
 prior Occam factor. The right panel of Figure~\ref{fig:snrvsodds_larger} shows similar information.
+
+\subsubsection{Further parameter estimation}
+
+In Figures~\ref{fig:ffdot_inj1} and \ref{fig:ffdot_inj1} we show the posterior distributions for two of the simulations performed for the searches over
+$h_0$, $\cos{\iota}$, $\phi_0$, $\psi$, $f_0$, $\dot{f}$, and $\alpha$ above.\footnote{Earlier, during the discussing of the ``P-P plots'' in \S\ref{sec:ppplots},
+it was mentioning that $\phi_0$ was held fixed due to the degeracies between $f_0$ and $\phi_0$. In this case, as we also have $\dot{f}$ the correlations
+become more complex, and whilst it would be expected that holding $\phi_0$ fixed would give valid posteriors, it is in such cases that a re-parameterisation
+may be more appropriate.} The simulation in Figure~\ref{fig:ffdot_inj1} had injected SNRs of 4.4 and 6.5 for H1
+and L1 respectively, with a coherent SNR of 7.9, and the recovered values of $\log{}_{10}\mathcal{O}_{\text{S}/\text{N}}$ and
+$\log{}_{10}\mathcal{O}_{\text{S}/\text{I}}$ of 1.55 and 0.95 respectively. It can be seen that the search in H1 alone finds additional structure
+in the frequency space, whilst in L1 the signal dominates, and the joint analysis also recovers the signal. The simulation in Figure~\ref{fig:ffdot_inj2}
+is a little stronger with injected SNRs of 7.3 and 8.5 for H1 and L1 respectively, and a coherent SNR of 11.2, and recovered values of 
+$\log{}_{10}\mathcal{O}_{\text{S}/\text{N}}$ and $\log{}_{10}\mathcal{O}_{\text{S}/\text{I}}$ of 23.8 and 6.3 respectively. The signal is by far the strongest
+feature in the data, and not other structure is present in the posteriors. The first signal would probably only rate as marginal if determining whether it was
+a true signal or not, whereas the second signal would be a clear detection.

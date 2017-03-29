@@ -78,7 +78,7 @@ log = %s
 error = %s
 output = %s
 notification = never
-accounting_group = ligo.dev.o1.cw.targeted.bayesian
+accounting_group = aluk.dev.o1.cw.targeted.bayesian
 queue 1
 """ % (opts.run, nlive, opts.mean, opts.sigma, opts.uniformprop, opts.walkprop, opts.stretchprop, opts.execpath, os.path.join(logdir, 'run-$(cluster).log'), \
        os.path.join(logdir,'run-$(cluster).err'), os.path.join(logdir,'run-$(cluster).out'))

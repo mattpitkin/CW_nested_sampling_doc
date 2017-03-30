@@ -178,3 +178,23 @@ of live points used when running nested sampling. The actual dependence of the n
 Figure~\ref{fig:numposts} (this uses the simulations discussed in \S\ref{sec:reseval}). It can be seen empirically that the mean number of posterior
 samples goes roughly as $\langle N_{\text{post}} \rangle \approx 2.4N_{\text{live}}$, although there is a lower tail extending to $N_{\text{post}} \approx
 0.01N_{\text{live}}^{1.14}$.
+
+\subsection{Code timing}\label{sec:timing}
+
+How long the code takes to runs depends on two main factors: the number of live points used and the information gain going from prior to posterior. Increases
+in both of these will generally mean that the code takes longer to run. Using the simulations from \S\ref{sec:proposaltesting} we have assessed the code
+run time for the simple Gaussian likelihood function. This allows us to quantify the code run time as a function of both number of live points and information
+gain.
+
+We find that the median calculation time for the simple Gaussian likelihood function used in \S\ref{sec:proposaltesting} (on a Intel ``Haswell'' processor,
+specifically Intel CPU E5-2680 v3 @ 2.50GHz), including some standard overheads\footnote{Without the overheads it is roughy $\sim 3.7\ee{-7}$ seconds.} is 
+$\sim 5.9\ee{-6}$ seconds. The median time for calculation of the likelihood (including model calculation time) for a standard search over only non-phase evolution
+parameters, and for one chunk of data, is $8.1\ee{-5}$ seconds.\foonote{Without the additional overheads this is a similar time of $4.9\ee{-5}$ seconds.}
+
+The median run time per likelihood evaluation for the nested sampling part of the code for the standard likelihood function (using 1024 live points) 
+is $8.5\ee{-4}$ seconds, which is $\sim 10$ times greater than the single likelihood evaluation time (this ratio will change as a function of the number
+of live points). The median run time per likelihood evaluation for the nested sampling part of the code for the test Gaussian likelihood function
+(using 1024 live points) is $1.8\ee{-4}$ seconds, which is $\sim 30$ times greater than the single likelihood evaluation time.
+
+We will use the median likelihood evaluation time, $\mathcal{T}_{1024}^{L}$ for the test Gaussian likelihood function, as our baseline for timing comparison.
+Appropriate scalings can be worked out from the above data.

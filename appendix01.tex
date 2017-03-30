@@ -347,7 +347,7 @@ the only required values in the {\tt .par} file are the right ascension and decl
 to perform the heterodyning that produced the input data file.}
 \begin{lrbox}{\Lst}
 \begin{lstlisting}
-PSRJ   1234+5601
+PSRJ   J1234+5601
 RAJ    12:24:00.00
 DECJ   56:01:00.00
 F0     100.01
@@ -449,7 +449,7 @@ included will be assumed to be zero). Any differences between the phase evolutio
 signal via Equation~\ref{eq:deltaphi}. Given an injection par file, called, say, {\tt injection.par}, containing
 \begin{lrbox}{\Lst}
 \begin{lstlisting}
-PSRJ    1234+5601
+PSRJ    J1234+5601
 RAJ     12:24:00.00
 DECJ    56:01:00.00
 F0      100.01
@@ -538,6 +538,62 @@ Here the ordering of the input files is important, with the files for each harmo
 \subsubsection{Example 4: single detectors, additional parameters}
 
 \hl{Example searching over additional phase evolution parameters.}
+
+Finally, we show an example when searching over additional phase evolution parameters. We show two options for this: the first is using the standard
+model and likelihood method, and the second performs the same search, but sped-up by using the ROQ likelihood. If one were searching over frequency and
+frequency derivative, $f_0$ and $\dot{f}$, then an example {\tt .par} file ({\tt pulsar.par}) could be
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+PSRJ   J1234+5601
+RAJ    12:24:00.00
+DECJ   56:01:00.00
+F0     100.01
+F1     -1.1e-10
+PEPOCH 54660
+EPHEM  DE405
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+with a prior file ({\tt prior.txt}) containing
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+H0      uniform 0 1e-20
+PHI0    uniform 0 3.14159265359
+PSI     uniform 0 1.57079632679
+COSIOTA uniform -1 1
+F0      gaussian 100.01   1e-4
+F1      gaussian -1.1e-10 1e-9
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+Note that the frequency and frequency derivative values in the prior file are for the rotation frequency, so if searching for the standard $l=m=2$
+harmonic then the actual frequencies and derivatives (and in this case their standard deviation) covered will be twice these values. This would also
+be the case for any other form of the prior. As, in this example, the {\tt F0} and {\tt F1} values have be assigned Gaussian priors, if they have a
+known correlation then a correlation coefficient file ({\tt pulsar.cor}) could also be set, e.g.\
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+    F0  F1
+F0  1.0
+F1  0.7 1.0
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+However, if this is not provided, then the parameters will be assumed to a priori be uncorrelated.
+
+If running without ROQ, for a data from a single detector, H1 ({\tt data\_H1.txt}), the following commands could be used
+\begin{lstlisting}[frame=single]
+$ lalapps_pulsar_parameter_estimation_nested --detectors H1 --input-files data_H1.txt --par-file pulsar.par --prior-file prior.txt --cor-file pulsar.cor --outfile nest_H1.hdf --Nmcmcinitial 0 --Nlive 1024 --tolerance 0.1
+\end{lstlisting}
+
+To run with ROQ enabled, in the simplest case, requires the user to set a number of training waveforms and tolerance to use the produce a reduced order
+model.\footnote{For now we do not attempt to explain these parameters, which we are leaving to a future publication, other than to say that for broader
+parameter space searches (or searches over frequency derivates for which the epoch is further from the data epoch) more training waveforms are required
+for a given tolerance. For a fixed tolerance if the parameter space is too broad more templates may be required than are computational feasible (due to e.g.\
+memory constraints) to use.} In this example we will use 2500 training waveforms, and a tolerance of $5\ee{-12}$, and assume data that starts at the same
+epoch as given in the {\tt .par} file. The following commands could be used
+\begin{lstlisting}[frame=single]
+$ lalapps_pulsar_parameter_estimation_nested --detectors H1 --input-files data_H1.txt --par-file pulsar.par --prior-file prior.txt --cor-file pulsar.cor --outfile nest_H1.hdf --Nmcmcinitial 0 --Nlive 1024 --tolerance 0.1 --roq --roq-tolerance 5e-12 --ntraining 2500
+\end{lstlisting}
 
 \subsection{The pipeline}
 

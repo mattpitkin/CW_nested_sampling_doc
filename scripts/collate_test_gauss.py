@@ -12,6 +12,7 @@ import numpy as np
 import argparse
 import subprocess as sp
 from scipy.special import erf
+import tarfile
 
 import matplotlib as mpl
 from matplotlib import pyplot as pl
@@ -30,23 +31,26 @@ mplparams = { \
 mpl.rcParams.update(mplparams)
 
 parser = argparse.ArgumentParser( )
-parser.add_argument("-i", "--ndirs", dest="ndirs", required=True, type=int, help="Set the number directories used in the runs.")
-parser.add_argument("-b", "--base-dir", dest="basedir", help="Set the base directory for the runs")
+parser.add_argument("-i", "--input-file", dest="infile", required=True, help="The input tarball file")
+#parser.add_argument("-i", "--ndirs", dest="ndirs", required=True, type=int, help="Set the number directories used in the runs.")
+#parser.add_argument("-b", "--base-dir", dest="basedir", help="Set the base directory for the runs")
 parser.add_argument("-o", "--output-file", dest="outfile", help="Set the output figure file without extension")
-parser.add_argument("-N", "--Nlive", dest="nlives", action='append', default=None, help="Set number of nested samples used (each value passed will be assumed as the base directory name for that data")
+#parser.add_argument("-N", "--Nlive", dest="nlives", action='append', default=None, help="Set number of nested samples used (each value passed will be assumed as the base directory name for that data")
 
 # parse input options
 opts = parser.parse_args()
 
 # the base directory
-basedir = opts.basedir
-if not os.path.isdir(basedir):
-  print("Error... base directory '%s' does not exist." % basedir, file=sys.stderr)
-  sys.exit(1)
+#basedir = opts.basedir
+#if not os.path.isdir(basedir):
+#  print("Error... base directory '%s' does not exist." % basedir, file=sys.stderr)
+#  sys.exit(1)
 
-if opts.ndirs < 1:
-  print("Error... there must be a positive number of directories.", file=sys.stderr)
-  sys.exit(1)
+#if opts.ndirs < 1:
+#  print("Error... there must be a positive number of directories.", file=sys.stderr)
+#  sys.exit(1)
+
+tar = tarfile.open(opts.infile, "r:gz")
 
 maxranges = {}
 trueuls = {}
@@ -56,6 +60,7 @@ evidences = {}
 upperlimits = {}
 evidenceerrs = {}
 kspvalues = {}
+timings = {}
 
 oformat = '*_stats.txt'
 pfile = 'prior.txt'
@@ -73,23 +78,34 @@ def kltrue(maxv, sigmah, lnZ):
 
   return -0.25*p_Z*(D + 2.*G)
 
-if opts.nlives is None:
-  nlives = ['']
-else:
-  nlives = []
-  for nlive in opts.nlives:
-    try:
-      nlives.append(str(int(nlive)))
-    except:
-      print("Error... could not convert '%s' number of live points to integer" % nlive, file=sys.stderr)
-      sys.exit(1)
+#if opts.nlives is None:
+#  nlives = ['']
+#else:
+#  nlives = []
+#  for nlive in opts.nlives:
+#    try:
+#      nlives.append(str(int(nlive)))
+#    except:
+#      print("Error... could not convert '%s' number of live points to integer" % nlive, file=sys.stderr)
+#      sys.exit(1)
+
+# hard code in run parameters
+nlives = ['512', '1024', '2048', '4096', '8192']
+ndirs = ['%03d' % i for i in range(11)]
+
+for m in tar.getmembers():
+    if m.isfile():
+      if statsfile in m.name:
+        fp = tf.extractfile(m)
+        d = json.load(fp)
 
 for j in range(len(nlives)):
-  livedir = os.path.join(basedir, nlives[j])
-  if len(nlives[j]) == 0:
-    lname = 'Unknown'
-  else:
-    lname = nlives[j]
+  #livedir = os.path.join(basedir, nlives[j])
+  #if len(nlives[j]) == 0:
+  #  lname = 'Unknown'
+  #else:
+  #  lname = nlives[j]
+  lname = nlives[j]
 
   # initialise dictionaries for different numbers of live points
   maxranges[lname] = []
@@ -100,60 +116,96 @@ for j in range(len(nlives)):
   upperlimits[lname] = []
   evidenceerrs[lname] = []
   kspvalues[lname] = []
+  timings[lname] = []
 
-  if not os.path.isdir(livedir):
-    print("Error... '%s' directory does not exist." % livedir, file=sys.stderr)
-    sys.exit(1)
+  #if not os.path.isdir(livedir):
+  #  print("Error... '%s' directory does not exist." % livedir, file=sys.stderr)
+  #  sys.exit(1)
   
-  for i in range(opts.ndirs):
-    fdir = os.path.join(livedir, "%03d" % i)
-    if not os.path.isdir(fdir):
-      print("Error... '%s' directory does not exist." % fdir, file=sys.stderr)
-      continue
+  #for i in range(opts.ndirs):
+  for fdir in ndirs:
+    #fdir = os.path.join(livedir, "%03d" % i)
+    #if not os.path.isdir(fdir):
+    #  print("Error... '%s' directory does not exist." % fdir, file=sys.stderr)
+    #  continue
+    
+    # get directories for the given number of live points and fdir value
+    lpdirs = [(tar.getmember(name), name) for name in tar.getnames() if Nlives[j]+'/'+fdir  in name]
   
-    l = os.listdir(fdir)
-    nf = 0
-    for f in l: # count number of files
-      if '_stats.txt' in f:
-        nf += 1
+    #l = os.listdir(fdir)
+    #nf = 0
+    #for f in l: # count number of files
+    #  if '_stats.txt' in f:
+    #    nf += 1
+
+    a = []
+    for lpv in lpdirs:
+      if lpv[0].isfile():
+        if '_stats.txt' in lpv[1]:
+          fp = tar.extractfile(lpv[0])
+          a.append([float(v.strip()) for v in fp.readline().split()])
+        elif pfile in lpv[1]
+          # get limits from prior file
+          fp = tar.extractfile(lpv[0])
+          l = fp.readline().split()
+          maxv = float(l[-1].strip())
+          maxranges[lname].append(maxv)
+        elif truefile in lpv[1]:
+          # get true values of evidence and upper limits
+          fp = tar.extractfile(lpv[0])
+          l = fp.readline().split()
+          trueevs[lname].append(float(l[0].strip()))
+          trueuls[lname].append(float(l[1].strip())) 
+          #truekls[lname].append(float(l[2].strip())) # this value was wrongly calculated
+          truekls[lname].append(kltrue(maxv, 1e-24, trueevs[lname][-1]))
+        else:
+          print("Unknown file '%s'" % lpv[1], file=sys.stderr)
+    a = np.array(a)
 
     # concatenate output of 'stats' files and parse it
-    p = (sp.check_output("cat "+os.path.join(fdir, oformat), shell=True)).split('\n')
-    a = np.array([[float(v.strip()) for v in l.split()] for l in p if len(l.split()) == 4])
+    #p = (sp.check_output("cat "+os.path.join(fdir, oformat), shell=True)).split('\n')
+    #a = np.array([[float(v.strip()) for v in l.split()] for l in p if len(l.split()) == 4])
 
-    if a.shape[0] != nf:
-      print("Warning... number of files ('%d') and number of values read in ('%d') is not consistent." % (nf, a.shape[0]), file=sys.stderr)
+    #if a.shape[0] != nf:
+    #  print("Warning... number of files ('%d') and number of values read in ('%d') is not consistent." % (nf, a.shape[0]), file=sys.stderr)
 
     evidences[lname].append(a[:,0])
     upperlimits[lname].append(a[:,1])
     evidenceerrs[lname].append(a[:,2])
     kspvalues[lname].append(a[:,3])
 
-    # get limits
-    if not os.path.isfile(os.path.join(fdir, pfile)):
-      print("Error... no prior file given in '%s'" % fdir, file=sys.stderr)
-      sys.exit(1)
+    if a.shape[1] == 5:
+      timings[lname].append(a[:,4])
+    else:
+      timings = None
 
-    fp = open(os.path.join(fdir, pfile), 'r')
-    l = fp.readline().split()
-    fp.close()
-    maxv = float(l[-1].strip())
-    maxranges[lname].append(maxv)
+    # get limits
+    #if not os.path.isfile(os.path.join(fdir, pfile)):
+    #  print("Error... no prior file given in '%s'" % fdir, file=sys.stderr)
+    #  sys.exit(1)
+
+    #fp = open(os.path.join(fdir, pfile), 'r')
+    #l = fp.readline().split()
+    #fp.close()
+    #maxv = float(l[-1].strip())
+    #maxranges[lname].append(maxv)
 
     # get true values of evidence and upper limits
-    if not os.path.isfile(os.path.join(fdir, truefile)):
-      print("Error... no 'true value' file given in '%s'" % fdir, file=sys.stderr)
-      sys.exit(1)
+    #if not os.path.isfile(os.path.join(fdir, truefile)):
+    #  print("Error... no 'true value' file given in '%s'" % fdir, file=sys.stderr)
+    #  sys.exit(1)
 
-    fp = open(os.path.join(fdir, truefile), 'r')
-    l = fp.readline().split()
-    fp.close()
-    trueevs[lname].append(float(l[0].strip()))
-    trueuls[lname].append(float(l[1].strip())) 
+    #fp = open(os.path.join(fdir, truefile), 'r')
+    #l = fp.readline().split()
+    #fp.close()
+    #trueevs[lname].append(float(l[0].strip()))
+    #trueuls[lname].append(float(l[1].strip()))
     #truekls[lname].append(float(l[2].strip())) # this value was wrongly calculated
-    truekls[lname].append(kltrue(maxv, 1e-24, trueevs[lname][-1]))
+    #truekls[lname].append(kltrue(maxv, 1e-24, trueevs[lname][-1]))
 
     #print("Mean Z = %.7e +/- %.7e, true Z = %.7e" % (np.mean(evidences[lname][-1]), np.mean(evidenceerrs[lname][-1]), trueevs[lname][-1]), file=sys.stdout)
+
+tar.close()
 
 # create figure for evidences
 fige = pl.figure(figsize=(12,7))
@@ -166,6 +218,11 @@ axul = figul.add_subplot(111)
 # create figure for the K-S test
 figks = pl.figure(figsize=(12,7))
 axks = figks.add_subplot(111)
+
+# create figure for timings
+if timings is not None:
+  figtim = pl.figure(figsize=(12,7))
+  axtim = figks.add_subplot(111)
 
 colors = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow'] # some colours
 
@@ -343,6 +400,30 @@ for j, nlive in enumerate(nlives):
     ayksnew.set_ylabel(r'KS test $p$-values')
     ayksnew.yaxis.set_label_position('left')
 
+  logposoff = logpos-dloffset+j*dlp
+
+  if timings is not None:
+    # offset the error bars so they don't overlap
+    if j == 0:
+      if len(nlives) > 1:
+        dkloffset = 0.2*(truekls[nlive][1]-truekls[nlive][0])
+        dklp = 0.4*(truekls[nlive][1]-truekls[nlive][0])/(len(nlives)-1.)
+      else:
+        dkloffset = 0.
+        dklp = 0.
+    kloff = truekls[nlive]-dkloffset+j*dklp
+    
+    timescaling = 5.9e-6
+    
+    vd = axtim.violinplot(np.array(timings[nlive])/timescaling, kloff, showextrema=False, showmedians=True, widths=0.09)
+    for ps in vd['bodies']:
+      ps.set_facecolor(colors[j])
+      ps.set_alpha(0.2)
+      ps.set_edgecolor(colors[j])
+      ps.set_lw(1)
+      ps = vd['cmedians']
+      ps.set_color(colors[j])
+
 # add legend
 axe.legend(handles=handles, loc='upper left')
 axul.legend(handles=handles, loc='best')
@@ -366,3 +447,10 @@ figks.savefig(opts.outfile+'_ks.png', dpi=300)
 figks.savefig(opts.outfile+'_ks.pdf')
 p = sp.Popen('pdftops -eps %s' % opts.outfile+'_ks.pdf', shell=True)
 p.communicate()
+
+if timings is not None:
+  figtim.tight_layout()
+  figtim.savefig(opts.outfile+'_timings.png', dpi=300)
+  figtim.savefig(opts.outfile+'_timings.pdf')
+  p = sp.Popen('pdftops -eps %s' % opts.outfile+'_timings.pdf', shell=True)
+  p.communicate()

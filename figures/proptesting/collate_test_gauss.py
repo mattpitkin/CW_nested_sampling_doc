@@ -93,12 +93,6 @@ def kltrue(maxv, sigmah, lnZ):
 nlives = ['512', '1024', '2048', '4096', '8192']
 ndirs = ['%03d' % i for i in range(11)]
 
-for m in tar.getmembers():
-    if m.isfile():
-      if statsfile in m.name:
-        fp = tf.extractfile(m)
-        d = json.load(fp)
-
 for j in range(len(nlives)):
   #livedir = os.path.join(basedir, nlives[j])
   #if len(nlives[j]) == 0:
@@ -130,7 +124,7 @@ for j in range(len(nlives)):
     #  continue
     
     # get directories for the given number of live points and fdir value
-    lpdirs = [(tar.getmember(name), name) for name in tar.getnames() if Nlives[j]+'/'+fdir  in name]
+    lpdirs = [(tar.getmember(name), name) for name in tar.getnames() if nlives[j]+'/'+fdir  in name]
   
     #l = os.listdir(fdir)
     #nf = 0
@@ -144,13 +138,16 @@ for j in range(len(nlives)):
         if '_stats.txt' in lpv[1]:
           fp = tar.extractfile(lpv[0])
           a.append([float(v.strip()) for v in fp.readline().split()])
-        elif pfile in lpv[1]
+        elif pfile in lpv[1]:
           # get limits from prior file
           fp = tar.extractfile(lpv[0])
           l = fp.readline().split()
           maxv = float(l[-1].strip())
           maxranges[lname].append(maxv)
-        elif truefile in lpv[1]:
+    
+    for lpv in lpdirs: # run again so that maxv is alway defined
+      if lpv[0].isfile():
+        if truefile in lpv[1]:
           # get true values of evidence and upper limits
           fp = tar.extractfile(lpv[0])
           l = fp.readline().split()
@@ -158,8 +155,7 @@ for j in range(len(nlives)):
           trueuls[lname].append(float(l[1].strip())) 
           #truekls[lname].append(float(l[2].strip())) # this value was wrongly calculated
           truekls[lname].append(kltrue(maxv, 1e-24, trueevs[lname][-1]))
-        else:
-          print("Unknown file '%s'" % lpv[1], file=sys.stderr)
+
     a = np.array(a)
 
     # concatenate output of 'stats' files and parse it
@@ -222,7 +218,7 @@ axks = figks.add_subplot(111)
 # create figure for timings
 if timings is not None:
   figtim = pl.figure(figsize=(12,7))
-  axtim = figks.add_subplot(111)
+  axtim = figtim.add_subplot(111)
 
 colors = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow'] # some colours
 
@@ -404,18 +400,19 @@ for j, nlive in enumerate(nlives):
 
   if timings is not None:
     # offset the error bars so they don't overlap
-    if j == 0:
-      if len(nlives) > 1:
-        dkloffset = 0.2*(truekls[nlive][1]-truekls[nlive][0])
-        dklp = 0.4*(truekls[nlive][1]-truekls[nlive][0])/(len(nlives)-1.)
-      else:
-        dkloffset = 0.
-        dklp = 0.
-    kloff = truekls[nlive]-dkloffset+j*dklp
+    #if j == 0:
+    #  if len(nlives) > 1:
+    #    dkloffset = 0.2*(truekls[nlive][1]-truekls[nlive][0])
+    #    dklp = 0.4*(truekls[nlive][1]-truekls[nlive][0])/(len(nlives)-1.)
+    #  else:
+    #    dkloffset = 0.
+    #    dklp = 0.
+    #kloff = truekls[nlive]-dkloffset+j*dklp
     
     timescaling = 5.9e-6
-    
-    vd = axtim.violinplot(np.array(timings[nlive])/timescaling, kloff, showextrema=False, showmedians=True, widths=0.09)
+    #print(kloff)
+    #print(np.array(timings[nlive]).shape)
+    vd = axtim.violinplot(np.array(timings[nlive]).T/timescaling, truekls[nlive], showextrema=False, showmedians=True)
     for ps in vd['bodies']:
       ps.set_facecolor(colors[j])
       ps.set_alpha(0.2)
@@ -423,6 +420,10 @@ for j, nlive in enumerate(nlives):
       ps.set_lw(1)
       ps = vd['cmedians']
       ps.set_color(colors[j])
+      
+    # get linear fit to mean evidence offset vs information
+    p = np.polyfit(truekls[nlive], [np.median(tims)/timescaling for tims in timings[nlive]], deg=1)
+    print("N live: %s, linear fit T = %.2f + %.2f(KL-div)" % (nlive, p[1], p[0]), file=sys.stdout)
 
 # add legend
 axe.legend(handles=handles, loc='upper left')
@@ -449,6 +450,10 @@ p = sp.Popen('pdftops -eps %s' % opts.outfile+'_ks.pdf', shell=True)
 p.communicate()
 
 if timings is not None:
+  axtim.set_yscale('log')
+  axtim.legend(handles=handles, loc='lower right')
+  axtim.set_xlabel('Information Gain (nats)')
+  axtim.set_ylabel(r'median run time ($\mathcal{T}_{L}^{-1}$)')
   figtim.tight_layout()
   figtim.savefig(opts.outfile+'_timings.png', dpi=300)
   figtim.savefig(opts.outfile+'_timings.pdf')

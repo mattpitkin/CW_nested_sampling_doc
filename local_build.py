@@ -57,7 +57,7 @@ FIGURE_TEMPLATE = r"""
 \end{<figure_env>}
 """.replace('{', '{{').replace('}', '}}').replace('<', '{').replace('>', '}')
 
-FIGURE_DEFAULTS = {'placement': '', 'width': '1\columnwidth', 'figure_env': 'figure'}
+FIGURE_DEFAULTS = {'placement': '!phtb', 'width': '1\columnwidth', 'figure_env': 'figure'}
 
 
 def get_input_string(filename, localdir, quotepath=True, flatten=False):

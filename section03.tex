@@ -189,12 +189,23 @@ gain.
 We find that the median calculation time for the simple Gaussian likelihood function used in \S\ref{sec:proposaltesting} (on a Intel ``Haswell'' processor,
 specifically Intel CPU E5-2680 v3 @ 2.50GHz), including some standard overheads\footnote{Without the overheads it is roughy $\sim 3.7\ee{-7}$ seconds.} is 
 $\sim 5.9\ee{-6}$ seconds. The median time for calculation of the likelihood (including model calculation time) for a standard search over only non-phase evolution
-parameters, and for one chunk of data, is $8.1\ee{-5}$ seconds.\foonote{Without the additional overheads this is a similar time of $4.9\ee{-5}$ seconds.}
+parameters, and for one chunk of data, is $8.1\ee{-5}$ seconds.\footnote{Without the additional overheads this is a similar time of $4.9\ee{-5}$ seconds.}
 
 The median run time per likelihood evaluation for the nested sampling part of the code for the standard likelihood function (using 1024 live points) 
 is $8.5\ee{-4}$ seconds, which is $\sim 10$ times greater than the single likelihood evaluation time (this ratio will change as a function of the number
 of live points). The median run time per likelihood evaluation for the nested sampling part of the code for the test Gaussian likelihood function
 (using 1024 live points) is $1.8\ee{-4}$ seconds, which is $\sim 30$ times greater than the single likelihood evaluation time.
 
-We will use the median likelihood evaluation time, $\mathcal{T}_{L}$ for the test Gaussian likelihood function, as our baseline for timing comparison.
-Appropriate scalings can be worked out from the above data.
+In Figure~\ref{fig:timings} we show the time taken for the runs in \S\ref{sec:proposaltesting},
+using the default proposals, as a function of number of live points and information gain. The code run time is divided by $\mathcal{T}_{L}= 5.9\ee{-6}$ to
+provide a way to scale it for other values of $\mathcal{T}_{L}$, e.g.\ that found from the code's standard likelihood function. If we perform a 2D linear
+fit to the median run time, $R/\mathcal{T}_L$, we get the relation
+\begin{align}\label{eq:runtime}
+ \ln{\left(\frac{R}{\mathcal{T}_L}\right)} &\approx 1.57 \ln{N_{\text{live}}} + 1.05 \ln{H} + 3.60, \\
+ \frac{R}{\mathcal{T}_L} &\approx 36.4 N_{\text{live}}^{1.57} H^{1.05}.
+\end{align}
+This relation should be considered as a rough lower limit to the run time for any particular likelihood function. Above we saw that for our standard likelihood
+function the nested sampling algorithm took roughly three times longer to run per likelihood evaluation than the simple test function. This is most likely due
+to (for the standard likelihood case) the internal MCMC, that draws new samples within the algorithm, requiring longer chains to give uncorrelated samples when
+the likelihood is more complex (i.e.\ with more parameters), and the proposal distributions have a harder time approximating it. So, for our standard likelihood
+function, and run over four parameters, this run time should be scaled by about a factor of thre

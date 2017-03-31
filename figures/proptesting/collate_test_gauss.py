@@ -217,7 +217,7 @@ axks = figks.add_subplot(111)
 
 # create figure for timings
 if timings is not None:
-  figtim = pl.figure(figsize=(12,7))
+  figtim = pl.figure(figsize=(7,6))
   axtim = figtim.add_subplot(111)
 
 colors = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow'] # some colours
@@ -399,20 +399,10 @@ for j, nlive in enumerate(nlives):
   logposoff = logpos-dloffset+j*dlp
 
   if timings is not None:
-    # offset the error bars so they don't overlap
-    #if j == 0:
-    #  if len(nlives) > 1:
-    #    dkloffset = 0.2*(truekls[nlive][1]-truekls[nlive][0])
-    #    dklp = 0.4*(truekls[nlive][1]-truekls[nlive][0])/(len(nlives)-1.)
-    #  else:
-    #    dkloffset = 0.
-    #    dklp = 0.
-    #kloff = truekls[nlive]-dkloffset+j*dklp
-    
     timescaling = 5.9e-6
     #print(kloff)
     #print(np.array(timings[nlive]).shape)
-    vd = axtim.violinplot(np.array(timings[nlive]).T/timescaling, truekls[nlive], showextrema=False, showmedians=True)
+    vd = axtim.violinplot((1e-6)*np.array(timings[nlive]).T/timescaling, truekls[nlive], showextrema=False, showmedians=True)
     for ps in vd['bodies']:
       ps.set_facecolor(colors[j])
       ps.set_alpha(0.2)
@@ -422,8 +412,11 @@ for j, nlive in enumerate(nlives):
       ps.set_color(colors[j])
       
     # get linear fit to mean evidence offset vs information
-    p = np.polyfit(truekls[nlive], [np.median(tims)/timescaling for tims in timings[nlive]], deg=1)
-    print("N live: %s, linear fit T = %.2f + %.2f(KL-div)" % (nlive, p[1], p[0]), file=sys.stdout)
+    #p = np.polyfit(truekls[nlive], [np.median(tims)/timescaling for tims in timings[nlive]], deg=1)
+    #print("N live: %s, linear fit T = %.2f + %.2f(KL-div)" % (nlive, p[1], p[0]), file=sys.stdout)
+    #if j == 0:
+    #  print(truekls)
+    #print([np.median(tims)/timescaling for tims in timings[nlive]])
 
 # add legend
 axe.legend(handles=handles, loc='upper left')
@@ -453,7 +446,7 @@ if timings is not None:
   axtim.set_yscale('log')
   axtim.legend(handles=handles, loc='lower right')
   axtim.set_xlabel('Information Gain (nats)')
-  axtim.set_ylabel(r'median run time ($\mathcal{T}_{L}^{-1}$)')
+  axtim.set_ylabel(r'run time ($10^6 \mathcal{T}_{L}$)')
   figtim.tight_layout()
   figtim.savefig(opts.outfile+'_timings.png', dpi=300)
   figtim.savefig(opts.outfile+'_timings.pdf')

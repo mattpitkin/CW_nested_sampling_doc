@@ -1,13 +1,18 @@
-# make file to automate all the annoying commands
-
 default: pdf
 
-pdf: *.tex bibliography/biblio.bib layout.md
-	local_build.py --latex pdflatex --filename main.tex --build-dir .
+pdf: *.tex bibliography/biblio.bib
+	pdflatex main.tex
+	bibtex main
+	pdflatex main.tex
+	pdflatex main.tex
 
 ps: *.tex bibliography/biblio.bib layout.md
-	local_build.py --latex latex --filename main.tex --build-dir .
+	latex main.tex
+	bibtex main
+	latex main.tex
+	latex main.tex
 	dvips main
+	ps2pdf main.ps
 
 clean:
 	@echo "Cleaning directory of backups and logs"

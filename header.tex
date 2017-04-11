@@ -11,8 +11,10 @@
   \usepackage{cleveref}
   
   % make PDF figure files be used before png files 
+  \ifdefined\usepdffigs
   \usepackage{grfext}
   \PrependGraphicsExtensions*{.pdf,.PDF}
+  \fi
 \fi
 
 \usepackage{natbib}

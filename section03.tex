@@ -140,6 +140,27 @@ $N_{\text{live}}$ & $c$ & $m$ \\
 \end{center}
 \end{table}
 
+\begin{figure*}[phtb]
+\begin{center}
+\includegraphics[width=0.92\textwidth]{./figures/proptesting/walk_prop/evidences/collate_plots_wp_evidences}
+\caption{ \protect\input{./figures/proptesting/walk_prop/evidences/caption}}
+\end{center}
+\end{figure*}
+
+\begin{figure*}[phtb]
+\begin{center}
+\includegraphics[width=0.92\textwidth]{./figures/proptesting/walk_prop/upperlimits/collate_plots_wp_uls}
+\caption{ \protect\input{./figures/proptesting/walk_prop/upperlimits/caption}}
+\end{center}
+\end{figure*}
+
+\begin{figure*}[phtb]
+\begin{center}
+\includegraphics[width=0.92\textwidth]{./figures/proptesting/walk_prop/kstest/collate_plots_wp_ks}
+\caption{ \protect\input{./figures/proptesting/walk_prop/kstest/caption}}
+\end{center}
+\end{figure*}
+
 Figure~\ref{fig:walkpropuls} shows the distribution of 95\% upper limits on the $x$ parameter in Equation~\ref{eq:testcdf} (calculated by solving
 the equation for $\text{UL}(x) = 0.95$). It can be seen that, other than for the narrowest prior range, there is a systematic bias towards the
 upper limit being underestimated by $\sim 2\%$. Figure~\ref{fig:walkpropks} show the distribution of two-sided $p$-values from a Kolmogorov-Smirnov
@@ -163,6 +184,27 @@ Figures~\ref{fig:walkunipropuls} and \ref{fig:walkunipropks} respectively are co
 seems to work whereas the ensemble walk proposal on its own does not is currently not understood, but we plan more work on figuring this
 out.
 
+\begin{figure*}[phtb]
+\begin{center}
+\includegraphics[width=0.92\textwidth]{./figures/proptesting/walk_uniform_prop/evidences/collate_plots_wup_evidences}
+\caption{ \protect\input{./figures/proptesting/walk_uniform_prop/evidences/caption}}
+\end{center}
+\end{figure*}
+
+\begin{figure*}[phtb]
+\begin{center}
+\includegraphics[width=0.92\textwidth]{./figures/proptesting/walk_uniform_prop/upperlimits/collate_plots_wup_uls}
+\caption{ \protect\input{./figures/proptesting/walk_uniform_prop/upperlimits/caption}}
+\end{center}
+\end{figure*}
+
+\begin{figure*}[phtb]
+\begin{center}
+\includegraphics[width=0.92\textwidth]{./figures/proptesting/walk_uniform_prop/kstest/collate_plots_wup_ks}
+\caption{ \protect\input{./figures/proptesting/walk_uniform_prop/kstest/caption}}
+\end{center}
+\end{figure*}
+
 \subsection{Posterior sample generation}\label{sec:postsamps}
 
 As discussed in \S\ref{sec:general} nested sampling codes, such as \lppen, do not intrinsically output samples that can be histogrammed to give
@@ -178,6 +220,13 @@ of live points used when running nested sampling. The actual dependence of the n
 Figure~\ref{fig:numposts} (this uses the simulations discussed in \S\ref{sec:reseval}). It can be seen empirically that the mean number of posterior
 samples goes roughly as $\langle N_{\text{post}} \rangle \approx 2.4N_{\text{live}}$, although there is a lower tail extending to $N_{\text{post}} \approx
 0.01N_{\text{live}}^{1.14}$.
+
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/codeeval/stats/numposts/numposts}
+\caption{ \protect\input{./figures/codeeval/stats/numposts/caption}}
+\end{center}
+\end{figure}
 
 \subsection{Code timing}\label{sec:timing}
 
@@ -208,4 +257,11 @@ This relation should be considered as a rough lower limit to the run time for an
 function the nested sampling algorithm took roughly three times longer to run per likelihood evaluation than the simple test function. This is most likely due
 to (for the standard likelihood case) the internal MCMC, that draws new samples within the algorithm, requiring longer chains to give uncorrelated samples when
 the likelihood is more complex (i.e.\ with more parameters), and the proposal distributions have a harder time approximating it. So, for our standard likelihood
-function, and run over four parameters, this run time should be scaled by about a factor of thre
+function, and run over four parameters, this run time should be scaled by about a factor of three.
+
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/proptesting/walk_uniform_prop/timing/walk_uniform_prop_timings}
+\caption{ \protect\input{./figures/proptesting/walk_uniform_prop/timing/caption}}
+\end{center}
+\end{figure}

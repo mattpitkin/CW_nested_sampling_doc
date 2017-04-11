@@ -35,6 +35,13 @@ parameter estimation MCMC code. Although this range is degenerate to rotations o
 A comparison of the marginalised posteriors for individual parameters, and pairs of parameters, are shown when using simulated data lasting
 ten days from a single detector (in this case assumed to be the LIGO Hanford detector, H1) in Figure~\ref{fig:simnoise_single}.
 
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/codeeval/simulations/noise/simulatednoisetest}
+\caption{ \protect\input{./figures/codeeval/simulations/noise/caption}}
+\end{center}
+\end{figure}
+
 It can be seen that the output posteriors look qualititavely consistent. However, we can also quantify some aspects of consistency by
 comparing the evidence output from the nested sampling code with that estimated from the grid-based method from \lppe, the upper limits
 on $h_0$ produced by the codes, and performing Kolmogorov-Smirnov consistency tests between the nested sampling posterior samples
@@ -68,6 +75,13 @@ Signal (two detectors)   & 0.240   & 0.991   & 0.722 & 0.052 & 0.067 & 0.032 \\
 We see a very similar situation, in terms of agreement between the codes, when running on simulated data assumed to be from two detectors (the LIGO
 H1 and L1 sites) as shown in Figure~\ref{fig:simnoise_single} and the second line of Table~\ref{tab:codeeval}. A {\tt jupyter} notebook with this test
 can be found \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/noise_multidet/SimulatedNoiseTestsMultidetPaper.ipynb}{here}.
+
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/codeeval/simulations/noise_multidet/simulatednoisemultidettest}
+\caption{ \protect\input{./figures/codeeval/simulations/noise_multidet/caption}}
+\end{center}
+\end{figure}
 
 The above tests using simulated noise and with searches covering the four standard unknown \gw parameter show that the code appears to
 be working as expected, and is in agreement with our previously used code. However, more generally we can perform parameter estimation
@@ -103,6 +117,13 @@ $p$-value  & 0.13 & 0.04 & 0.78 & 0.23 & 0.44 & 0.26 & 0.85 & 0.28 & 0.29 & 0.86
 \end{center}
 \end{table*}
 
+\begin{figure*}[!phtb]
+\begin{center}
+\includegraphics[width=0.9\textwidth]{./figures/codeeval/simulations/noise_multiparam/noise_multiparam}
+\caption{ \protect\input{./figures/codeeval/simulations/noise_multiparam/caption}}
+\end{center}
+\end{figure*}
+
 \subsubsection{Simulated signals}\label{sec:simsignal}
 
 The next test is checking how the codes compare when there is a signal present in the data. When generating the simulated signals we initially
@@ -118,9 +139,23 @@ between the old and new codes and with the injected signal parameters. The quant
 where is should be noted that the evidence ratio between the codes is larger than statistical uncertainty would expect, although the fractional difference between
 the values ($\lesssim 1\%$) is still small enough to not greatly effect conclusions drawn from either values if used in model selection.
 
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/codeeval/simulations/signal/simulatedsignaltest}
+\caption{ \protect\input{./figures/codeeval/simulations/signal/caption}}
+\end{center}
+\end{figure}
+
 Similarly, using a signal with a coherent multi-detector signal-to-noise ratio of 8 (for the same parameters as above except with $h_0 = 3.5\ee{-23}$) when
 simulated and injected into Gaussian noise for two detectors (H1
 and L1) we see the posteriors shown in Figure~\ref{fig:simsignal_multi}, and consistency checks in Table~\ref{tab:codeeval}.
+
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/codeeval/simulations/signal_multidet/simulatedsignalmultitest}
+\caption{ \protect\input{./figures/codeeval/simulations/signal_multidet/caption}}
+\end{center}
+\end{figure}
 
 The notebooks for the above two tests can be found \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/signal/SimulatedSignalTestsPaper.ipynb}{here} and 
 \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/signal_multidet/SimulatedSignalMultidetTestsPaper.ipynb}{here}.
@@ -142,6 +177,13 @@ parameters. Finally, for $\alpha$ and $T_0$ it can be seen that the posteriors j
 about these parameters. For completeness, we find that the the signal was recovered with SNRs of $\sim 20$ in both H1 and L1 individually, with a coherent
 SNR of $\sim 28$, and odds values for the multi-detector analysis of $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{N}}\right) = 152$
 and $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{I}}\right) = 7.8$.
+
+\begin{figure*}[!phtb]
+\begin{center}
+\includegraphics[width=0.9\textwidth]{./figures/codeeval/simulations/scox1_inj/scox1_inj}
+\caption{ \protect\input{./figures/codeeval/simulations/scox1_inj/caption}}
+\end{center}
+\end{figure*}
 
 \subsubsection{Results evaluation}\label{sec:reseval}
 
@@ -165,11 +207,25 @@ very closely follows the theoretically expected distribution calculated as $\sig
 bias towards the nested sampling evidence being underestimated by a few percent, as was also observed for the simple Gaussian likelihood function case
 in Figure~\ref{fig:walkunipropevs}.
 
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/codeeval/stats/nest_evs/nest_evs}
+\caption{ \protect\input{./figures/codeeval/stats/nest_evs/caption}}
+\end{center}
+\end{figure}
+
 In Figure~\ref{fig:uls} we see a comparison between the 95\% upper limits on $h_0$ as a function of the number of live points. The core distribution of upper
 limits produced via nested sampling are centred around the true (or grid-based) values, with the distribution decreasing with increasing numbers of live points.
 The standard deviation on the distribution roughly follows $2^{6.8}N_{\text{live}}^{-1/2}$. The figure shows some extreme outliers in the distributions, but it
 if found that these outliers occur in the cases when the number of posterior samples drawn from the nested samples is extremely low (the lower tails of the
 distributions in Figure~\ref{fig:numposts}).
+
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/codeeval/stats/uls/uls}
+\caption{ \protect\input{./figures/codeeval/stats/uls/caption}}
+\end{center}
+\end{figure}
 
 \subsection{Injections into real data}
 
@@ -191,6 +247,21 @@ the signal is recovered with SNRs of 164 and 96 in H1 and L1 respectively, and a
 $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{N}}\right) = 6729$ and $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{I}}\right) = 9.1$. For ``Pulsar05''
 the signal is recovered with SNRs of 9.9 amd 6.4 in H1 and L1 respectively, and a coherent SNR of 11.8, and with
 $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{N}}\right) = 22.5$ and $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{I}}\right) = 4.6$.
+
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/codeeval/simulations/S6_hwinj/hwinj03/hwinj03}
+\caption{ \protect\input{./figures/codeeval/simulations/S6_hwinj/hwinj03/caption}}
+\end{center}
+\end{figure}
+
+
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/codeeval/simulations/S6_hwinj/hwinj05/hwinj05}
+\caption{ \protect\input{./figures/codeeval/simulations/S6_hwinj/hwinj05/caption}}
+\end{center}
+\end{figure}
 
 \subsection{Monte-Carlo studies}
 
@@ -261,6 +332,13 @@ comparing our observed distribution to a uniform distribution, and a ``cloud'' o
 cumulative distribution. We see that, overall, our posteriors seem to produce posteriors that give credible intervals that behave as expected, without any
 large deviations.
 
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/codeeval/stats/pp_standard/pp_plots_standard}
+\caption{ \protect\input{./figures/codeeval/stats/pp_standard/caption}}
+\end{center}
+\end{figure}
+
 Similarly, we have done the same thing for the posteriors produced from the simulations that included searches over $f_0$, $\dot{f}_0$, and $\alpha$. 
 In this case we know that the parameters are $f_0$ and $\phi_0$ are completely correlated (i.e.\ there is a degeneracy), so we have held the value of $\phi_0$
 fixed at zero.\footnote{In cases where there is a degeneracy between parameters the samplers used in the code can have problems, leading to observable effects in
@@ -272,6 +350,13 @@ with further derivatives being incorporated through additional phase parameters 
 internally sampling in $\phi_0$, $f_0$, and $\dot{f}_0$, one could use $\phi_{\text{start}}$, $\phi_{\text{mid}}$, and $\phi_{\text{end}}$, and convert between
 the two using linear algebra.} These ``P-P plots'' can be seen in Figure~\ref{fig:pp_extra}, where generally we see posterior credible intervals behaving as
 expected.
+
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/codeeval/stats/pp_extra/pp_plots_extra}
+\caption{ \protect\input{./figures/codeeval/stats/pp_extra/caption}}
+\end{center}
+\end{figure}
 
 \subsubsection{Evaluating the odds}\label{sec:evalodds}
 
@@ -286,6 +371,13 @@ $\ln{\mathcal{O}_{\text{S}/\text{N}}} \propto \rho_{\text{coh}}^2$ and $\mathcal
 We note that the locations of these distributions on the y-axis can be strongly effected by the prior volume, changes to which will move the distributions
 up or down, and can affect where they intersect. However, the general shape of the distributions should be very similar.
 
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/codeeval/stats/snr_vs_odds/snr_v_odds_plot}
+\caption{ \protect\input{./figures/codeeval/stats/snr_vs_odds/caption}}
+\end{center}
+\end{figure}
+
 In Figure~\ref{fig:oddsplot} there are two panels showing $\mathcal{O}_{\text{S}/\text{I}}$ as a function of $\mathcal{O}_{\text{S}/\text{N}}$. In the upper
 panel a hexagon-binned histogram has been used to plot the distribution for the coherent injections, with the bin colours showing the average
 coherent SNR. The plateauing of $\mathcal{O}_{\text{S}/\text{I}}$ is just that seen in Figure~\ref{fig:snrvsodds}. The bottom panel show the coherent signals
@@ -296,6 +388,13 @@ $\mathcal{O}_{\text{S}/\text{I}}$ will be useful for distinguishing a coherent f
 to this are that the way we created our incoherent signals may not well match true signals caused by instrumental (non-astrophysical) effects in \gw detectors.
 However, we hope our simulations are extreme, in a conservative way, in that one detector is actually containing an unadulterated signal, and is therefore
 potentially producing a far larger $\mathcal{O}_{\text{S}/\text{N}}$ value than might be expected.}
+
+\begin{figure*}[phtb]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{./figures/codeeval/stats/odds/odds_plot}
+\caption{ \protect\input{./figures/codeeval/stats/odds/caption}}
+\end{center}
+\end{figure*}
 
 The above simulations were all performed with signal searches over only $h_0$, $\cos{\iota}$, $\phi_0$ and $\psi$. Uncertainties on other parameter will
 likely cause things to change, but it is expected that the distributions would look broadly similar with the main changes being slight rescalings of the axes.
@@ -311,6 +410,13 @@ this more complex search does tend to give higher values than for the simpler se
 found (at large enough SNR) within this larger space is more convincing (more parameters have to match up) than in the simpler case, and this outweights any
 prior Occam factor. The right panel of Figure~\ref{fig:snrvsodds_larger} shows similar information.
 
+\begin{figure*}[phtb]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{./figures/codeeval/stats/snr_vs_odds_larger/snr_v_odds_larger_plot}
+\caption{ \protect\input{./figures/codeeval/stats/snr_vs_odds_larger/caption}}
+\end{center}
+\end{figure*}
+
 \subsubsection{Further parameter estimation}
 
 In Figures~\ref{fig:ffdot_inj1} and \ref{fig:ffdot_inj1} we show the posterior distributions for two of the simulations performed for the searches over
@@ -325,3 +431,18 @@ is a little stronger with injected SNRs of 7.3 and 8.5 for H1 and L1 respectivel
 $\log{}_{10}\mathcal{O}_{\text{S}/\text{N}}$ and $\log{}_{10}\mathcal{O}_{\text{S}/\text{I}}$ of 23.8 and 6.3 respectively. The signal is by far the strongest
 feature in the data, and not other structure is present in the posteriors. The first signal would probably only rate as marginal if determining whether it was
 a true signal or not, whereas the second signal would be a clear detection.
+
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/codeeval/simulations/signal_freq/one/ffdot_inj1}
+\caption{ \protect\input{./figures/codeeval/simulations/signal_freq/one/caption}}
+\end{center}
+\end{figure}
+
+
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/codeeval/simulations/signal_freq/two/ffdot_inj2}
+\caption{ \protect\input{./figures/codeeval/simulations/signal_freq/two/caption}}
+\end{center}
+\end{figure}

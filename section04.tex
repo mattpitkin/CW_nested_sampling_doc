@@ -2,8 +2,8 @@
 
 In this section we will show how the posterior parameter distributions that we can generate from the output
 of our nested sampling code compare to evaluating them with a previous implementation of the analysis code
-\citep[\lppe used in e.g.][]{2014ApJ...785..119A} using a (generally inefficient) MCMC algorithm and over a grid in parameters.
-We will show comparisons of the codes in two different regimes: no signal is present in the data, and an obvious signal is
+\citep[\lppef, or for the rest of this document shortened to \lppe, used in, e.g.,][]{2014ApJ...785..119A} using a (generally inefficient) MCMC algorithm
+and over a grid in parameters. We will show comparisons of the codes in two different regimes: no signal is present in the data, and an obvious signal is
 present in the data. We do this using simulated data both containing purely Gaussian noise and containing simulated signals
 added to Gaussian noise.
 
@@ -30,7 +30,7 @@ consistent between codes.
 An initial test of the code is whether the output posterior probability distributions match those produced when evaluating the
 posterior over a fixed grid in the four-dimensional parameter space of $\vec{\theta} = \{h_0, \cos{\iota}, \psi, \phi_{22}^C\}$, when
 using purely Gaussian noise.\footnote{It is worth noting that in many of these tests the polarisation angle prior covers $-\pi/4$ to $\pi/4$
-rather than the 0 to $\pi/2$ range given in, e.g., \citet{2015MNRAS.453.4399P} due to this being the range required by the older
+rather than the 0 to $\pi/2$ range given in, e.g., \citet{2015MNRAS.453.4399P}, due to this being the range required by the older
 parameter estimation MCMC code. Although this range is degenerate to rotations over $\pi/2$, so spans the same range of waveform models.}
 A comparison of the marginalised posteriors for individual parameters, and pairs of parameters, are shown when using simulated data lasting
 ten days from a single detector (in this case assumed to be the LIGO Hanford detector, H1) in Figure~\ref{fig:simnoise_single}.
@@ -47,10 +47,8 @@ comparing the evidence output from the nested sampling code with that estimated 
 on $h_0$ produced by the codes, and performing Kolmogorov-Smirnov consistency tests between the nested sampling posterior samples
 and MCMC posterior samples (giving a $p$-value for the null hypothesis that the samples are from the same distributions).
 These are shown in Table~\ref{tab:codeeval} and show very good consistency between the codes, although it should be noted that
-these are for one particular run and some statistical fluctuations in the exact values for different runs are to be expected (see e.g.\
-the variations in evidence values in \S\ref{sec:proposaltesting}).
-
-A {\tt jupyter} notebook with this test can be found \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/noise/SimulatedNoiseTestsPaper.ipynb}{here}.
+these are for one particular run and some statistical fluctuations in the exact values for different runs are to be expected (see, e.g.,
+the variations in evidence values in \S\ref{sec:proposaltesting}). A {\tt jupyter} notebook with this test can be found \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/noise/SimulatedNoiseTestsPaper.ipynb}{here}.
 
 \begin{table*}[hptb]
 \caption{Consistency tests between outputs of the new code, \lppen, and the old code, \lppe, when running on simulated data
@@ -73,7 +71,7 @@ Signal (two detectors)   & 0.240   & 0.991   & 0.722 & 0.052 & 0.067 & 0.032 \\
 \end{table*}
 
 We see a very similar situation, in terms of agreement between the codes, when running on simulated data assumed to be from two detectors (the LIGO
-H1 and L1 sites) as shown in Figure~\ref{fig:simnoise_single} and the second line of Table~\ref{tab:codeeval}. A {\tt jupyter} notebook with this test
+H1 and L1 sites) as shown in Figure~\ref{fig:simnoise_multi} and the second line of Table~\ref{tab:codeeval}. A {\tt jupyter} notebook with this test
 can be found \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/noise_multidet/SimulatedNoiseTestsMultidetPaper.ipynb}{here}.
 
 \begin{figure}[!phtb]
@@ -83,7 +81,7 @@ can be found \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/mas
 \end{center}
 \end{figure}
 
-The above tests using simulated noise and with searches covering the four standard unknown \gw parameter show that the code appears to
+The above tests using simulated noise, and with searches covering the four standard unknown \gw parameters, show that the code appears to
 be working as expected, and is in agreement with our previously used code. However, more generally we can perform parameter estimation
 over a larger number of signal parameters, and can again check for consistency with the previous code. We produce one day of Gaussian
 noise for a single detector and search over the four \gw parameter with the same priors as before, but then also use a multi-variate Gaussian prior (\S\ref{sec:gaussianprior})
@@ -93,10 +91,11 @@ This gives a total of 12 parameters in the search. The multi-variate prior is de
 the parameter pairs $[T_0, \omega_0]$ and $[P_{\text{b}}, \dot{\omega}_0]$ for which we use a very high correlation of $0.9999$ (we do not set them to
 be fully correlated due to numerical issues inverting such matrices).
 
-The one-and-two dimensional posteriors output for this case when run with both \lppe and \lppen can be seen in Figure~\ref{fig:noise_multiparam},
+The one-and-two dimensional posteriors (expressed as offsets from the assumed heterodyne parameter values) output for this case when run with both
+\lppe and \lppen can be seen in Figure~\ref{fig:noise_multiparam},
 which also overlays the marginalised priors on top. It can be seen qualititavely that the codes are consistent\footnote{It is worth mentioning that in performing
 these tests a bug was discovered in \lppe in which Equation~\ref{eq:deltaphi} was being applied with the wrong sign, leading to parameter estimates
-having the wrong sign. However, this bug was fixed for the example shown here.} and for the {\it phase} parameter priors are recovered, except for
+having the wrong sign. However, this bug was fixed for the example shown here.} and for the {\it phase} parameters the priors are recovered, except for
 $\dot{f}$, which has some structure due to the specifics of the noise realisation. The Kolmogorov-Smirnov test $p$-values testing the null hypothesis
 that the posterior samples from each code are drawn from the same distribution are shown in Table~\ref{tab:noisemultiks}, and suggest that the
 distributions are consistent.
@@ -128,7 +127,7 @@ $p$-value  & 0.13 & 0.04 & 0.78 & 0.23 & 0.44 & 0.26 & 0.85 & 0.28 & 0.29 & 0.86
 
 The next test is checking how the codes compare when there is a signal present in the data. When generating the simulated signals we initially
 assume that the signal's phase evolution is perfectly known and has been removed via the heterodyne described in \S\ref{sec:model}, and therefore
-$\Delta\phi_2 = 0$ from Equation~\ref{eq:deltaphi}. As in \S\ref{sec:simnoise} then will search over the four-dimensional parameter space of
+$\Delta\phi_2 = 0$ from Equation~\ref{eq:deltaphi}. As in \S\ref{sec:simnoise} we search over the four-dimensional parameter space of
 $\vec{\theta} = \{h_0, \cos{\iota}, \psi, \Phi_{22}^C\}$.
 
 We create a simulated signal in the H1 detector spanning ten days of data with parameters ($h_0 = 6.2\ee{-23}$, $\Phi_{22}^C = 2.4$\,rad, $\cos{\iota} = 0.3$
@@ -148,7 +147,9 @@ the values ($\lesssim 1\%$) is still small enough to not greatly effect conclusi
 
 Similarly, using a signal with a coherent multi-detector signal-to-noise ratio of 8 (for the same parameters as above except with $h_0 = 3.5\ee{-23}$) when
 simulated and injected into Gaussian noise for two detectors (H1
-and L1) we see the posteriors shown in Figure~\ref{fig:simsignal_multi}, and consistency checks in Table~\ref{tab:codeeval}.
+and L1) we see the posteriors shown in Figure~\ref{fig:simsignal_multi}, and consistency checks in Table~\ref{tab:codeeval}. The notebooks for the above two tests
+can be found \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/signal/SimulatedSignalTestsPaper.ipynb}{here} and 
+\href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/signal_multidet/SimulatedSignalMultidetTestsPaper.ipynb}{here}.
 
 \begin{figure}[!phtb]
 \begin{center}
@@ -157,23 +158,20 @@ and L1) we see the posteriors shown in Figure~\ref{fig:simsignal_multi}, and con
 \end{center}
 \end{figure}
 
-The notebooks for the above two tests can be found \href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/signal/SimulatedSignalTestsPaper.ipynb}{here} and 
-\href{https://github.com/mattpitkin/CW_nested_sampling_doc/blob/master/figures/codeeval/simulations/signal_multidet/SimulatedSignalMultidetTestsPaper.ipynb}{here}.
-
 A set of simulated signals with sky location and orbital parameters set to those of the Low-mass X-ray binary Sco X-1 were injected into
 Gaussian noise for the study in \citet{2015PhRvD..92b3006M}. As a test of our code when recovering a signal from a source in a binary system
 we have recovered one of these signals using approximately 1.4 days of simulated data. We have purposely performed the heterodyne data processing stage
 with values of several of the phase parameters ($f_0$, $\alpha$, $T_0$, $a\sin{i}$ and $P_{\text{b}}$) set to {\it not} match the known simulated signal
 values. Therefore, to recover the signal, in addition to the four \gw parameters we have had to allow the code to search over these extra parameters.
 For these additional parameters Gaussian priors were used, with the prior means set to be the parameter values used for heterodyning (not those for
-the actual signal), with standard devaitions wide enough to encompass the true signal values. For $h_0$ a Fermi-Dirac prior was used, whilst the other
+the actual signal), with standard deviations wide enough to encompass the true signal values. For $h_0$ a Fermi-Dirac prior was used, whilst the other
 angle parameters used priors covering their minimal allowed ranges. The recovered signal posterior distributions can be seen
-in Figure~\ref{fig:scox1_inj}, which show that the true parameters are correctly recovered (the plot show recovered phase parameters as offsets from
+in Figure~\ref{fig:scox1_inj}, which show that the true parameters are correctly recovered (the plot shows recovered phase parameters as offsets from
 the heterodyne parameter values, i.e.\ the centres of the Gaussian priors). It can be seen that for $f_0$ and $P_{\text{b}}$ the posteriors contain the
-correct value, but are peaked well away from the value used for heterodyning (which would be a zero in the plots), showing the codes ability to explore
+correct value, but are peaked well away from the value used for heterodyning (which would be at zero in the plots), showing the code's ability to explore
 the prior space in these parameters. The one-dimensional marginal distribution for $\phi_0$ spans the full prior range, however, this is due to it being
 highly correlated with $f_0$, and, although not visible on the plot, this very strong correlation is present in the two-dimensional posterior for these
-parameters. Finally, for $\alpha$ and $T_0$ it can be seen that the posteriors just fill the prior ranges as the data give not additional information
+parameters. Finally, for $\alpha$ and $T_0$, it can be seen that the posteriors just fill the prior ranges as the data provides no additional information
 about these parameters. For completeness, we find that the the signal was recovered with SNRs of $\sim 20$ in both H1 and L1 individually, with a coherent
 SNR of $\sim 28$, and odds values for the multi-detector analysis of $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{N}}\right) = 152$
 and $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{I}}\right) = 7.8$.
@@ -194,13 +192,13 @@ have choosen numbers of live points from 256 to 16384, increasing in a power of 
 complex Gaussian noise with 1440 points over one day. Choosing a random source sky location for each realisation, and using uniform priors for the
 parameters $h_0$, $\cos{\iota}$, $\Phi_{22}^C$ and $\psi$, we have performed parameter estimation using both \lppen and \lppe in its grid-based mode.
 For \lppe the integrals required for calculating the signal evidence and 95\% upper limit on $h_0$ are performed using the trapezium rule, whilst
-for the output of \lppen the upper limit has been calculated used a greedy-binning approach bounded from zero. This assessment is very similar to what
+for the output of \lppen the upper limit has been calculated using a greedy-binning approach bounded from zero. This assessment is very similar to what
 we did in \S\ref{sec:proposaltesting}, but has not just used a fixed Gaussian likelihood function in each case. We will make the assumption that the
 grid-based results are a representation of the true values for the evidence and upper limit, however, it should be noted that there will in fact be
 errors (and potentially biases) from the trapezium rule approximation.
 
-In Figure~\ref{fig:nest_evs} we see a comparison between the signal evidences evaluation using nested sampling and the trapezium rule. The left-hand
-axis shows the logarithm of the ratio of the two value, whilst the right hand axis shows the actual percentage difference between the evidences. These
+In Figure~\ref{fig:nest_evs} we see a comparison between the signal evidences evaluated using nested sampling and the trapezium rule. The left-hand
+axis shows the logarithm of the ratio of the two values, whilst the right hand axis shows the actual percentage difference between the evidences. These
 are plotted as a function of the number of live points used in the nested sampling evaluation by \lppen. We find that the distribution of evidences
 very closely follows the theoretically expected distribution calculated as $\sigma_{\mathcal{Z}} = \sqrt{H/N_{\text{live}}}$ (see
 \S\ref{sec:proposaltesting}), where given our prior range set up we found $\langle H \rangle \approx 2.45$. It can also be seen that there is a slight
@@ -215,9 +213,9 @@ in Figure~\ref{fig:walkunipropevs}.
 \end{figure}
 
 In Figure~\ref{fig:uls} we see a comparison between the 95\% upper limits on $h_0$ as a function of the number of live points. The core distribution of upper
-limits produced via nested sampling are centred around the true (or grid-based) values, with the distribution decreasing with increasing numbers of live points.
+limits produced via nested sampling are centred around the true (or grid-based) values, with the distribution decreasing in width with increasing numbers of live points.
 The standard deviation on the distribution roughly follows $2^{6.8}N_{\text{live}}^{-1/2}$. The figure shows some extreme outliers in the distributions, but it
-if found that these outliers occur in the cases when the number of posterior samples drawn from the nested samples is extremely low (the lower tails of the
+is found that these outliers occur in the cases when the number of posterior samples drawn from the nested samples is extremely low (the lower tails of the
 distributions in Figure~\ref{fig:numposts}).
 
 \begin{figure}[!phtb]
@@ -235,9 +233,9 @@ use, and extraction, in advanced LIGO's first obersving run]{2016arXiv161207864B
 by, e.g., Equation~2 of \citet{2017arXiv170107709T}, which in past have been searched for using a variety of analysis pipelines, including the one
 described in this document using \lppe \citep[see, e.g., Appendix~B of][]{2007PhRvD..76d2001A}.
 
-Here we have used \lppen to perform parameter estimation on the parameters $\vec{\theta} = \{h_0, \cos{\iota}, \psi, \phi_{0}\}$\footnote{$\phi_0$ is
-being used here as opposed to $\Phi_{22}^C$ as we are not having to compare to the previous code.} for two hardware injections added to intial LIGO
-data from the sixth science run (S6). These are two out of the thirteen total continuous wave injections and where called ``Pulsar03'' and ``Pulsar05''
+Here we have used \lppen to perform parameter estimation on the parameters $\vec{\theta} = \{h_0, \cos{\iota}, \psi, \phi_{0}\}$ for two hardware injections added
+to intial LIGO data from the sixth science run (S6).\footnote{$\phi_0$ is being used here as opposed to $\Phi_{22}^C$ as we are not having to compare to the previous
+code.} These are two out of the thirteen total continuous wave injections and were called ``Pulsar03'' and ``Pulsar05''
 respectively. The data have been heterodyned with the known phase evolution of the signals. The extracted posterior distributions can be seen in
 Figures~\ref{fig:hwinj03} and \ref{fig:hwinj05} and are in very good agreement with the injection parameters.\footnote{For these hardware injections
 exact agreement between the expected injection parameters and those recovered, or between detectors, is not entirely expected. This is due to the
@@ -245,7 +243,7 @@ injections needing to be performed using actuation functions (converting the exp
 interferometer test mass) that may not exactly match the actuations functions later required for calibrating the detectors.} For ``Pulsar03''
 the signal is recovered with SNRs of 164 and 96 in H1 and L1 respectively, and a coherent SNR of 190, and with
 $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{N}}\right) = 6729$ and $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{I}}\right) = 9.1$. For ``Pulsar05''
-the signal is recovered with SNRs of 9.9 amd 6.4 in H1 and L1 respectively, and a coherent SNR of 11.8, and with
+the signal is recovered with SNRs of 9.9 and 6.4 in H1 and L1 respectively, and a coherent SNR of 11.8, and with
 $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{N}}\right) = 22.5$ and $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{I}}\right) = 4.6$.
 
 \begin{figure}[!phtb]
@@ -271,7 +269,7 @@ with $\phi_0$, $\psi$ and $\cos{\iota}$ drawn from uniform distributions over th
 but the first set
 calculates $h_0$ such that the coherent SNR (Equation~\ref{eq:snr}) is drawn uniformly between 0 and 20; the second set draws the $h_0$ uniformly between
 0 and $3.25\ee{-22}$, such that the maximum coherent SNR (given the known noise level) is $\sim 55$. This latter set is used to evaluate the posterior
-distributions as described below in \S\ref{sec:ppplots}, whilst both sets are used to evaluate odds distributions. The source's sky locations are drawn
+distributions as described below in \S\ref{sec:ppplots}, whilst both sets are used to evaluate odds distributions. The sources' sky locations are drawn
 uniformly from over the sky-sphere. For these analyses each
 simulated data set is one solar day long, consisting of 1440 complex data points (generated as if heterodyned at precisely the known source phase evolution)
 sampled once per minute. This data has been used to estimate the four parameters $h_0$, $\cos{\iota}$, $\phi_0$ and $\psi$, with each being given
@@ -280,10 +278,10 @@ bulk of the likelihood). When running \lppen on these, two parallel runs with 10
 in \S\ref{sec:proposals}, and with the samples from both runs being combined to produce posterior samples and evidence estimates.
 
 Another set of 2000 simulations has been created that again create simulated signals and add them to Gaussian noise for the H1 and L1 detectors. In this
-case the total SNR shared between the detector has be drawn from a uniform distribution between 0 and 30, however, the signals have been purposely created
+case the total SNR shared between the detectors has be drawn from a uniform distribution between 0 and 30, however, the signals have been purposely created
 to be incoherent between detectors. The parameters $\phi_0$, $\psi$ and $\cos{\iota}$ are drawn from their minimal allowed ranges, but are different for
 the signals input into the two detectors, whilst the sky positions are also independent for both detectors. The signal rotational frequency and frequency
-derivative are also offset between detectors, such that the offsets are drawn from Gaussian distributions of $1/2048$\,Hz and $1\ee{-10}$\,Hz$\,s^{-1}$
+derivative are also offset between detectors, such that the offsets are drawn from Gaussian distributions of width $1/2048$\,Hz and $1\ee{-10}$\,Hz$\,s^{-1}$
 respectively. The length of the data is the same as in the previous case, but it is assumed that the data for both detectors was heterodyned using the
 known phase evolution for the signal in the just H1 detector. The same prior and run settings as above were used. These simulations have been used for
 assessing the odds for a coherent versus incoherent signal (see \S\ref{sec:odds}).
@@ -291,7 +289,7 @@ assessing the odds for a coherent versus incoherent signal (see \S\ref{sec:odds}
 Finally, two sets of simulations of 500 signals have been created to assess the code when estimating additional phase parameters: in this case
 the rotational frequency $f_0$, frequency derivative $\dot{f}_0$, and right ascension $\alpha$. Gaussian priors on these three parameters have been
 used, with parameters given in Table~\ref{tab:gaussianpriors}. These Gaussian priors are used when generating signals and when estimating them
-using \lppen, whilst the simulated data is created such that it was heterodyned using the means values. As above, one set of these simulations has amplitude 
+using \lppen, whilst the simulated data is created such that it was heterodyned using the mean values. As above, one set of these simulations has amplitudes 
 calculated such that the coherent SNRs are drawn uniformly between 0 and 20, whilst the other has amplitude drawn uniformly between 0 and $3.25\ee{-22}$.
 The latter of these is used to evaluate the posterior distributions, whilst both are used for odds distributions assessment. Again, the angles are drawn
 uniformly from their minimal ranges and sky positions are drawn uniformly over the sky-sphere.
@@ -320,7 +318,7 @@ from posterior distribution output by \lalinf codes \citep{2015PhRvD..91d2003V},
 drawn from the prior distributions used when reconstructing them\footnote{In this case the amplitudes of the simulations are not drawn from the full prior range,
 but are drawn from a flat distribution within that range, so are valid for this comparison.}, and sees if the credible intervals effectively behave as frequentist
 confidence intervals, i.e.\ do 50\% of the known parameter values fall within some pre-specified definition (like the minimal credible region, or credible
-region bounded by the lower extent to the prior) of the 50\% credible region. This can test whether the underlying \lalinf parameter sampling is working as
+region bounded by the lower extent of the prior) of the 50\% credible region. This can test whether the underlying \lalinf parameter sampling is working as
 expected, or if there are biases to wider, or narrower, credible regions. The method, and the ``P-P plots'' it produces through evaluation over a range of credible
 intervals, has now become commonly used to assess the \lalinf parameter estimation codes \citep{2015PhRvD..91d2003V} as a way of showing up any problems.
 
@@ -341,7 +339,7 @@ large deviations.
 
 Similarly, we have done the same thing for the posteriors produced from the simulations that included searches over $f_0$, $\dot{f}_0$, and $\alpha$. 
 In this case we know that the parameters are $f_0$ and $\phi_0$ are completely correlated (i.e.\ there is a degeneracy), so we have held the value of $\phi_0$
-fixed at zero.\footnote{In cases where there is a degeneracy between parameters the samplers used in the code can have problems, leading to observable effects in
+fixed at zero.\footnote{In cases where there is a complete degeneracy between parameters the samplers used in the code can have problems, leading to observable effects in
 the ``P-P plots''. In certain cases, where the degeneracies are known, there are ways to deal with this: one parameter of a degenerate pair can be held fixed,
 a custom proposal distribution can be hard coded for degenerate parameters that deals with the correlations, or, reparameterisations can be found that do not
 have the degeneracies. In the future the latter of these may be implemented in our code to deal with strong degeneracies between the initial phase and derivatives of it
@@ -379,11 +377,10 @@ up or down, and can affect where they intersect. However, the general shape of t
 \end{figure}
 
 In Figure~\ref{fig:oddsplot} there are two panels showing $\mathcal{O}_{\text{S}/\text{I}}$ as a function of $\mathcal{O}_{\text{S}/\text{N}}$. In the upper
-panel a hexagon-binned histogram has been used to plot the distribution for the coherent injections, with the bin colours showing the average
-coherent SNR. The plateauing of $\mathcal{O}_{\text{S}/\text{I}}$ is just that seen in Figure~\ref{fig:snrvsodds}. The bottom panel show the coherent signals
-as red circles, with the incoherent signals as dark circles (these are also seen in the lower left of the upper panel). Here we see that for incoherent signals
-the value of $\mathcal{O}_{\text{S}/\text{I}}$ between the coherent and incoherent signals diverges quite quickly, with $\ln{\mathcal{O}_{\text{S}/\text{I}}}$
-falling off roughly linearly with $\mathcal{O}_{\text{S}/\text{N}}$. This shows that, hopefully, for reasonable strength signals the value of
+panel the colours of points show the signal's coherent SNR. The plateauing of $\mathcal{O}_{\text{S}/\text{I}}$ is just that seen in Figure~\ref{fig:snrvsodds}. The
+bottom panel shows a zoomed out version, with the incoherent signals as dark circles (these are also seen in the lower left of the upper panel). Here we see that for incoherent signals
+the value of $\mathcal{O}_{\text{S}/\text{I}}$ between the coherent and incoherent signals diverges quite quickly, with $\log{}_{10}{\mathcal{O}_{\text{S}/\text{I}}}$
+falling off roughly linearly with $\log{}_{10}{\mathcal{O}_{\text{S}/\text{N}}}$. This shows that, hopefully, for reasonable strength signals the value of
 $\mathcal{O}_{\text{S}/\text{I}}$ will be useful for distinguishing a coherent from an incoherent (and therefore not astrophyical) signal.\footnote{The caveats
 to this are that the way we created our incoherent signals may not well match true signals caused by instrumental (non-astrophysical) effects in \gw detectors.
 However, we hope our simulations are extreme, in a conservative way, in that one detector is actually containing an unadulterated signal, and is therefore
@@ -396,17 +393,14 @@ potentially producing a far larger $\mathcal{O}_{\text{S}/\text{N}}$ value than 
 \end{center}
 \end{figure*}
 
-The above simulations were all performed with signal searches over only $h_0$, $\cos{\iota}$, $\phi_0$ and $\psi$. Uncertainties on other parameter will
-likely cause things to change, but it is expected that the distributions would look broadly similar with the main changes being slight rescalings of the axes.
-
 It is useful to see how these distributions change when the parameter space searched over increases in complexity. So, in Figure~\ref{fig:snrvsodds_larger}
 we see similar plots to those above, but for the simulations that included searches over $f_0$, $\dot{f}$, and $\alpha$ (but fixed $\phi_0$). In the left
 panel we see $\mathcal{O}_{\text{S}/\text{N}}$ and $\mathcal{O}_{\text{S}/\text{I}}$ as a function of $\rho_{\text{coh}}$ for these simulations, with the
-earlier simulations plotted underneath. It is obvious that for these injections that these odds follow the same form as before, however, at low SNR there
+earlier simulations plotted underneath. It is obvious that, for these injections the odds follow the same form as before, however, at low SNR there
 is more scatter in $\mathcal{O}_{\text{S}/\text{I}}$ than seen before. This can be interpreted as finding spikes in $f_0\operatorname{-}\dot{f}$-space, that
 are not related to the signal, in individual detectors, which are therefore not coherent. For higher SNRs ($\gtrsim 10$) the $\mathcal{O}_{\text{S}/\text{I}}$
 value for
-this more complex search does tend to give higher values than for the simpler search. A hand-wavy explanation for this could be that a truely coherent signal
+this more complex search does tend to give higher values than for the simpler search. A hand-wavy explanation for this {\it could be} that a truely coherent signal
 found (at large enough SNR) within this larger space is more convincing (more parameters have to match up) than in the simpler case, and this outweights any
 prior Occam factor. The right panel of Figure~\ref{fig:snrvsodds_larger} shows similar information.
 
@@ -419,7 +413,7 @@ prior Occam factor. The right panel of Figure~\ref{fig:snrvsodds_larger} shows s
 
 \subsubsection{Further parameter estimation}
 
-In Figures~\ref{fig:ffdot_inj1} and \ref{fig:ffdot_inj1} we show the posterior distributions for two of the simulations performed for the searches over
+In Figures~\ref{fig:ffdot_inj1} and \ref{fig:ffdot_inj2} we show the posterior distributions for two of the simulations performed for the searches over
 $h_0$, $\cos{\iota}$, $\phi_0$, $\psi$, $f_0$, $\dot{f}$, and $\alpha$ above.\footnote{Earlier, during the discussing of the ``P-P plots'' in \S\ref{sec:ppplots},
 it was mentioning that $\phi_0$ was held fixed due to the degeracies between $f_0$ and $\phi_0$. In this case, as we also have $\dot{f}$ the correlations
 become more complex, and whilst it would be expected that holding $\phi_0$ fixed would give valid posteriors, it is in such cases that a re-parameterisation
@@ -429,7 +423,7 @@ $\log{}_{10}\mathcal{O}_{\text{S}/\text{I}}$ of 1.55 and 0.95 respectively. It c
 in the frequency space, whilst in L1 the signal dominates, and the joint analysis also recovers the signal. The simulation in Figure~\ref{fig:ffdot_inj2}
 is a little stronger with injected SNRs of 7.3 and 8.5 for H1 and L1 respectively, and a coherent SNR of 11.2, and recovered values of 
 $\log{}_{10}\mathcal{O}_{\text{S}/\text{N}}$ and $\log{}_{10}\mathcal{O}_{\text{S}/\text{I}}$ of 23.8 and 6.3 respectively. The signal is by far the strongest
-feature in the data, and not other structure is present in the posteriors. The first signal would probably only rate as marginal if determining whether it was
+feature in the data, and no other structure is present in the posteriors. The first signal would probably only rate as marginal if determining whether it was
 a true signal or not, whereas the second signal would be a clear detection.
 
 \begin{figure}[!phtb]

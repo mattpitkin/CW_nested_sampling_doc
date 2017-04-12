@@ -2,112 +2,116 @@
 
 \section{Code usage}\label{app:usage}
 
-Here we document the various command line options for the code and its use in a variety of situations. All the command
-line options for \lppen, as shown with the \verb|--help| command, are given in Table~\ref{tab:commands}.
+Here we document the various command line options for the code and its use in a variety of situations. The majority of the command
+line options for \lppen, as shown with the \verb|--help| command, are given (in a slightly edited form) in Table~\ref{tab:commands}.
 \begin{footnotesize}
-\begin{longtable}{|p{0.2\textwidth}p{0.7\textwidth}|}
+\begin{longtable}{|p{0.15\textwidth}p{0.75\textwidth}|}
 \caption{A list of command line arguments for the \lppen code.}\label{tab:commands} \\
 \hline
 \multicolumn{2}{|l|}{Usage: \lppenf [options]} \\
- --help            &  display this message \\
- --verbose         &  display all error messages \\
- --detectors       &  all IFOs with data to be analysed e.g. H1,H2 (delimited by commas) (if generating fake data these
-                     should not be set) \\
- --par-file        &  pulsar parameter (.par) file (full path) \\
- --cor-file        &  pulsar TEMPO-fit parameter correlation matrix \\
- --input-files     &  full paths and file names for the data for each detector and model harmonic in the list (must be
-                     in the same order) delimited by commas. These files can be gzipped. If not set you can generate
-                     fake data (see --fake-data below) \\
- --sample-interval &  (REAL8) the time interval bewteen samples (default to 60 s) \\
- --outfile         &  name of output data file (a HDF5 formated file with the extension '.hdf' or '.h5' [required]) \\
- --output-chunks   &  Output lists of stationary chunks into which the data has been split \\
- --outXML          &  name of output XML file [not required] \\
- --chunk-min       &  (INT4) minimum stationary length of data to be used in the likelihood e.g. 5 mins \\
- --chunk-max       &  (INT4) maximum stationary length of data to be used in the likelihood e.g. 30 mins \\
- --time-bins       &  (INT4) no. of time bins in the time-psi lookup table \\
- --prior-file      &  file containing the parameters to search over and their upper and lower ranges \\
- --ephem-earth     &  Earth ephemeris file \\
- --ephem-sun       &  Sun ephemeris file \\
- --ephem-timecorr  &  Einstein delay time correction ephemeris file \\
- --harmonics       &  (CHAR) the signal model frequency harmonics that you want to use (delimited by commas). Currently
-                     this can be either the 'triaxial' model for which you use 2 (the default value) or 1,2 for a
-                     model with emission at both the rotation frequency and twice the rotation frequency. \\
- --biaxial         &  Set this if the waveform model parameters spcify a biaxial star \\
- --gaussian-like   &  Set this if a Gaussian likelihood is to be used. If the input file contains a column specifying
-                     the noise standard deviation of the data then that will be used in the Gaussian likelihood
-                     function, otherwise the noise variance will be calculated from the data. \\
- --nonGR           &  Set to allow non-GR polarisation modes and/or a variable speed of gravitational waves \\
- --randomise       &  Set this, with an INT seed, to randomise the data (through permutations of the time stamps) for
-                     use in Monte-Carlo studies. NOTE: this will not work if using the code to create injections \\
+ {\tt --help}            &  Display these commands. \\
+ {\tt --verbose}         &  Display progress information from the code, including details of the nested sampling progress. \\
+ {\tt --detectors}       &  Input all interferometers whose data is to be analysed, e.g.\, {\tt H1,L1} (delimited by commas) for the LIGO Hanford and
+ LIGO Livingston detectors (see the discussion in \S\ref{sec:example2} for the allowed detector names). If generating fake data, described below, these
+                     should not be set, otherwise this is {\bf required}. \\
+ {\tt --par-file}        &  The pulsar's parameter ({\tt .par}) file (see \S\ref{sec:parfile}). {\bf Required}. \\
+ {\tt --cor-file}        &  The pulsar's parameter correlation matrix file (see \S\ref{sec:priorfile}). {\bf Optional}. \\
+ {\tt --harmonics}       &  The signal model frequency harmonics that you want to use (delimited by commas). Currently
+                            this can be either a single value (e.g., the {\bf default} is to assume a 'triaxial' star emitting from the $l=m=2$ mode and use a value
+                            of 2), or {\tt 1,2} for a model with emission at both the rotation frequency and twice the rotation frequency. \\
+ {\tt --input-files}     &  The files containing the pre-processed (heterodyned, or spectrally interpolated) data for each detector and model harmonic specified by
+                            {\tt --detectors} and {\tt --harmonics} delimited by commas (these files must be listed in the same order as passed to
+                            {\tt --detectors} and {\tt --harmonics}, with the files for different harmonics for individual detectors listed together). If this not
+                            set you can generate fake data (see {\tt --fake-data below}), but it is otherwise this is {\bf required}. \\
+ {\tt --outfile}         &  The name for the output data file. This must be a HDF5 file with the extension '.hdf' or '.h5'. {\bf Required}. \\
+ {\tt --output-chunks}   &  Output lists of the stationary chunks into which the data has been split (see \S\ref{sec:splitting}). {\bf Optional}. \\
+ {\tt --chunk-min}       &  The minimum stationary length of data to be used in the likelihood. This {\bf defaults} to 5, e.g., 5 mins for data
+                            sampled at 1/60~Hz. {\bf Optional}. \\
+ {\tt --chunk-max}       &  The maximum stationary length of data to be used in the likelihood. This {\bf defaults} to 0, which is the value for no
+                            maximum length to be applied, except if the {\tt --oldChunks} flag is set, in which case it defaults to 30. {\bf Optional}. \\
+ {\tt --time-bins}       &  Number of time bins over a sidereal day in the antenna response lookup table. This {\bf defaults} to 2880 bins. {\bf Optional}. \\
+ {\tt --prior-file}      &  The file containing the prior ranges for parameters to search over (see \S\ref{sec:priorfile}). {\bf Required}. \\
+ {\tt --ephem-earth}     &  The Earth ephemeris file. If not supplied this will attempt to be found in the path. \\
+ {\tt --ephem-sun}       &  The Sun ephemeris file. If not supplied this will attempt to be found in the path. \\
+ {\tt --ephem-timecorr}  &  The Einstein delay time correction ephemeris file. If not supplied this will attempt to be found in the path. \\
+ {\tt --biaxial}         &  Set this if using the waveform model parameters with two harmonics, and specifically for a biaxial star \citep[see, e.g.,][]{2015MNRAS.453.4399P}. \\
+ {\tt --gaussian-like}   &  Set this if a Gaussian likelihood is to be used. If the input file(s) contains a column specifying
+                            the noise standard deviation of the data then that will be used in the Gaussian likelihood
+                            function, otherwise the noise variance will be calculated from the data. \\
+ {\tt --nonGR}           &  Set this to allow non-GR polarisation modes and/or a variable speed of gravitational waves. \\
+ {\tt --randomise}       &  Set this, with an integer seed, to randomise the data (through permutations of the time stamps) for
+                            use in Monte-Carlo studies. Note that this will not work if using the code to create injections. \\
+ {\tt --truncate-time}   &  Only analyse data up to the given GPS time. {\bf Optional}. \\
+ {\tt --truncate-samples}&  Only analyse data samples up to the number given here. {\bf Optional}. \\
+ {\tt --truncate-fraction}& Only analyse the given fraction of data samples (this must be a value between 0 and 1). {\bf Optional}. \\
  ~ & ~ \\
 \multicolumn{2}{|l|}{~Nested sampling parameters:} \\
- --Nlive           &  (INT4) no. of live points for nested sampling \\
- --Nmcmc           &  (INT4) no. of for MCMC used to find new live points (if not specified an  adaptive number of
-                     points is used) \\
- --Nmcmcinitial    &  (INT4) no. of MCMC points to use in the initial resampling of the prior (default is to use
-                     MAXMCMC) \\
- --Nruns           &  (INT4) no. of parallel runs \\
- --tolerance       &  (REAL8) tolerance of nested sampling integrator \\
- --randomseed      &  seed for random number generator \\
+ {\tt --Nlive}           &  Set the integer number of live points for nested sampling. {\bf Required}. \\
+ {\tt --Nmcmc}           &  Set the length of the MCMC used to find new live points (if not specified an adaptive number of
+                            points is used). \\
+ {\tt --Nmcmcinitial}    &  Set the number of MCMC points to use in the initial resampling of the prior. This defaults to 5000, but
+                            for our analyses this can be set to zero. \\
+ {\tt --tolerance}       &  The tolerance used as the stopping criterion for the nested sampling integrator. This {\bf defaults} to 0.1. \\
+ {\tt --randomseed}      &  A seed for the random number generator. By default, if not supplied, this is set by the system clock. \\
  ~ & ~ \\
-\multicolumn{2}{|l|}{~MCMC proposal parameters:} \\
- --diffev          &  (UINT4) relative weight of using differential evolution of the live points as the proposal
-                     (DEFAULT = 0, e.g. 0\%) \\
- --freqBinJump     &  (UINT4) relative weight of using jumps to adjacent frequency bins as a proposal (DEFAULT = 0,
-                     e.g. this is not required unless searching over frequency) \\
- --ensembleStretch &  (UINT4) relative weight of the ensemble stretch proposal (DEFAULT = 0, e.g. 0\%) [NOTE: this
-                     proposal greatly increases the autocorrelation lengths, so in general should be avoided] \\
- --ensembleWalk    &  (UINT4) relative weight of the ensemble walk proposal (DEFAULT = 3, e.g. 75\%) \\
- --uniformprop     &  (UINT4) relative weights of uniform proposal (DEFAULT = 1, e.g. 25\%) \\
+\multicolumn{2}{|l|}{~MCMC proposal parameters: (see \S\ref{sec:proposals})} \\
+ {\tt --diffev}          &  The (integer) relative weight of using differential evolution of the live points as the proposal. The {\bf default} is 0,
+                            e.g., 0\%. \\
+ {\tt --freqBinJump}     &  The (integer) relative weight of using jumps to adjacent frequency bins as a proposal. The {\bf default} is 0, and this is not
+                            required unless searching over frequency. \\
+ {\tt --ensembleStretch} &  The (integer) relative weight of the ensemble stretch proposal. The {\bf default} is 0. Note that this
+                            proposal greatly increases the parameter autocorrelation lengths, so in general should be avoided. \\
+ {\tt --ensembleWalk}    &  The (integer) relative weight of the ensemble walk proposal. The {\bf default} is 3, e.g., 75\%. \\
+ {\tt --uniformprop}     &  The (integer) relative weight of uniform proposal. The {\bf default} is 1, e.g., 25\%. \\
  ~ & ~ \\
 \multicolumn{2}{|l|}{~Reduced order quadrature (ROQ) parameters:} \\
- --roq             &  Set this to use reduced order quadrature to compute the likelihood \\
- --ntraining       &  (UINT4) The number of training models used to generate an orthonormal basis of waveform models \\
- --roq-tolerance   &  (REAL8) The tolerance used during the basis generation (DEFAULT = 1e-11) \\
- --enrich-max      &  (UINT4) The number of times to try and "enrich" the basis set using new training data. The
-                     enrichment process stop before this value is reached if three consecutive enrichment steps
-                     produce no new bases (DEFAULT = 100) \\ 
- --roq-uniform     &  Set this flag to cause training model parameters for parameters with Gaussian prior
-                     distributions to be drawn from a uniform distribution spanning mu +/- 5 sigma. Otherwise, by
-                     default parameters are drawn from their given prior distributions \\
- --output-weights  &  (CHAR) If this is set then the weights will be output to the (binary) file that is named and the
-                     programme will exit. These could be read in later instead of being regenerated. This allows the
-                     ROQ to be generated on a machine with a large amount of RAM, whilst the full parameter
-                     estimation can run on a machine with less RAM. \\
- --input-weights   &  (CHAR) A binary file containing all the weights in a defined format. If this is present then the
-                     RQO will not be recalculated \\
+ {\tt --roq}             &  Set this flag to use reduced order quadrature to compute the likelihood. \\
+ {\tt --ntraining}       &  The (integer) number of training models used to generate an orthonormal basis of waveform models. \\
+ {\tt --roq-tolerance}   &  The tolerance used during the basis generation. The {\bf default} is {\tt 1e-11}. \\
+ {\tt --enrich-max}      &  The (integer) number of times to try and ``enrich'' \citep[see, e.g.,][]{2016PhRvD..94d4031S} the basis set using new training
+                            data. The enrichment process stops before this value is reached if three consecutive enrichment steps
+                            produce no new bases. The {\bf default} is 100. \\ 
+ {\tt --roq-uniform}     &  Set this flag to cause training model parameters, for parameters with Gaussian prior distributions, to be drawn from a
+                            uniform distribution spanning $\mu \pm 5 \sigma$. Otherwise, by
+                            default, parameters are drawn from their given prior distributions. \\
+ {\tt --output-weights}  &  Give an output file name to which to output (a binary version of) the weights will be output. If this is set the
+                            programme will exit after outputing the weights. These files could be read in later instead of being regenerated.
+                            This allows the potential for the ROQ to be generated on a machine with a large amount of RAM, whilst the full parameter
+                            estimation can run on a machine with less RAM. \\
+ {\tt --input-weights}   &  A binary file, created using the {\tt --output-weights} command, containing all the weights in a defined format.
+                            If this is present then the ROQ will not be recalculated. \\
  ~ & ~ \\
 \multicolumn{2}{|l|}{~Signal injection parameters:} \\
- --inject-file     &  a pulsar parameter (par) file containing the parameters of a signal to be injected. If this is
-                     given a signal will be injected \\
- --inject-output   &  a filename to which the injected signal will be output if specified \\
- --fake-data       &  a list of IFO's for which fake data will be generated e.g. H1,L1 (delimited by commas). Unless
-                     the --fake-psd flag is set the power spectral density for the data will be generated from the
-                     noise models in LALNoiseModels. For Advanced detectors (e.g Advanced LIGO) prefix the name with
-                     an A (e.g. AH1 for an Advanced LIGO detector at Hanford). The noise will be white across the data
-                     bandwidth \\
- --fake-psd        &  if you want to generate fake data with specific power spectral densities for each detector giving
-                     in --fake-data then they should be specified here delimited by commas (e.g. for --fake-data H1,L1
-                     then you could use --fake-psd 1e-48,1.5e-48) where values are single-sided PSDs in \verb|Hz^-1| \\
- --fake-starts     &  the start times (in GPS seconds) of the fake data for each detector separated by commas (e.g.
-                     910000000,910021000). If not specified these will all default to 900000000 \\
- --fake-lengths    &  the length of each fake data set (in seconds) for each detector separated by commas. If not
-                     specified these will all default to 86400 (i.e. 1 day) \\
- --fake-dt         &  the data sample rate (in seconds) for the fake data for each detector. If not specified this will
-                     default to 60s \\
- --scale-snr       &  give a (multi-detector) SNR value to which you want to scale the injection. This is 1 by default \\
+ {\tt --inject-file}     &  A pulsar parameter ({\tt .par}) file containing the parameters of a signal to be injected. If this is
+                           given a signal will be injected. \\
+ {\tt --inject-output}   &  A filename to which the injected signal will be output if specified. \\
+ {\tt --inject-only}     &  If this is set, and an {\tt --inject-output} file is set, then do not perform nested sampling on the
+                            created injection, but just exit the code after creation of, and writing out of, the injection. \\
+ {\tt --fake-data}       &  A list of inteferometers for which fake data will be generated, e.g., H1,L1 (delimited by commas). Unless
+                            the {\tt --fake-psd} flag is set the power spectral density for the data will be generated from the
+                            noise models in described in \S\ref{sec:example2}. The noise will be white across the data bandwidth. \\
+ {\tt --fake-psd}        &  If wanting to generate fake data with specific power spectral densities for each detector given
+                            by {\tt --fake-data} then they should be specified here delimited by commas (e.g., for {\tt --fake-data H1,L1}
+                            then you could use {\tt --fake-psd 1e-48,1.5e-48}) where values are single-sided PSDs in Hz$^{-1}$. \\
+ {\tt --fake-starts}     &  The start times (in GPS seconds) of the fake data for each detector separated by commas (e.g.,
+                            {\tt 910000000,910021000}). If not specified these will all {\bf default} to 900000000. \\
+ {\tt --fake-lengths}    &  The length of each fake data set (in seconds) for each detector separated by commas. If not
+                            specified these will all {\bf default} to 86400 (i.e., 1 solar day). \\
+ {\tt --fake-dt}         &  The data sample rate (in seconds) for the fake data for each detector. If not specified these will
+                            {\bf default} to 60~s. \\
+ {\tt --scale-snr}       &  This gives a (multi-detector) SNR value to which you want to scale the injection. By {\bf default} this is 1. \\
  ~ & ~ \\
 \multicolumn{2}{|l|}{~Legacy code flags:} \\
- --oldChunks       & Set if using fixed chunk sizes for dividing the data as in the old code, rather than the
-                    calculating chunks using the change point method \\
- --source-model    & Set if using both 1 and 2 multiples of the frequency and requiring the use of the original source
-                    model parameters from Jones, MNRAS, 402 (2010) \\
+ {\tt --oldChunks}       &  Set this if using fixed chunk sizes for dividing the data as in the old code, rather than the
+                            calculating chunks using the change point method. \\
+ {\tt --source-model}    &  Set this if using both 1 and 2 multiples of the frequency and requiring the use of the original source
+                            model parameters from \citet{2015MNRAS.453.4399P}. \\
  ~ & ~ \\
 \multicolumn{2}{|l|}{~Benchmarking:} \\
- --time-it         & Set if wanting to time the various parts of the code. A output file with the ``outfile'' filename
-                    appended with ``\_timings'' will contain the timings \\
- --sampleprior    &  (UINT4) Set this to be a number of samples generated from the prior. The nested sampling will not
-                    be performed \\
+ {\tt --time-it}         &  Set this if wanting to time the various parts of the code. A output file with the ``outfile'' filename
+                            appended with ``\_timings'' will contain the timings \\
+ {\tt --sampleprior}     &  Set this to output this (integer) number of samples generated from the prior. The nested sampling will not
+                            be performed. \\
 \hline
 \end{longtable}
 \end{footnotesize}
@@ -143,7 +147,7 @@ been installed and that the executable binaries for \lppen and {\tt lalapps\_nes
 executables is set in the list of values in your {\tt PATH} environment variable). The code can automatically find solar system ephemeris and timing
 files provided they are in a standard location, although these can also be specified explicitly on the command line.
 
-\subsubsection{An example {\tt .par} file}
+\subsubsection{An example {\tt .par} file}\label{sec:parfile}
 
 The {\tt .par} file input should be the same file that was used when performing the heterodyning (or {\it Spectral Interpolation})
 of the data used to produce the input data time series. A {\sc tempo(2)}-style {\tt .par} file could have the following form, e.g.\
@@ -281,9 +285,9 @@ Parameter & Description \\
 \end{longtable}
 
 
-\subsubsection{Example prior file}
+\subsubsection{Example prior file}\label{sec:priorfile}
 
-The prior functions used by the code are decribed in Section~\ref{sec:priorfuncs}. To implement them in the code requires a prior
+The prior functions used by the code are decribed in \S\ref{sec:priorfuncs}. To implement them in the code requires a prior
 file specifying the prior function require for each parameter that will be varied. A an example prior file containing all the
 allowed prior types (for descriptive purposed only) is:
 \begin{lstlisting}[frame=single]
@@ -444,7 +448,7 @@ $ h5ls -v post_H1.hdf/lalinference/ | grep -A2 evidence
 \\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
 However, note that in this latter example the evidence values are truncated to integer values.
 
-\subsubsection{Example 2: single detector, single harmonic, simulated data}
+\subsubsection{Example 2: single detector, single harmonic, simulated data}\label{sec:example2}
 
 As well as taking real data as an input the code can simulate Gaussian noise, and/or create and add a simulated signal to the data. To create
 a signal to inject into the data requires a {\tt .par} file for the signal parameters. This can be the same, or different, to the file input

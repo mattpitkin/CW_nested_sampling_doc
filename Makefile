@@ -3,10 +3,10 @@
 default: pdf
 
 pdf: *.tex bibliography/biblio.bib layout.md
-	local_build.py --latex pdflatex --filename main.tex --build-dir .
+	./local_build.py --latex pdflatex --filename main.tex --build-dir .
 
 ps: *.tex bibliography/biblio.bib layout.md
-	local_build.py --latex latex --filename main.tex --build-dir .
+	./local_build.py --latex latex --filename main.tex --build-dir .
 	dvips main
 
 clean:

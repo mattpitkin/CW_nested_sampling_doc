@@ -254,11 +254,11 @@ fit to the natrual logarithm of the median run time, $R/\mathcal{T}_L$, we get t
  \ln{\left(\frac{R}{\mathcal{T}_L}\right)} &\approx 1.57 \ln{N_{\text{live}}} + 1.05 \ln{H} + 3.60, \\
  \frac{R}{\mathcal{T}_L} &\approx 36.4 N_{\text{live}}^{1.57} H^{1.05}.
 \end{align}
-This relation should be considered as a rough lower limit to the run time for any particular likelihood function. Above we saw that for our standard likelihood
-function the nested sampling algorithm took roughly three times longer to run per likelihood evaluation than the simple test function. This is most likely due
-to (for the standard likelihood case) the internal MCMC, that draws new samples within the algorithm, requiring longer chains to give uncorrelated samples when
-the likelihood is more complex (i.e.\ with more parameters), and the proposal distributions have a harder time approximating it. So, for our standard likelihood
-function, and run over four parameters, this run time should be scaled by about a factor of three.
+This relation should be considered as a rough lower limit to the run time for any particular likelihood function. Above, we saw that for our standard likelihood
+function the nested sampling algorithm was roughly three times quicker per likelihood evaluation than the simple test function. In both cases the internal MCMC, which
+draws new samples within the algorithm, required very similar small lengths to give uncorrelated samples, so there most be other internal bottlenecks that make the
+simpler likelihood relatively slower. However, in general, longer MCMC chains will be required to give uncorrelated samples, so the number of likelihood evaluations
+will increase.
 
 \begin{figure}[!phtb]
 \begin{center}

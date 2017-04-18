@@ -9,7 +9,7 @@ added to Gaussian noise.
 
 Using a selection of many simulated signals we also show how the odds comparing a signal model and a noise only model change with
 signal-to-noise ratio, along with comparing coherent verses incoherent signals (for coherent simulated signal and incoherent simulations).
-The simulations also allow us to evaluate the posterior probabilty distributions produced by the code using what is colloquially known,
+The simulations also allow us to evaluate the posterior probability distributions produced by the code using what is colloquially known,
 in ground-based \gw parameter estimate circles at least, as ``P-P plots'' (see \S\ref{sec:ppplots})
 
 \subsection{Code comparison}
@@ -42,7 +42,7 @@ ten days from a single detector (in this case assumed to be the LIGO Hanford det
 \end{center}
 \end{figure}
 
-It can be seen that the output posteriors look qualititavely consistent. However, we can also quantify some aspects of consistency by
+It can be seen that the output posteriors look qualitatively consistent. However, we can also quantify some aspects of consistency by
 comparing the evidence output from the nested sampling code with that estimated from the grid-based method from \lppe, the upper limits
 on $h_0$ produced by the codes, and performing Kolmogorov-Smirnov consistency tests between the nested sampling posterior samples
 and MCMC posterior samples (giving a $p$-value for the null hypothesis that the samples are from the same distributions).
@@ -93,7 +93,7 @@ be fully correlated due to numerical issues inverting such matrices).
 
 The one-and-two dimensional posteriors (expressed as offsets from the assumed heterodyne parameter values) output for this case when run with both
 \lppe and \lppen can be seen in Figure~\ref{fig:noise_multiparam},
-which also overlays the marginalised priors on top. It can be seen qualititavely that the codes are consistent\footnote{It is worth mentioning that in performing
+which also overlays the marginalised priors on top. It can be seen qualitatively that the codes are consistent\footnote{It is worth mentioning that in performing
 these tests a bug was discovered in \lppe in which Equation~\ref{eq:deltaphi} was being applied with the wrong sign, leading to parameter estimates
 having the wrong sign. However, this bug was fixed for the example shown here.} and for the {\it phase} parameters the priors are recovered, except for
 $\dot{f}$, which has some structure due to the specifics of the noise realisation. The Kolmogorov-Smirnov test $p$-values testing the null hypothesis
@@ -185,10 +185,10 @@ and $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{I}}\right) = 7.8$.
 
 \subsubsection{Results evaluation}\label{sec:reseval}
 
-The above results have shown good qualititive, and quantitative, agreement between the old and new codes for individual cases, but it is also useful
+The above results have shown good qualitative, and quantitative, agreement between the old and new codes for individual cases, but it is also useful
 to see how they compare for a large number of noise realisations when assessing two important quantities: the 95\% upper limit on \gw amplitude $h_0$,
 and the signal model evidence. It is also useful to see how these compare as a function of the number of live points used by the code. To this end we
-have choosen numbers of live points from 256 to 16384, increasing in a power of two for each step, and for each number generated 500 reaslisations of
+have chosen numbers of live points from 256 to 16384, increasing in a power of two for each step, and for each number generated 500 realisations of
 complex Gaussian noise with 1440 points over one day. Choosing a random source sky location for each realisation, and using uniform priors for the
 parameters $h_0$, $\cos{\iota}$, $\Phi_{22}^C$ and $\psi$, we have performed parameter estimation using both \lppen and \lppe in its grid-based mode.
 For \lppe the integrals required for calculating the signal evidence and 95\% upper limit on $h_0$ are performed using the trapezium rule, whilst
@@ -381,7 +381,7 @@ panel the colours of points show the signal's coherent SNR. The plateauing of $\
 bottom panel shows a zoomed out version, with the incoherent signals as dark circles (these are also seen in the lower left of the upper panel). Here we see that for incoherent signals
 the value of $\mathcal{O}_{\text{S}/\text{I}}$ between the coherent and incoherent signals diverges quite quickly, with $\log{}_{10}{\mathcal{O}_{\text{S}/\text{I}}}$
 falling off roughly linearly with $\log{}_{10}{\mathcal{O}_{\text{S}/\text{N}}}$. This shows that, hopefully, for reasonable strength signals the value of
-$\mathcal{O}_{\text{S}/\text{I}}$ will be useful for distinguishing a coherent from an incoherent (and therefore not astrophyical) signal.\footnote{The caveats
+$\mathcal{O}_{\text{S}/\text{I}}$ will be useful for distinguishing a coherent from an incoherent (and therefore not astrophysical) signal.\footnote{The caveats
 to this are that the way we created our incoherent signals may not well match true signals caused by instrumental (non-astrophysical) effects in \gw detectors.
 However, we hope our simulations are extreme, in a conservative way, in that one detector is actually containing an unadulterated signal, and is therefore
 potentially producing a far larger $\mathcal{O}_{\text{S}/\text{N}}$ value than might be expected.}
@@ -400,8 +400,8 @@ earlier simulations plotted underneath. It is obvious that, for these injections
 is more scatter in $\mathcal{O}_{\text{S}/\text{I}}$ than seen before. This can be interpreted as finding spikes in $f_0\operatorname{-}\dot{f}$-space, that
 are not related to the signal, in individual detectors, which are therefore not coherent. For higher SNRs ($\gtrsim 10$) the $\mathcal{O}_{\text{S}/\text{I}}$
 value for
-this more complex search does tend to give higher values than for the simpler search. A hand-wavy explanation for this {\it could be} that a truely coherent signal
-found (at large enough SNR) within this larger space is more convincing (more parameters have to match up) than in the simpler case, and this outweights any
+this more complex search does tend to give higher values than for the simpler search. A hand-wavy explanation for this {\it could be} that a truly coherent signal
+found (at large enough SNR) within this larger space is more convincing (more parameters have to match up) than in the simpler case, and this outweighs any
 prior Occam factor. The right panel of Figure~\ref{fig:snrvsodds_larger} shows similar information.
 
 \begin{figure*}[phtb]
@@ -415,7 +415,7 @@ prior Occam factor. The right panel of Figure~\ref{fig:snrvsodds_larger} shows s
 
 In Figures~\ref{fig:ffdot_inj1} and \ref{fig:ffdot_inj2} we show the posterior distributions for two of the simulations performed for the searches over
 $h_0$, $\cos{\iota}$, $\phi_0$, $\psi$, $f_0$, $\dot{f}$, and $\alpha$ above.\footnote{Earlier, during the discussing of the ``P-P plots'' in \S\ref{sec:ppplots},
-it was mentioning that $\phi_0$ was held fixed due to the degeracies between $f_0$ and $\phi_0$. In this case, as we also have $\dot{f}$ the correlations
+it was mentioning that $\phi_0$ was held fixed due to the degeneracies between $f_0$ and $\phi_0$. In this case, as we also have $\dot{f}$ the correlations
 become more complex, and whilst it would be expected that holding $\phi_0$ fixed would give valid posteriors, it is in such cases that a re-parameterisation
 may be more appropriate.} The simulation in Figure~\ref{fig:ffdot_inj1} had injected SNRs of 4.4 and 6.5 for H1
 and L1 respectively, with a coherent SNR of 7.9, and the recovered values of $\log{}_{10}\mathcal{O}_{\text{S}/\text{N}}$ and

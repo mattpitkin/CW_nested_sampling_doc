@@ -26,7 +26,7 @@ where $\Phi_{i,\text{het}}(t)$ is the phase evolution for a given data stream $i
 low-pass filtering and averaging values of $B'(t)$.
 
 Under the standard assumption that the general theory of relativity (GR) is correct the code uses the form of
-the signal model defined in \citet{2015arXiv150105832J}, which, when heterodyned and asumming low-pass
+the signal model defined in \citet{2015arXiv150105832J}, which, when heterodyned and assuming low-pass
 filtering, gives a signal at a pulsar's rotation frequency (where $\Phi_{1,{\text{het}}}(t) = \phi(t)$) of
 \begin{widetext}
 \begin{equation}\label{eq:hf}
@@ -193,7 +193,7 @@ It can be seen that all the summation terms can be pre-computed. If using the Ga
 pre-computation of the summation terms can also be done, but with the substitutions $B_i \rightarrow
 B_i/\sigma_i$, $a(t_i) \rightarrow a(t_i)/\sigma_i$ and $b(t_i) \rightarrow b(t_i)/\sigma_i$. For the model,
 assuming GR emission just from the $l=m=2$ mode, it is just the four different $\mathcal{C}$ terms (real and imaginary parts
-of the `$+$' and `$\times$' polariations amplitude components) that need
+of the `$+$' and `$\times$' polarisations amplitude components) that need
 to be calculated during the sampling process within the code.
 
 In the case where we want to search over phase evolution parameters that mean that $\Delta\phi_{\mathcal{K}}(t) \ne 0$ in the model then
@@ -218,7 +218,7 @@ have $I_{31} \geqslant I_{21}$.
 
 \subsubsection{Uniform prior}\label{sec:uniformprior}
 
-A parameter can be given a uniform (or flat, or top-hat) prior, in which the probabilty is constant within a given
+A parameter can be given a uniform (or flat, or top-hat) prior, in which the probability is constant within a given
 range and zero outside that range, i.e.
 \begin{equation}
 p(x|I) = \begin{cases}
@@ -290,11 +290,11 @@ $C_i$ is the covariance matrix.
 Such a model can be used, for example, if there is a bimodal Gaussian prior on a particular parameter, as is the case for the
 inclination angle $\iota$ if it is calculated from fits to pulsar wind nebulae \citep[see, e.g., Appendix B in][]{2017arXiv170107709T}. In such a case the Gaussian Mixture Model can define
 two Gaussian distributions of equal standard deviations and weights. A more complex use of this prior would be for creating a smooth
-probability distribution using samples drawn from it, i.e. taking posterior samples from a search for a particular pulsar, and
+probability distribution using samples drawn from it, i.e.\ taking posterior samples from a search for a particular pulsar, and
 creating a smooth model of those samples (for, say, the two parameters $h_0$ and $\cos{\iota}$) to be input as a prior when looking
 at future data for the same source.
 
-Two examples of histrograms of samples drawn from one-dimensional Gaussian Mixture Models with two and three modes respectively
+Two examples of histograms of samples drawn from one-dimensional Gaussian Mixture Models with two and three modes respectively
 are shown in Figure~\ref{fig:priorgmm}.
 
 \begin{figure}[!phtb]
@@ -368,7 +368,7 @@ X_0 = -\sigma \ln{}\left(-e^{-r} + \left(1+e^{r} \right)^{-C(X_0)} + e^{1-r}\lef
 Thus, drawing CDF samples uniformly between 0 and 1, and inverting via the above equation gives values drawn from Equation~\ref{eq:fermidirac}.
 
 This prior can use useful for amplitude parameters, where a uniform prior may have previously been used. It has the property of being roughly
-flat at low values of the parameter and with an exponetial fall-off at large values. This gives the advantage over a uniform prior with a
+flat at low values of the parameter and with an exponential fall-off at large values. This gives the advantage over a uniform prior with a
 sharp upper cut-off in that the distribution is continuous rather than (perhaps) arbitrarily truncated.
 
 This form of prior was used for the \gw amplitude parameter, $h_0$, in \citet{2017arXiv170107709T} as opposed to the earlier use of
@@ -399,7 +399,7 @@ $N_{\text{s}}=1$, $M_{1,1}=1$, $n_{1,1,0}=1$ and, given a dataset of length $N$,
 of this value $\ln{\mathcal{Z}_{\text{single}}}$. We want to calculate the odds between this evidence and that for the data containing
 {\it any} single change point (i.e. point at which the data seems to be drawn from a different Gaussian distribution). So, for
 one single change point, at index $i$, we calculate $\ln{\mathcal{Z}_{\text{cp,i}}}$, by using Equation~\ref{eq:nulllike} and setting
-$N_{\text{dets}} =1$, $N_{\text{s}}=1$, $M_{1,1}=2$, $n_{1,1}=\{1,i\}$ and $m_{1,1} = \{i,N-i\}$. We also impose a minumum allowed data
+$N_{\text{dets}} =1$, $N_{\text{s}}=1$, $M_{1,1}=2$, $n_{1,1}=\{1,i\}$ and $m_{1,1} = \{i,N-i\}$. We also impose a minimum allowed data
 chunk size of $n_{\text{min}}$ (which defaults to a value of 5 data points in the code), so that $i \geqslant n_{\text{min}}$. As we want
 the evidence for {\it any} single change point, we must take the sum all the single change point evidences
 \begin{equation}
@@ -414,7 +414,7 @@ split the data into two chunks at the change point value $i$ with the largest ev
 data drawn from a single Gaussian distribution actually being split far too often, and also there being a dependence on the
 data length. So, instead, we empirically calculate an odds threshold above which the value of Equation~\ref{eq:cpodds} must be to
 impose a split in the data.\footnote{A different approach would be to apply different priors to each hypothesis. These are most
-probably fairly straighforward to work out (i.e. something using the number of change point positions tried), although we have just taken
+probably fairly straightforward to work out (i.e. something using the number of change point positions tried), although we have just taken
 the empirical approach.} The empirical threshold we use is worked out by finding the 99\% upper limit on the value of
 Equation~\ref{eq:cpodds} when data is purely drawn from a single Gaussian distribution (i.e. it gives a 1\% false alarm probability)
 as a function of the data length $N$. The results of doing this for 30\,000 instances of data for a range of $n$ values, and three
@@ -475,7 +475,7 @@ selection situations, and we will define three such situations here \citep[see, 
 \begin{enumerate}
  \item the odds for a (multi-detector and multi-frequency-band) coherent signal versus (non-stationary) Gaussian noise, $\mathcal{O}_{\text{S}/\text{N}}$;
  \item the odds for a (multi-detector and multi-frequency-band) coherent signal versus incoherent (between detector) signals, $\mathcal{O}_{\text{S}/\text{I}_{\text{simple}}}$;
- \item the odds for a (multi-detector and multi-frequency-band) coherent signal versus comibinations of incoherent (between detector) signals or noise,
+ \item the odds for a (multi-detector and multi-frequency-band) coherent signal versus combinations of incoherent (between detector) signals or noise,
  $\mathcal{O}_{\text{S}/\text{I}}$ \citep[cf.\ Equation~A6 in][]{2017arXiv170107709T}.
 \end{enumerate}
 

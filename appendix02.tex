@@ -26,7 +26,7 @@ distribution.
 
 We chose a scale invariant prior on $\sigma$ of $p(\sigma|I) = 1/\sigma$, for which the marginalisation of
 Eqn.~\ref{eq:likesigma} can be performed analytically as we will show.
-Subtituting this prior and Eqn.~\ref{eq:likesigma2} into Eqn.~\ref{eq:likesigma} we can begin the
+Substituting this prior and Eqn.~\ref{eq:likesigma2} into Eqn.~\ref{eq:likesigma} we can begin the
 integration with the substitution
 \begin{equation}\label{eq:u}
 u = \sqrt{\frac{\sum_{k=1}^m|B_k-y(\vec{\theta})_k|^2}{2\sigma^2}},
@@ -83,7 +83,3 @@ p(\mathbf{B}|\vec{\theta},I) = \prod_{j=1}^M \frac{(m_j-1)!}{2\pi^{m_j}}
 \end{equation}
 where $M$ is the total number of independent data chunks with lengths $m_j$ and $k_0 = 1+\sum_{i=1}^{j}
 m_{i-1}$ (with $m_0 = 0$) is the index of the first data point in each chunk.
-
-  
-  
-  

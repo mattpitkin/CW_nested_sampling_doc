@@ -253,13 +253,29 @@ $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{N}}\right) = 22.5$ and $\log{}_{10
 \end{center}
 \end{figure}
 
-
 \begin{figure}[!phtb]
 \begin{center}
 \includegraphics[width=1\columnwidth]{./figures/codeeval/simulations/S6_hwinj/hwinj05/hwinj05}
 \caption{ \protect\input{./figures/codeeval/simulations/S6_hwinj/hwinj05/caption}}
 \end{center}
 \end{figure}
+
+Several thousand simulated signals have been added to the LIGO sixth science run (S6) dataset \citep[see Section~IV of][]{2016PhRvD..94l4010W}.
+Here we have used \lppen to perform parameter estimation on the parameters $\vec{\theta} = \{h_0, \cos{\iota}, \psi, \phi_{0}, f, \dot{f}, \alpha, \delta\}$.
+In this case, as for the binary signal discussed in \S\ref{sec:simsignal}, we have purposely heterodyned the signal using values of $f$ and $\dot{f}$ offset
+from their known rotational values by $\Delta f = 5\ee{-8}$\,Hz and $\Delta \dot{f} = -4\ee{-15}$\,Hz\,s$^{-1}$. We have used the whole of the S6 dataset,
+spanning almost 1.3\,yr, with roughly 50\% duty factors for both H1 and L1. The code was run using the ROQ mode for each individual detector and a joint
+detector analysis. Gaussian priors were used on the frequency and sky location parameters. The recovered marginalised posterior distributions can be seen
+in Figure~\ref{fig:s6sw_inj}, where all parameters are observed to be correctly recovered at their true values, even $f$ and $\dot{f}$ which we offset (it is
+hard to see in the plots, but these values are constrained well within their allowed prior ranges). The signal was recovered with SNR of roughly 29 and 21 in
+H1 and L1 individually, and with a coherent SNR of 35. The odds values are $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{N}}\right) = 251$ and $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{I}}\right) = 9.5$ showing that the signal is very significantly distinguished from the noise model.
+
+\begin{figure*}[!phtb]
+\begin{center}
+\includegraphics[width=0.9\textwidth]{./figures/codeeval/simulations/S6_swinj/s6sw_inj}
+\caption{ \protect\input{./figures/codeeval/simulations/S6_swinj/caption}}
+\end{center}
+\end{figure*}
 
 \subsection{Monte-Carlo studies}
 
@@ -426,17 +442,17 @@ $\log{}_{10}\mathcal{O}_{\text{S}/\text{N}}$ and $\log{}_{10}\mathcal{O}_{\text{
 feature in the data, and no other structure is present in the posteriors. The first signal would probably only rate as marginal if determining whether it was
 a true signal or not, whereas the second signal would be a clear detection.
 
-\begin{figure}[!phtb]
+\begin{figure*}[!phtb]
 \begin{center}
-\includegraphics[width=1\columnwidth]{./figures/codeeval/simulations/signal_freq/one/ffdot_inj1}
+\includegraphics[width=0.6\textwidth]{./figures/codeeval/simulations/signal_freq/one/ffdot_inj1}
 \caption{ \protect\input{./figures/codeeval/simulations/signal_freq/one/caption}}
 \end{center}
-\end{figure}
+\end{figure*}
 
 
-\begin{figure}[!phtb]
+\begin{figure*}[!phtb]
 \begin{center}
-\includegraphics[width=1\columnwidth]{./figures/codeeval/simulations/signal_freq/two/ffdot_inj2}
+\includegraphics[width=0.6\textwidth]{./figures/codeeval/simulations/signal_freq/two/ffdot_inj2}
 \caption{ \protect\input{./figures/codeeval/simulations/signal_freq/two/caption}}
 \end{center}
-\end{figure}
+\end{figure*}

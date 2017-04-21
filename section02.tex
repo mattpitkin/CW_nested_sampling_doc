@@ -48,7 +48,7 @@ and the true signal phase \citep[which does not necessarily have to precisely fo
 $\Delta\phi_1(t) = (\phi_{1,{\text{true}}}(t)-\Phi_{1,{\text{het}}}(t))$ and $\Delta\phi_2(t) = (\phi_{2,{\text{true}}}(t)-\Phi_{2,{\text{het}}}(t))$. More generally,
 for emission at an arbitrary scaling of the rotation frequency, $\mathcal{K}$ (where $\Phi_{\mathcal{K},{\text{het}}}(t) = \mathcal{K}\phi(t)$), an even more generic signal model (still assuming GR is correct) would be
 \begin{equation}\label{eq:hkf}
-h_{\mathcal{K}f}(t) =  e^{i\Delta\phi_{\mathcal{K}}(t)}\left(H_+F_{+}(\psi,t)e^{i\Phi_0} +
+h_{\mathcal{K}f}(t) =  \frac{e^{i\Delta\phi_{\mathcal{K}}(t)}}{2}\left(H_+F_{+}(\psi,t)e^{i\Phi_0} +
 iH_{\times}F_{\times}(\psi,t)e^{i\Phi_{0}} \right),
 \end{equation}
 where $H_+$ and $H_{\times}$ are the amplitude components for the `$+$' and `$\times$' polarisations, and $\Phi_0$ is the signal's initial phase.
@@ -73,6 +73,22 @@ relations between the waveform amplitude and phase parameters and physical sourc
 signal phase perfectly with the heterodyne, and as such $\Delta\phi_{\mathcal{K}}(t) = 0$. In such cases the only time
 varying components of the signal are the antenna pattern functions, which allows great speed increases in the
 signal generation and likelihood calculations (see \S\ref{sec:fastlike}).
+
+\subsubsection{General tensor-vector-scalar signal model}
+
+A more generic {\it heterodyned} model, assuming gravity is described by some metric theory, but not necessarily GR, is given by
+\citep[see, e.g.][]{2015PhRvD..91h2002I,MaxCWpolariations}
+\begin{widetext}
+ \begin{equation}\label{eq:hnongr}
+    h_{\mathcal{K}f}^{\text{tvs}}(t) =  \frac{e^{i\Delta\phi_{\mathcal{K}}(t)}}{2}\left[ e^{i\Phi_{\text{t}}}\left(F_+H_+ + F_{\times}H_{\times}e^{i\psi_{\text{t}}}\right)
+    + e^{i\Phi_{\text{v}}}\left(F_{\text{x}}H_{\text{x}} + F_{\text{y}}H_{\text{y}}e^{\psi_{\text{v}}}\right) + e^{i\Phi_{\text{s}}}\left(F_{\text{b}}H_{\text{b}} + F_{\text{l}}H_{\text{l}}e^{i\psi_{\text{s}}} \right)\right],
+ \end{equation}
+\end{widetext}
+where $H_{p}$ (for $p \in \{+,\times,\text{x},\text{y},\text{b},\text{l}\}$) are the amplitudes for the tensor (`$+$' and `$\times$'), vector (`x' and `y'),
+and scalar (`b' and `l') \gw amplitude components, $F_{p}$ are their associate antenna responses (not defined as a function
+of $\psi$ as above) \citep[see, e.g.][]{2009PhRvD..79h2002N,2012PhRvD..85d3005B}, and $\Phi_{\text{t,v,s}}$ and $\psi_{\text{t,v,s}}$ are angles related to the initial
+phase of, and rotation within, the tensor, vector and scalar components. For a standard \gw interferometer the two scalar components are entirely
+degenerate, and as such only one of them needs to be defined \citep[e.g., only the `b' mode is used in Equation~19 of][]{MaxCWpolariations}.
 
 \subsection{The likelihood functions}\label{sec:likelihood}
 

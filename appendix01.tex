@@ -86,6 +86,7 @@ line options for \lppen, as shown with the \verb|--help| command, are given (in 
 \multicolumn{2}{|l|}{~Signal injection parameters:} \\
  {\tt --inject-file}     &  A pulsar parameter ({\tt .par}) file containing the parameters of a signal to be injected. If this is
                            given a signal will be injected. \\
+ {\tt --inject-nonGR}    &  A parameter ({\tt .par}) file containing the values of specific non-GR signal parameters to be injected. \\
  {\tt --inject-output}   &  A filename to which the injected signal will be output if specified. \\
  {\tt --inject-only}     &  If this is set, and an {\tt --inject-output} file is set, then do not perform nested sampling on the
                             created injection, but just exit the code after creation of, and writing out of, the injection. \\
@@ -205,8 +206,6 @@ Parameter & Description \\
 {\tt PHI22}, $\Phi_{22}^C$ & gravitational wave phase for the $l=m=2$ mode in the waveform model (rads) \citep[see][]{2015MNRAS.453.4399P} \\
 {\tt PHI21}, $\Phi_{21}^C$ & gravitational wave phase for the $l=2, m=1$ mode in the waveform model (rads) \citep[see][]{2015MNRAS.453.4399P} \\
 {\tt Q22}, $Q_{22}$ & $l=m=2$ mass quadrupole moment (kg\,m$^{2}$) \citep[see e.g.][]{2005PhRvL..95u1101O} \\
-{\tt HPLUS}, $H_+$ &  gravitational wave amplitude for the $l=m=2$ mode in the source model for the $+$-polarisation \\
-{\tt HCROSS}, $H_{\times}$ &  gravitational wave amplitude for the $l=m=2$ mode in the source model for the $\times$-polarisation \\
 {\tt I21}, $I_{21}$ & physical gravitational wave amplitude in source model \citep[see][]{2015MNRAS.453.4399P} \\
 {\tt I31}, $I_{31}$ & physical gravitational wave amplitude in source model \citep[see][]{2015MNRAS.453.4399P} \\
 {\tt LAMBDA}, $\lambda$ & Euler angle in source model \citep[see][]{2015MNRAS.453.4399P} \\
@@ -263,8 +262,8 @@ Parameter & Description \\
 {\tt T0\_}$X$ & times of periastron for multiple orbital components ($X=2,3$ for {\tt BT1P} and {\tt BT2P} models) (MJD) \\
 {\tt ECC\_}$X$ & eccentricities for multiple orbital components ($X=2,3$ for {\tt BT1P} and {\tt BT2P} models) \\
 {\tt FB}$X$ & orbital frequencies for multiple components (in {\tt BTX} model) (Hz) \\
-{\tt A0}, $A$ & first aberration parameter \citep[see e.g.\ Section~2.7.3 of][]{2006MNRAS.372.1549E} \\
-{\tt B0}, $B$ & second aberration parameter \citep[see e.g.\ Section~2.7.3 of][]{2006MNRAS.372.1549E} \\
+{\tt A0}, $A$ & first aberration parameter \citep[see, e.g., Section~2.7.3 of][]{2006MNRAS.372.1549E} \\
+{\tt B0}, $B$ & second aberration parameter \citep[se, e.g., Section~2.7.3 of][]{2006MNRAS.372.1549E} \\
 \hline
 \multicolumn{2}{c}{Glitch parameters \citep[see][]{2006MNRAS.369..655H,2013MNRAS.429..688Y}} \\
 \hline
@@ -279,6 +278,19 @@ Parameter & Description \\
 \multicolumn{2}{c}{Non-GR parameters} \\
 \hline
 {\tt CGW}, $c_{\text{gw}}$ & speed of gravitational waves as a fraction of the speed of light \\
+{\tt HPLUS}, $H_+$ &  gravitational wave amplitude for the tensor $+$-polarisation \citep[see, e.g.,][for definitions of this and the subsequent
+parameters]{MaxCWpolariations} \\
+{\tt HCROSS}, $H_{\times}$ &  gravitational wave amplitude for the tensor $\times$-polarisation \\
+{\tt PHI0TENSOR}, $\Phi_{\text{t}}$ & tensor mode phase parameter \\
+{\tt PSITENSOR}, $\psi_{\text{t}}$ & tensor mode phase parameter \\
+{\tt HVECTORX}, $H_{\text{x}}$ &  gravitational wave amplitude for the vector x-polarisation \\
+{\tt HVECTORY}, $H_{\text{y}}$ &  gravitational wave amplitude for the vector y-polarisation \\
+{\tt PHI0VECTOR}, $\Phi_{\text{v}}$ & vector mode phase parameter \\
+{\tt PSIVECTOR}, $\psi_{\text{v}}$ & vector mode phase parameter \\
+{\tt HSCALARB}, $H_{\text{x}}$ &  gravitational wave amplitude for the scalar $b$-polarisation \\
+{\tt HSCALARL}, $H_{\text{y}}$ &  gravitational wave amplitude for the scalar $l$-polarisation \\
+{\tt PHI0SCALAR}, $\Phi_{\text{s}}$ & scalar mode phase parameter \\
+{\tt PSISCALAR}, $\psi_{\text{s}}$ & scalar mode phase parameter \\
 \hline
 \hline
 \end{longtable}
@@ -606,6 +618,94 @@ of $\sim 1.8$, rather than the $1440/32 = 45$ factor that might be hoped for. Ho
 noted that this observed speed-up is not a general rule, but is specific to the data and set up we used, but similar speed-ups for similar set ups would not be
 unexpected. We also find that the likelihoods produced by the ROQ method agree very well with that produced using the full likelihood evaluation, with the
 maximum-likelihood-template likelihoods agreeing to within $6\ee{-10}\%$.
+
+\subsubsection{Example 6: single detector, non-GR model}
+
+The standard analysis considers two hypotheses: GR signal and Gaussian noise. On top of these, we can also include non-GR signal hypotheses consisting of all
+possible combinations of tensor, vector and scalar modes: GR+s, GR+v, GR+sv, s, v, sv \citep[see][for definitions of these]{MaxCWpolariations}.\footnote{If the
+orientation of the source is known, we can also make a distinction between GR and a ``free-tensor'' hypothesis, corresponding to a signal model with $+$ and $\times$
+polarisations with unrestricted amplitudes and phases.} For any set of data, we can compute Bayes factors for each of these hypotheses using \lppen and then combine
+them to produce odds for any-signal vs.\ noise and non-GR vs.\ GR.
+
+The \lppen code accepts the {\tt --nonGR} and {\tt --inject-nonGR} arguments, which can be used to search for and inject non-GR signals, respectively. Both options may
+be used as simple flags or with a specific argument. In the former case, the code will use a generic signal model that includes all polarisations mentioned in the prior
+file. For instance, for a single detector (H1 in this case) the most generic search (one including all 5 polarizations freely) would be carried out by calling (without injections):
+\begin{lstlisting}[frame=single]
+lalapps_pulsar_parameter_estimation_nested --par-file pulsar.par --input-files data.txt --outfile output.hdf --prior-file prior.txt --Nlive 1000 --detectors H1 --nonGR
+\end{lstlisting}
+with a prior file like:
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+HPLUS       loguniform  1e-28  1e-21
+HCROSS      loguniform  1e-28  1e-21
+PHI0TENSOR  uniform     0      6.283185307179586
+PSITENSOR   uniform     0      6.283185307179586
+HVECTORX    loguniform  1e-28  1e-21
+HVECTORY    loguniform  1e-28  1e-21
+PHI0VECTOR  uniform     0      6.283185307179586
+PSIVECTOR   uniform     0      6.283185307179586
+HSCALARB    loguniform  1e-28  1e-21
+PHI0SCALAR  uniform     0      6.283185307179586
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+where {\tt HPLUS} and {\tt HCROSS} are the tensor amplitudes, {\tt HVECTORX} and {\tt HVECTORY} are the vector amplitudes and {\tt HSCALARB} is the scalar amplitude
+(we could equivalently use {\tt HSCALARL}, since the breathing and longitudinal modes are degenerate to quadrupolar antennas like LIGO or Virgo); the {\tt PHI0TENSOR},
+{\tt PHI0VECTOR} and {\tt PHI0SCALAR} parameters determine the overall complex phase offset between different ranks, while {\tt PSITENSOR} and {\tt PSIVECTOR} are 
+phase offsets between modes of the same rank. Relevant parameters that do not explicitly show up in the prior file are set to zero; as a result, the same command above
+can be used to search only over, say, vector modes by changing the prior file to read:
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+HVECTORX loguniform 1e-28 1e-21
+HVECTORY loguniform 1e-28 1e-21
+PHI0VECTOR uniform 0 6.283185307179586
+PSIVECTOR uniform 0 6.283185307179586
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+This can be used to produce any of the ``free'' non-GR searches (s, v, t, sv, st, vt, svt). Note that, if any of the prior files are used without the {\tt --nonGR}
+flag, the code will fail, as it will expect GR-specific parameters (like {\tt H0} and {\tt COSIOTA}). A generic non-GR injection may be produced by using the
+{\tt --inject-nonGR} flag with an injection file that gives the values of non-GR parameters desired, e.g.,
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+HPLUS 3e-24
+HVECTORX  4e-24
+PHI0VECTOR 3
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+would produce an injection with `+' and vector-x components of the given strain amplitudes, with no phase offset for plus ({\tt PHI0TENSOR} is 0) and 3 radians for
+vector-x.
+
+The non-GR options also accept an argument that specifies a particular non-GR model; currently accepted options are {\tt G4V} and {\tt EGR}. The former corresponds
+to a vector-only model \citep[proposed in][]{2015arXiv150304866M} that we usually use for testing; this model includes vector x and y modes with a particular
+weighting given by the pulsars inclination as in equations~7 and 8 of \citet{2015PhRvD..91h2002I}. An example of a prior file for a {\tt --nonGR G4V} analysis
+would be:
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+PSI         uniform    -0.785398163397448  0.785398163397448
+IOTA        uniform     0                  6.283185307179586
+H0          loguniform  1e-28              1e-21
+PHI0VECTOR  uniform     0                  6.283185307179586
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+The second option accepted by {\tt --nonGR} and {\tt --inject-nonGR} is {\tt EGR}, which stands for ``enhanced GR''. This corresponds to a model made up of a GR signal
+plus contributions from any non-tensorial modes specified in the prior file. For instance, passing {\tt --nonGR EGR} with a prior like:
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+PSI         uniform    -0.785398163397448 0.785398163397448
+COSIOTA     uniform    -1                 1
+H0          loguniform  1e-28             1e-21
+PHI0TENSOR  uniform     0                 6.283185307179586
+HVECTORX    loguniform  1e-28             1e-21
+HSCALARB    loguniform  1e-28             1e-21
+PHI0SCALAR  uniform     0                 6.283185307179586
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+will produce a GR+s search; thus, by appropriately modifying the prior file, the {\tt --nonGR EGR} option can be used to also search for GR+v and GR+sv signals.
+Non-GR injection files are constructed similarly. 
 
 \subsection{The pipeline}
 

@@ -39,7 +39,8 @@ h_{2f}(t) =  e^{i\Delta\phi_2(t)}\left(-\frac{C_{22}}{2}F_{+}(\psi,t)[1+\cos{}^2
 iC_{22}F_{\times}(\psi,t)\cos{\iota}e^{i\Phi_{22}^C} \right).
 \end{equation}
 \end{widetext}
-The $F_{+}$ and $F_{\times}$ values are the detector dependent antenna patterns, which are a function of the
+The $F_{+}$ and $F_{\times}$ values are the detector dependent antenna patterns \citep[see, e.g., equation~\ref{eq:antenna}, taken from][]{1998PhRvD..58f3001J},
+which are a function of the
 detector position, source sky position and source polarisation angle $\psi$. The $C_{21}$, $C_{22}$,
 $\Phi_{21}^C$ and $\Phi_{22}^C$ values are convenient ways of representing the waveform in terms of an
 amplitude and phase of the signal for the $l=2$, $m=1$ harmonic and $l=m=2$ harmonic respectively. The
@@ -76,7 +77,7 @@ signal generation and likelihood calculations (see \S\ref{sec:fastlike}).
 
 \subsubsection{General tensor-vector-scalar signal model}
 
-A more generic {\it heterodyned} model, assuming gravity is described by some metric theory, but not necessarily GR, is given by
+A more generic {\it heterodyned} model, assuming gravity is described by an arbitrary metric theory, but not necessarily GR, is given by
 \citep[see, e.g.][]{2015PhRvD..91h2002I,MaxCWpolariations}
 \begin{widetext}
  \begin{equation}\label{eq:hnongr}
@@ -85,10 +86,20 @@ A more generic {\it heterodyned} model, assuming gravity is described by some me
  \end{equation}
 \end{widetext}
 where $H_{p}$ (for $p \in \{+,\times,\text{x},\text{y},\text{b},\text{l}\}$) are the amplitudes for the tensor (`$+$' and `$\times$'), vector (`x' and `y'),
-and scalar (`b' and `l') \gw amplitude components, $F_{p}$ are their associate antenna responses (not defined as a function
-of $\psi$ as above) \citep[see, e.g.][]{2009PhRvD..79h2002N,2012PhRvD..85d3005B}, and $\Phi_{\text{t,v,s}}$ and $\psi_{\text{t,v,s}}$ are angles related to the initial
+and scalar (`b' and `l') \gw amplitude components, $F_{p}$ are their associate time dependent antenna responses
+\citep[see, e.g.][]{2009PhRvD..79h2002N,2012PhRvD..85d3005B,2015PhRvD..91h2002I}, and $\Phi_{\text{t,v,s}}$ and $\psi_{\text{t,v,s}}$ are angles related to the initial
 phase of, and rotation within, the tensor, vector and scalar components. For a standard \gw interferometer the two scalar components are entirely
-degenerate, and as such only one of them needs to be defined \citep[e.g., only the `b' mode is used in Equation~19 of][]{MaxCWpolariations}.
+degenerate, and as such only one of them needs to be defined \citep[e.g., only the `b' mode is used in Equation~19 of][]{MaxCWpolariations}. 
+When searching for a generic signal such as this the orientation of the wave-frame (given by $\psi$ and $\iota$) used to define the polarisation modes is arbitrary:
+one is free to pick any right-handed frame one wants and define the modes there, but we usually make a choice that we know simplifies things for a given signal
+(e.g.\ we align the z-axis with the direction of propagation, and/or we align the x-and-y-axes with the detector arms). Hence, for a generic search, we are free to
+arbitrarily set our frame such that $\psi=0$ and the values $F_{p}$ given in equation~\ref{eq:hnongr} can be defined by, e.g., equations~24--29 of
+\citet{2015PhRvD..91h2002I}. However, when we have a specific prediction of what a given waveform should look like, it is always in a {\it particular} frame. By
+convention, this is usually a frame in which the x-axis is aligned with the line of nodes (though the convention is not universal). In other words, if a theory
+predicts certain amounts of polarisation with some specific phase evolution (say, that given by GR) then that is a frame dependent statement, and $\psi$ in
+required to orient the model frame accordingly. In such a case \citep[e.g., GR or some other theory such as G4v in][]{2015arXiv150304866M} antenna patterns from
+equations~30--35 (and $\psi_{\text{t}}$ and $\psi_{\text{v}}$ from equations 46--47, and 49--50, for GR and G4v respectively) of \citet{2015PhRvD..91h2002I}
+would be required.
 
 \subsection{The likelihood functions}\label{sec:likelihood}
 
@@ -176,7 +187,7 @@ In cases when the only time varying components of the model are the antenna patt
 $\Delta \phi_j(t)$ in equation~\ref{eq:hf} or \ref{eq:h2f} is zero) the likelihood
 evaluation can be greatly sped-up by pre-calculating the components in the internal summations. For a given sky
 position and detector the antenna patterns can be defined by \citep{1998PhRvD..58f3001J}
-\begin{align}
+\begin{align}\label{eq:antenna}
 F_+(t,\psi) &= \sin{\zeta}\left[a(t)\cos{2\psi} + b(t)\sin{2\psi}\right], \nonumber \\
 F_{\times}(t,\psi) &= \sin{\zeta}\left[b(t)\cos{2\psi} - a(t)\sin{2\psi}\right],
 \end{align}

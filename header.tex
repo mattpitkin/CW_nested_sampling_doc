@@ -4,15 +4,18 @@
   \documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4}
 \else
   %\documentclass[aps,prd,showpacs,superscriptaddress,twocolumn,preprintnumbers,altaffilletter]{revtex4-1}
-  \documentclass[twocolumn,numberedappendix]{openjournal}
+  %\documentclass[twocolumn,numberedappendix]{openjournal}
+  \documentclass[pasp,numberedappendix]{emulateapj}
   %\bibliographystyle{aipauth4-1}
  
   % add style files not included in latexml
   \usepackage{cleveref}
   
   % make PDF figure files be used before png files 
+  \ifdefined\usepdffigs
   \usepackage{grfext}
-  %\PrependGraphicsExtensions*{.pdf,.PDF}
+  \PrependGraphicsExtensions*{.pdf,.PDF}
+  \fi
 \fi
 
 \usepackage{natbib}
@@ -29,8 +32,10 @@
 \newcommand{\gws}{gravitational waves\xspace}
 \newcommand{\gw}{gravitational wave\xspace}
 \newcommand{\lalinf}{\texttt{LALInference}\xspace}
-\newcommand{\lppen}{\texttt{lalapps\_pulsar\_parameter\_estimation\_nested}\xspace}
-\newcommand{\lppe}{\texttt{lalapps\_pulsar\_parameter\_estimation}\xspace}
+\newcommand{\lppenf}{\texttt{lalapps\_pulsar\_parameter\_estimation\_nested}\xspace}
+\newcommand{\lppen}{\texttt{lppen}\xspace}
+\newcommand{\lppef}{\texttt{lalapps\_pulsar\_parameter\_estimation}\xspace}
+\newcommand{\lppe}{\texttt{lppe}\xspace}
 \newcommand{\ee}[1]{\!\times\!10^{#1}}
 
 \newcommand{\hl}[1]{{\color{red} #1}}

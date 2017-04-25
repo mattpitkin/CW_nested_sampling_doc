@@ -110,7 +110,8 @@ for j in range(len(nlives)):
   upperlimits[lname] = []
   evidenceerrs[lname] = []
   kspvalues[lname] = []
-  timings[lname] = []
+  if timings is not None:
+    timings[lname] = []
 
   #if not os.path.isdir(livedir):
   #  print("Error... '%s' directory does not exist." % livedir, file=sys.stderr)
@@ -204,15 +205,15 @@ for j in range(len(nlives)):
 tar.close()
 
 # create figure for evidences
-fige = pl.figure(figsize=(12,7))
+fige = pl.figure(figsize=(8,7))
 axe = fige.add_subplot(111)
 
 # create figure for upper limits
-figul = pl.figure(figsize=(12,7))
+figul = pl.figure(figsize=(8,7))
 axul = figul.add_subplot(111)
 
 # create figure for the K-S test
-figks = pl.figure(figsize=(12,7))
+figks = pl.figure(figsize=(8,7))
 axks = figks.add_subplot(111)
 
 # create figure for timings
@@ -237,15 +238,15 @@ for j, nlive in enumerate(nlives):
   # got linear fit to mean evidence offset vs information
   p = np.polyfit(truekls[nlive], [np.mean(ev-trueevs[nlive][i]) for i, ev in enumerate(evidences[nlive])], deg=1)
   lfits.append(p)
-  print("N live: %s, linear fit ln(Z/Z_true) = %.2f + %.2f(KL-div)" % (nlive, p[1], p[0]), file=sys.stdout)
+  print("N live: %s, linear fit ln(Z/Z_true) = %.2f + %.3f(KL-div)" % (nlive, p[1], p[0]), file=sys.stdout)
 
   # violin plot for evidence ratios
   logpos = np.log10(maxranges[nlive])
 
   # offset the error bars so they don't overlap
   if len(nlives) > 1:
-    dloffset = 0.2*(logpos[1]-logpos[0])
-    dlp = 0.4*(logpos[1]-logpos[0])/(len(nlives)-1.)
+    dloffset = 0.3*(logpos[1]-logpos[0])
+    dlp = 0.6*(logpos[1]-logpos[0])/(len(nlives)-1.)
   else:
     dloffset = 0.
     dlp = 0.
@@ -284,7 +285,7 @@ for j, nlive in enumerate(nlives):
 
     axenew.set_xlabel('Prior range')
     axenew.xaxis.set_label_position('bottom')
-    axe.set_ylabel(r'$\ln{(Z/Z_{\rm true})}$')
+    axe.set_ylabel(r'$\ln{(\mathcal{Z}/\mathcal{Z}_{\rm true})}$')
 
     # add the KL divergence (information gain)
     axenew2 = axenew.twiny()
@@ -307,7 +308,7 @@ for j, nlive in enumerate(nlives):
 
     ayenew.get_yaxis().set_tick_params(which='both', direction='out')
     ayenew.set_yticklabels(['$%d$' % yv for yv in pDZvals])
-    ayenew.set_ylabel(r'$(Z-Z_{\rm true})/Z_{\rm true} \%$')
+    ayenew.set_ylabel(r'$(\mathcal{Z}-\mathcal{Z}_{\rm true})/\mathcal{Z}_{\rm true} \%$')
 
   # produce violin plot of h0 upper limits
   vd = axul.violinplot(upperlimits[nlive], logposoff, showextrema=False, showmedians=True, widths=0.09)
@@ -346,8 +347,8 @@ for j, nlive in enumerate(nlives):
   if j == len(nlives)-1:
     ayulnew = axul.twinx()
     ulmin, ulmax = axul.get_ybound()
-    pdulvals = np.flipud(-np.arange(0., -np.floor(100.*(ulmin-trueuls[nlive][0])/trueuls[nlive][0]), 2))
-    pdulvals = np.concatenate((pdulvals, np.arange(2., np.floor(100.*(ulmax-trueuls[nlive][0])/trueuls[nlive][0]), 2)))
+    pdulvals = np.flipud(-np.arange(0., -np.floor(100.*(ulmin-trueuls[nlive][0])/trueuls[nlive][0]), 4))
+    pdulvals = np.concatenate((pdulvals, np.arange(4., np.floor(100.*(ulmax-trueuls[nlive][0])/trueuls[nlive][0]), 4)))
     equivuls = ((pdulvals/100.)*trueuls[nlive][0]) + trueuls[nlive][0]
 
     ayulnew.grid(b=False)
@@ -413,7 +414,7 @@ for j, nlive in enumerate(nlives):
       
     # get linear fit to mean evidence offset vs information
     #p = np.polyfit(truekls[nlive], [np.median(tims)/timescaling for tims in timings[nlive]], deg=1)
-    #print("N live: %s, linear fit T = %.2f + %.2f(KL-div)" % (nlive, p[1], p[0]), file=sys.stdout)
+    #print("N live: %s, linear fit T = %.2f + %.3f(KL-div)" % (nlive, p[1], p[0]), file=sys.stdout)
     #if j == 0:
     #  print(truekls)
     #print([np.median(tims)/timescaling for tims in timings[nlive]])

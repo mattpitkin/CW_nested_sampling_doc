@@ -52,7 +52,7 @@ where we use the approximation that $\sum_i^N \mu_t n_{j,i} \approx 0$. So, the 
 where we can also say that the single dataset SNR is defined as $\rho^2 = \sum_i^N \mu_t^2/\sigma^2 = N\left(\mu_t/\sigma\right)^2$, and in this case
 $\rho_{\text{coh}} = \sqrt{2}\rho$, and we can see that if we take the natural logarithm of this that
 \begin{equation}
-\ln{\mathcal{O}_{\text{S}/\text{N}} = \ln{\left(p(\mu|M,I)\right)} + \frac{1}{2}\ln{\left(\frac{2\pi\sigma^2}{N}\right)} + \frac{1}{2}\rho_{\text{coh}}^2.
+\ln{\mathcal{O}_{\text{S}/\text{N}}} = \ln{\left(p(\mu|M,I)\right)} + \frac{1}{2}\ln{\left(\frac{2\pi\sigma^2}{N}\right)} + \frac{1}{2}\rho_{\text{coh}}^2.
 \end{equation}
 We see here that the log odds is proportional to $\rho^2$, with a minor influence from the $\ln{\left(2\pi\sigma^2/N\right)}$ term which is roughly equivalent
 to $\ln{\left(2\pi\rho^{-2}\right)}$. Empirically (and probably with some mathematical justification that can be derived) this approximation seems to give the
@@ -62,7 +62,7 @@ median odds value on random realisations of noise, even down to low SNR (see Fig
 
 We can define a coherent signal versus incoherent signal odds ratio as
 \begin{equation}
-\mathcal{O}^{\text{S}/\text{I}} = \frac{\mathcal{Z}_{\text{coh}}}{\mathcal{Z}_{\text{incoh}}} = \frac{\mathcal{Z}_{\{d\}}}{\mathcal{Z}_{d_1}\mathcal{Z}_{d_2}},
+\mathcal{O}_{\text{S}/\text{I}} = \frac{\mathcal{Z}_{\text{coh}}}{\mathcal{Z}_{\text{incoh}}} = \frac{\mathcal{Z}_{\{d\}}}{\mathcal{Z}_{d_1}\mathcal{Z}_{d_2}},
 \end{equation}
 where $\mathcal{Z}_{\{d\}}$, $\mathcal{Z}_{d_1}$, and $\mathcal{Z}_{d_2}$, are the evidences for a signal in the full dataset, and two individual
 datasets (this is equivalent to Equation~\ref{eq:cohvincoh1}). Using the same approximations as above, we find that
@@ -81,3 +81,10 @@ we created multiple realisations of two dataset of Gaussian random noise (with S
 mean offset. In each case we have analytically calculated the evidences for a coherent $\mu$ for both datasets, and independent $\mu\text{s}$ in both datasets.
 These are then compared to the approximations above. In this case we have purposely chosen a prior on $\mu$ such that the distributions of odds values for
 $\mathcal{O}_{\text{S}/\text{I}}$ and $\mathcal{O}_{\text{S}/\text{N}}$ cross, which is similar to the case we observed in our actual analysis shown in \S\ref{sec:simsignal}.
+
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{./figures/appendix3/approx_odds}
+\caption{ \protect\input{./figures/appendix3/caption}}
+\end{center}
+\end{figure}

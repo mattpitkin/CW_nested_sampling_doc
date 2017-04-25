@@ -8,7 +8,7 @@ of some of the concepts we will discuss below.
 One main point about the nested sampling algorithm is that it starts by randomly drawing a certain number of samples (the number of
 which we call the number of live points, $N_{\text{live}}$, which will be the constant number of ``active'', or ``live'', samples),  
 where a sample is a vector containing a value for each parameter $\vec{\theta}$, from the prior distribution (see \S\ref{sec:priorfuncs}).
-The samples must be independent draws. For each of these samples the likeihood will be calculated and the sample $\vec{\theta}_{\text{min}}$
+The samples must be independent draws. For each of these samples the likelihood will be calculated and the sample $\vec{\theta}_{\text{min}}$
 corresponding to the minimum likelihood, $L_{\text{min}} = p(\mathbf{B}|\vec{\theta}_{\text{min}})$, will be noted. As the algorithm
 progresses the number of live points stays the
 same, but at each iteration a new sample will be added in place of the one with the minimum likelihood, and therefore the
@@ -29,30 +29,30 @@ would be
 \end{equation}
 where $p(x|I)$ is the prior on $x$.
 
-There are various methods to sample from the constrained prior, the simplest of which is just to samples from the full
+There are various methods to sample from the constrained prior, the simplest of which is just to sample from the full
 prior and only accept a sample if it meets the likelihood constraint. However, such a simple method soon becomes very
-inefficient if the likelihood gets more and more tightly concentracted within the prior volume (which can happen rapidly
+inefficient if the likelihood gets more and more tightly concentrated within the prior volume (which can happen rapidly
 for high-dimensional problems). One popular nested sampling method is MultiNest \citep{2009MNRAS.398.1601F}, which performs
 the sampling by calculating a set of ellipsoids bounding the live points and drawing points uniformly from within them.
-Various other approaches exist such as Diffusive Nested Sampling \citet{Brewer2011,2016arXiv160603757B} and POLYCHORD \citet{2015MNRAS.450L..61H}.
+Various other approaches exist such as Diffusive Nested Sampling \citep{Brewer2011,2016arXiv160603757B} and POLYCHORD \citep{2015MNRAS.450L..61H}.
 
 The version of nested sampling used in the \lalinf library, as used by our code, makes use of a Markov chain Monte Carlo (MCMC) approach to
 drawing new samples \citep{Veitch:2010}. The MCMC attempts to sample from the constrained prior distributions in an efficient manner, with
-the final sample of the chain being a statistically independent samples from the rest of the live points. To sample most efficiently
-the MCMC requires a proposal distribution that closely resembles the underlying constrain prior that it is trying to sample from.
+the final sample of the chain being a statistically independent sample from the rest of the live points. To sample most efficiently
+the MCMC requires a proposal distribution that closely resembles the underlying constrained prior that it is trying to sample from.
 \lalinf has a variety of potential proposal distributions \citep{2015PhRvD..91d2003V}, but our code currently allows five different
 proposals, that can be used in different proportions:
 \begin{description}
- \item[Ensemble walk] This is one of the affine invarient ensemble proposals described by \citet{GoodmanWeare}, which adopt the
+ \item[Ensemble walk] This is one of the affine invariant ensemble proposals described by \citet{GoodmanWeare}, which adopt the
  scale and shape of the current set of samples. The hard-coded setup in \lalinf is that three samples randomly drawn from a cache
- of samples are used to define the walker samples. This is the main default proposal of our code, and is used as the proposal
+ of samples are used to define the ``walker'' samples. This is the main default proposal of our code, and is used as the proposal
  75\% of the time.
- \item[Ensemble stretch] This is another affine invarient ensemble proposal described by \citet{GoodmanWeare}, and makes use of
+ \item[Ensemble stretch] This is another affine invariant ensemble proposal described by \citet{GoodmanWeare}, and makes use of
  two samples randomly drawn from the sample cache. By default this proposal is not used at all.
  \item[Differential evolution] This is similar to the stretch proposal in that it uses two samples randomly drawn from the sample
  cache. By default this proposal is not used at all.
  \item[Uniform proposal] This proposal just draws points from their full prior for parameters that have a uniform prior specified.
- This proposal ise used 25\% of the time by default.
+ This proposal is used 25\% of the time by default.
  \item[Frequency jump] This proposal tries jumping between Fourier frequency bins if frequency is one of the required parameters.
  This proposal has not been tested and, by default, is not used at all.
 \end{description}
@@ -69,8 +69,8 @@ a hardcoded maximum length.
 
 We would like to test whether some of the above proposals lead to accurate calculations of the evidence integral as given in Equation~\ref{eq:evidence}.
 It is especially interesting to do this over ranges of prior volumes that are initially similar to the posterior volume, but then diverge to be
-much larger than the posterior volume (or in other words, as the information gain, or Kullback–Leibler divergence, increases). To do this our
-code has the option of setting a one-dimensional Gaussian distribution as the likelihood function, and using a flat prior bounded between $A$ and $B$,
+much larger than the posterior volume (or in other words, as the information gain, $H$, or Kullback-Leibler divergence, increases). To do this our
+code has the option of setting a one-dimensional Gaussian distribution as the likelihood function, using a flat prior bounded between $A$ and $B$,
 and working out the evidence. Analytically the evidence is given by
 \begin{align}\label{eq:testgaussev}
  \mathcal{Z} &= \int_A^B \frac{1}{\sqrt{2\pi}\sigma}\exp{\left(-\frac{(x-\mu)}{2\sigma^2} \right)}\frac{1}{(B-A)} \text{d}x, \nonumber \\
@@ -82,10 +82,10 @@ upper limits we obtain from the posterior samples match the expected upper limit
  \text{UL}(x) = \frac{1}{2a}\left(\erf{\left[\frac{(\mu-A)}{\sqrt{2}\sigma}\right]} - \erf{\left[\frac{(\mu-x)}{\sqrt{2}\sigma}\right]}\right),
 \end{equation}
 where $a = (\erf{\left[(\mu - A)/\sqrt{2}\sigma\right]} - \erf{\left[(\mu - B)/\sqrt{2}\sigma\right]})/2$ is the area under the distribution.
-We can calculate the true Kullback-Leibler divergence for via
+We can calculate the true Kullback-Leibler divergence via
 \begin{widetext}
 \begin{align}\label{eq:kldiv}
-D_{\text{KL}} =& \int_A^B p(x|\mu,\sigma,I) \ln{\left(\frac{p(x|\mu,\sigma,I)}{p(x|I)}\right)} \text{d}x, \nonumber \\ 
+H =& \int_A^B p(x|\mu,\sigma,I) \ln{\left(\frac{p(x|\mu,\sigma,I)}{p(x|I)}\right)} \text{d}x, \nonumber \\ 
  =& \int_A^B \frac{p(\mu,\sigma|x,I)p(x|I)}{\mathcal{Z}} \ln{\left(\frac{p(\mu,\sigma|x,I)p(x|I)}{\mathcal{Z}p(x|I)}\right)} \text{d}x, \nonumber \\
  =& \frac{p(x|I)}{\mathcal{Z}} \int_A^B p(\mu,\sigma|x,I) \left[\ln{\left( p(\mu,\sigma|x,I) \right)} - \ln{\mathcal{Z}}\right] \text{d}x, \nonumber \\
  =& -\frac{p(x|I)}{4\mathcal{Z}}\Bigg[ \left(1+2\left(\ln{\mathcal{Z}} 
@@ -93,36 +93,36 @@ D_{\text{KL}} =& \int_A^B p(x|\mu,\sigma,I) \ln{\left(\frac{p(x|\mu,\sigma,I)}{p
  & \frac{2}{\sqrt{2\pi}\sigma}\left((A-\mu)\exp{\left(-\frac{(A-\mu)^2}{2\sigma^2}\right)} - (B-\mu)\exp{\left(-\frac{(B-\mu)^2}{2\sigma^2}\right)}  \right) \Bigg]
 \end{align}
 \end{widetext}
-where $p(x|\mu,\sigma,I)$ is the posterior, $p(\mu,\sigma|x,I)$ the likelihood, and $p(x|I)$ is the prior (with $p(x|I) = (B-A)^{-1}$), and $Z$ is the
+where $p(x|\mu,\sigma,I)$ is the posterior, $p(\mu,\sigma|x,I)$ the likelihood, and $p(x|I)$ is the prior (with $p(x|I) = (B-A)^{-1}$), and $\mathcal{Z}$ is the
 evidence calculated via Equation~\ref{eq:testgaussev}. For the case of $\mu=0$ and $A=0$, and provided $B \gg \sigma$, this generally simplifies
 to
 \begin{equation}
-D_{\text{KL}} \approx -\frac{1}{4\mathcal{Z}B}\left[1+2\left(\ln{\mathcal{Z}} +\ln{\left(\sqrt{2\pi\sigma^2}\right)}\right)\right].
+H \approx -\frac{1}{4\mathcal{Z}B}\left[1+2\left(\ln{\mathcal{Z}} +\ln{\left(\sqrt{2\pi\sigma^2}\right)}\right)\right].
 \end{equation}
 A final thing that we can check, on top of the upper limit value, is whether the posterior samples appear to be drawn from the expected
 posterior distribution. To do this we use a Kolmogorov-Smirnov test comparing the CDF of the samples with the analytical CDF and calculating the
 two-sided $p$-value for the null hypothesis that the two distributions are the same.
 
-In the tests below we have run the code on this Gaussian likelihood by with a Gaussian of zero mean and $\sigma = 10^{-24}$, truncated at zero
+In the tests below we have run the code on this Gaussian likelihood with a Gaussian of zero mean and $\sigma = 10^{-24}$, truncated at zero
 by fixing the lower prior bound to $A=0$. This is similar to the form of the likelihood seen in pulsar searches when no signal is present.
-We have then set a range of upper bounds, $B$ from $10^{-23}$ to $10^{-13}$ increasing by a factor of ten each time, and a range of numbers of
+We have then set a range of upper bounds, $B$, from $10^{-23}$ to $10^{-13}$ increasing by a factor of ten each time, and a range of numbers of
 live points from $2^9$ to $2^{13}$ increasing by powers of two each time. For each combination of upper bound and number of live points we have
 run the code on the test Gaussian likelihood 100 times to see the statistical spread of the output.
 
 In the first test we check how just using the ensemble walk proposal (which is {\it not} the default configuration described above) fairs at
 estimating the evidence, upper limit, and posterior distribution. Figure~\ref{fig:walkpropevs} shows a variety of information, but it
-primarily shows the distribution of the ratio of evidence output from our code, $\mathcal{Z}$, to the true evidence calculated via
+primarily shows the distribution of the ratio of evidences output from our code, $\mathcal{Z}$, to the true evidence calculated via
 Equation~\ref{eq:testgaussev} as a function of the value of the upper prior bound $B$ (or equivalently on the top axis the
 information gain, in nats, calculated via Equation~\ref{eq:kldiv}). This is shown for the range of different numbers of live points used.
 It is clear that as the information gain increases (i.e.\ the posterior is constrained within a successively smaller part of the
 prior range) we are systematically more biased towards overestimating the evidence. It can also be seen that the bias increases with
-increasing number of live points. Linear fits (in $\ln{(\mathcal{Z}/\mathcal{Z}_{\text{true}})}$ and $D_{\text{KL}}$, the information gain) for different numbers
+increasing number of live points. Linear fits (in $\ln{(\mathcal{Z}/\mathcal{Z}_{\text{true}})}$ and $H$, the information gain) for different numbers
 of live points are shown in Table~\ref{tab:klvsz}. It is interesting to note that the statistical spread of values (if ignoring the
-systematic offset) are consistent with the expected range given by the error bars, and calculated using $\sqrt{H/N_{\text{live}}}$, where
+systematic offset) are consistent with the expected range given by the error bars, and calculated using $\sqrt{H/N_{\text{live}}}$, where here
 $H$ is the mean of the {\it information gain} (in nats) returned by the nested sampling algorithm for each run.
 
 \begin{table}[h]
-\caption{Linear coefficients in fits of $\ln{(\mathcal{Z}/\mathcal{Z}_{\text{true}})} = mD_{\text{KL}} + c$ from the results
+\caption{Linear coefficients in fits of $\ln{(\mathcal{Z}/\mathcal{Z}_{\text{true}})} = mH + c$ from the results
 shown in Figure~\ref{fig:walkpropevs} for differing numbers of live points.\label{tab:klvsz}}
 \begin{center}
 \begin{tabular}{l c c}
@@ -130,15 +130,36 @@ shown in Figure~\ref{fig:walkpropevs} for differing numbers of live points.\labe
 \hline
 $N_{\text{live}}$ & $c$ & $m$ \\
 \hline
-512 & $-0.27$ & 0.04 \\
-1024 & $-0.24$ & 0.06 \\
-2048 & $-0.18$ & 0.06 \\
-4096 & $-0.12$ & 0.07 \\
-8192 & $-0.09$ & 0.07 \\
+512 & $-0.27$ & 0.045 \\
+1024 & $-0.24$ & 0.058 \\
+2048 & $-0.18$ & 0.065 \\
+4096 & $-0.12$ & 0.068 \\
+8192 & $-0.09$ & 0.070 \\
 \hline
 \end{tabular}
 \end{center}
 \end{table}
+
+\begin{figure}[phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/proptesting/walk_prop/evidences/collate_plots_wp_evidences}
+\caption{ \protect\input{./figures/proptesting/walk_prop/evidences/caption}}
+\end{center}
+\end{figure}
+
+\begin{figure}[phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/proptesting/walk_prop/upperlimits/collate_plots_wp_uls}
+\caption{ \protect\input{./figures/proptesting/walk_prop/upperlimits/caption}}
+\end{center}
+\end{figure}
+
+\begin{figure}[phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/proptesting/walk_prop/kstest/collate_plots_wp_ks}
+\caption{ \protect\input{./figures/proptesting/walk_prop/kstest/caption}}
+\end{center}
+\end{figure}
 
 Figure~\ref{fig:walkpropuls} shows the distribution of 95\% upper limits on the $x$ parameter in Equation~\ref{eq:testcdf} (calculated by solving
 the equation for $\text{UL}(x) = 0.95$). It can be seen that, other than for the narrowest prior range, there is a systematic bias towards the
@@ -150,46 +171,75 @@ inconsistent a large amount of the time. This is most likely due to differences 
 posterior samples to use.
 
 The systematic biases in evidence values and upper limits may not be major problem, but does point towards there being some issue with the
-implememtation of the ensemble walk proposal.
+implementation of the ensemble walk proposal.
 
-In the second test we have check what happens with the codes current default proposal settings: using the ensemble walk proposal 75\%
-of the time and the uniform proposal 25\% of the time. It should be noted that this default is not an accident and came about from tests
+In the second test we have check what happens with the code's current default proposal settings: using the ensemble walk proposal 75\%
+of the time and the uniform proposal 25\% of the time. It should be noted that this default is not an accident, and came about from tests
 similar to these when just using the ensemble walk proposal.
 
 Figure~\ref{fig:walkunipropevs} shows the evidence distributions equivalent to those in Figure~\ref{fig:walkpropevs}. However, what can
-be seen in this case is that there is no obvious systematic bias as a function of $D_{\text{KL}}$, and the statistical uncertainty is
+be seen in this case is that there is no obvious systematic bias as a function of $H$, and the statistical uncertainty is
 consistent with expectations (as shown by the error bars). Similarly, the upper limits and Kolmogorov-Smirnov $p$-values shown in
 Figures~\ref{fig:walkunipropuls} and \ref{fig:walkunipropks} respectively are consistent. The reason why this combination of proposals
 seems to work whereas the ensemble walk proposal on its own does not is currently not understood, but we plan more work on figuring this
 out.
 
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/proptesting/walk_uniform_prop/evidences/collate_plots_wup_evidences}
+\caption{ \protect\input{./figures/proptesting/walk_uniform_prop/evidences/caption}}
+\end{center}
+\end{figure}
+
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/proptesting/walk_uniform_prop/upperlimits/collate_plots_wup_uls}
+\caption{ \protect\input{./figures/proptesting/walk_uniform_prop/upperlimits/caption}}
+\end{center}
+\end{figure}
+
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/proptesting/walk_uniform_prop/kstest/collate_plots_wup_ks}
+\caption{ \protect\input{./figures/proptesting/walk_uniform_prop/kstest/caption}}
+\end{center}
+\end{figure}
+
 \subsection{Posterior sample generation}\label{sec:postsamps}
 
 As discussed in \S\ref{sec:general} nested sampling codes, such as \lppen, do not intrinsically output samples that can be histogrammed to give
-representations of marginalised posterior distributions for the model parameters. They instead output an ascending likelihood order list of samples,
-each of which occupies a known approximate amount prior volume. New samples must be drawn from these, with appropriate weighting (see Equation~\ref{eq:postaccept}),
+representations of marginalised posterior distributions for the model parameters. They instead output an ascending likelihood ordered list of samples,
+each of which occupies a known approximate amount prior volume. Samples must be drawn from these, with appropriate weighting (see Equation~\ref{eq:postaccept}),
 to give a new set of samples that does represent the posterior distribution. During this process it is also possible to appropriately combine samples from parallel
 independent nested sampling runs (weighting each based on their calculated evidences) to recalculate the evidence and generate posterior samples.
 
 What is described above is not a core function of the \lppen code, but is an integral part to generating results with it, and has been used to
-produce posterior distributions discussing earlier in the section, and later in this document. Due to the probablistic
+produce posterior distributions discussing earlier in the section, and later in this document. Due to the probabilistic
 way that posterior samples are generated there will only be a finite number of samples, and the number of samples is dependent on the number
 of live points used when running nested sampling. The actual dependence of the number of posterior samples on $N_{\text{live}}$ can be seen in
-Figure~\ref{fig:numposts} (this uses the simulations discussed in \S\ref{sec:reseval}). It can be seen empirically that the mean number of posterior
+Figure~\ref{fig:numposts} (this uses the simulations discussed in \S\ref{sec:reseval}). It can be seen empirically, that the mean number of posterior
 samples goes roughly as $\langle N_{\text{post}} \rangle \approx 2.4N_{\text{live}}$, although there is a lower tail extending to $N_{\text{post}} \approx
 0.01N_{\text{live}}^{1.14}$.
+
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/codeeval/stats/numposts/numposts}
+\caption{ \protect\input{./figures/codeeval/stats/numposts/caption}}
+\end{center}
+\end{figure}
 
 \subsection{Code timing}\label{sec:timing}
 
 How long the code takes to runs depends on two main factors: the number of live points used and the information gain going from prior to posterior. Increases
 in both of these will generally mean that the code takes longer to run. Using the simulations from \S\ref{sec:proposaltesting} we have assessed the code
-run time for the simple Gaussian likelihood function. This allows us to quantify the code run time as a function of both number of live points and information
+run time for the simple testing Gaussian likelihood function. This allows us to quantify the code run time as a function of both number of live points and information
 gain.
 
-We find that the median calculation time for the simple Gaussian likelihood function used in \S\ref{sec:proposaltesting} (on a Intel ``Haswell'' processor,
-specifically Intel CPU E5-2680 v3 @ 2.50GHz), including some standard overheads\footnote{Without the overheads it is roughy $\sim 3.7\ee{-7}$ seconds.} is 
-$\sim 5.9\ee{-6}$ seconds. The median time for calculation of the likelihood (including model calculation time) for a standard search over only non-phase evolution
-parameters, and for one chunk of data, is $8.1\ee{-5}$ seconds.\footnote{Without the additional overheads this is a similar time of $4.9\ee{-5}$ seconds.}
+We find that the median calculation time for the simple Gaussian likelihood function used in \S\ref{sec:proposaltesting} (on an Intel ``Haswell'' processor,
+specifically Intel CPU E5-2680 v3 @ 2.50GHz), including some standard overheads\footnote{Without the overheads it is roughly $\sim 3.7\ee{-7}$ seconds.} is 
+$\sim 5.9\ee{-6}$ seconds. The median time for calculation of the likelihood (including model calculation time) for a standard search (Eqn.~\ref{eq:stlikelihood})
+over only non-phase evolution parameters, and for one chunk of data, is $8.1\ee{-5}$ seconds.\footnote{Without the additional overheads this is a similar time of
+$4.9\ee{-5}$ seconds.}
 
 The median run time per likelihood evaluation for the nested sampling part of the code for the standard likelihood function (using 1024 live points) 
 is $8.5\ee{-4}$ seconds, which is $\sim 10$ times greater than the single likelihood evaluation time (this ratio will change as a function of the number
@@ -199,13 +249,20 @@ of live points). The median run time per likelihood evaluation for the nested sa
 In Figure~\ref{fig:timings} we show the time taken for the runs in \S\ref{sec:proposaltesting},
 using the default proposals, as a function of number of live points and information gain. The code run time is divided by $\mathcal{T}_{L}= 5.9\ee{-6}$ to
 provide a way to scale it for other values of $\mathcal{T}_{L}$, e.g.\ that found from the code's standard likelihood function. If we perform a 2D linear
-fit to the median run time, $R/\mathcal{T}_L$, we get the relation
+fit to the natural logarithm of the median run time, $R/\mathcal{T}_L$, we get the relation
 \begin{align}\label{eq:runtime}
  \ln{\left(\frac{R}{\mathcal{T}_L}\right)} &\approx 1.57 \ln{N_{\text{live}}} + 1.05 \ln{H} + 3.60, \\
  \frac{R}{\mathcal{T}_L} &\approx 36.4 N_{\text{live}}^{1.57} H^{1.05}.
 \end{align}
-This relation should be considered as a rough lower limit to the run time for any particular likelihood function. Above we saw that for our standard likelihood
-function the nested sampling algorithm took roughly three times longer to run per likelihood evaluation than the simple test function. This is most likely due
-to (for the standard likelihood case) the internal MCMC, that draws new samples within the algorithm, requiring longer chains to give uncorrelated samples when
-the likelihood is more complex (i.e.\ with more parameters), and the proposal distributions have a harder time approximating it. So, for our standard likelihood
-function, and run over four parameters, this run time should be scaled by about a factor of thre
+This relation should be considered as a rough lower limit to the run time for any particular likelihood function. Above, we saw that for our standard likelihood
+function the nested sampling algorithm was roughly three times quicker per likelihood evaluation than the simple test function. In both cases the internal MCMC, which
+draws new samples within the algorithm, required very similar small lengths to give uncorrelated samples, so there most be other internal bottlenecks that make the
+simpler likelihood relatively slower. However, in general, longer MCMC chains will be required to give uncorrelated samples, so the number of likelihood evaluations
+will increase.
+
+\begin{figure}[!phtb]
+\begin{center}
+\includegraphics[width=1\columnwidth]{./figures/proptesting/walk_uniform_prop/timing/collate_plots_wup_timings}
+\caption{ \protect\input{./figures/proptesting/walk_uniform_prop/timing/caption}}
+\end{center}
+\end{figure}

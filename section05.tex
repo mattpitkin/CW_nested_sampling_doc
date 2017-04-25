@@ -1,0 +1,18 @@
+\section{Conclusions}
+
+In this document we have described some of the workings of a code, \lppenf, that is used for performing parameter estimation and Bayesian model
+selection in searches for \gw signals from known pulsars. We have described the available signal models, likelihood functions and prior functions.
+We have compared the code to one that had been previously used for the same purpose, \lppef, and found that the results agree very well for a range
+of situations. The comparisons have not been completely exhaustive, and there are situations that have not been tested, however, it is worth noting
+that \lppe is not necessarily expected to provide complete ground truth. The code has also be validated on additional software and hardware simulated
+signals and appears to return posterior distributions that behave as expected, and evidence values that show the expected behaviour.
+
+As a test of the internal nested sampling algorithm, and proposal distributions, used by the code a large number of simulations were performed using
+a simple Gaussian likelihood function. These interestingly highlighted that if using, in particular, the ensemble walk proposal distribution the evidence
+values output became systematically more biases away from the true value as a function of information gain between the prior and posterior distributions.
+The test showed that this bias was alleviated by including a proposal distribution that drew values from the full prior a certain fraction of the time.
+The reason for this systematic bias is currently unknown, but in general, given the magnitude of the bias, it should have a relatively minor effect. It was
+also shown that with the ensemble walk proposal source amplitude upper limits could be systematically biased by about 2\%, however, again this effect
+appears to be alleviated with the flat proposal distribution.
+
+Some example use cases of \lppen are documented in Appendix~\ref{app:usage}.

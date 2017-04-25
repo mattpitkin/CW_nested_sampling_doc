@@ -1,148 +1,156 @@
 \appendix
 
-\section{Code usage}
+\section{Code usage}\label{app:usage}
 
-Here we document the various command line options for the code and its use in a variety of situations. All the command
-line options for \lppen, as shown with the \verb|--help| command, are given below.
-\begin{lstlisting}[frame=single]
-Usage: lalapps_pulsar_parameter_estimation_nested [options]
-
- --help              display this message
- --verbose           display all error messages
- --detectors         all IFOs with data to be analysed e.g. H1,H2 (delimited by commas) (if generating fake data these
-                     should not be set)
- --par-file          pulsar parameter (.par) file (full path)
- --cor-file          pulsar TEMPO-fit parameter correlation matrix
- --input-files       full paths and file names for the data for each detector and model harmonic in the list (must be
-                     in the same order) delimited by commas. These files can be gzipped. If not set you can generate
-                     fake data (see --fake-data below)
- --sample-interval   (REAL8) the time interval bewteen samples (default to 60 s)
- --outfile           name of output data file (a HDF5 formated file with the extension '.hdf' or '.h5' [required])
- --output-chunks     Output lists of stationary chunks into which the data has been split
- --outXML            name of output XML file [not required]
- --chunk-min         (INT4) minimum stationary length of data to be used in the likelihood e.g. 5 mins
- --chunk-max         (INT4) maximum stationary length of data to be used in the likelihood e.g. 30 mins
- --time-bins         (INT4) no. of time bins in the time-psi lookup table
- --prior-file        file containing the parameters to search over and their upper and lower ranges
- --ephem-earth       Earth ephemeris file
- --ephem-sun         Sun ephemeris file
- --ephem-timecorr    Einstein delay time correction ephemeris file
- --harmonics         (CHAR) the signal model frequency harmonics that you want to use (delimited by commas). Currently
-                     this can be either the 'triaxial' model for which you use 2 (the default value) or 1,2 for a
-                     model with emission at both the rotation frequency and twice the rotation frequency.
- --biaxial           Set this if the waveform model parameters spcify a biaxial star
- --gaussian-like     Set this if a Gaussian likelihood is to be used. If the input file contains a column specifying
-                     the noise standard deviation of the data then that will be used in the Gaussian likelihood
-                     function, otherwise the noise variance will be calculated from the data.
- --nonGR             Set to allow non-GR polarisation modes and/or a variable speed of gravitational waves
- --randomise         Set this, with an INT seed, to randomise the data (through permutations of the time stamps) for
-                     use in Monte-Carlo studies. NOTE: this will not work if using the code to create injections
-
- Nested sampling parameters:
- --Nlive             (INT4) no. of live points for nested sampling
- --Nmcmc             (INT4) no. of for MCMC used to find new live points (if not specified an  adaptive number of
-                     points is used)
- --Nmcmcinitial      (INT4) no. of MCMC points to use in the initial resampling of the prior (default is to use
-                     MAXMCMC)
- --Nruns             (INT4) no. of parallel runs
- --tolerance         (REAL8) tolerance of nested sampling integrator
- --randomseed        seed for random number generator
-
- MCMC proposal parameters:
- --diffev            (UINT4) relative weight of using differential evolution of the live points as the proposal
-                     (DEFAULT = 0, e.g. 0%)
- --freqBinJump       (UINT4) relative weight of using jumps to adjacent frequency bins as a proposal (DEFAULT = 0,
-                     e.g. this is not required unless searching over frequency)
- --ensembleStretch   (UINT4) relative weight of the ensemble stretch proposal (DEFAULT = 0, e.g. 0%) [NOTE: this
-                     proposal greatly increases the autocorrelation lengths, so in general should be avoided]
- --ensembleWalk      (UINT4) relative weight of the ensemble walk proposal (DEFAULT = 3, e.g. 75%)
- --uniformprop       (UINT4) relative weights of uniform proposal (DEFAULT = 1, e.g. 25%)
-
- Reduced order quadrature (ROQ) parameters:
- --roq               Set this to use reduced order quadrature to compute the likelihood
- --ntraining         (UINT4) The number of training models used to generate an orthonormal basis of waveform models
- --roq-tolerance     (REAL8) The tolerance used during the basis generation (DEFAULT = 1e-11)
- --enrich-max        (UINT4) The number of times to try and "enrich" the basis set using new training data. The
-                     enrichment process stop before this value is reached if three consecutive enrichment steps
-                     produce no new bases (DEFAULT = 100)
- --roq-uniform       Set this flag to cause training model parameters for parameters with Gaussian prior
-                     distributions to be drawn from a uniform distribution spanning mu +/- 5 sigma. Otherwise, by
-                     default parameters are drawn from their given prior distributions
- --output-weights    (CHAR) If this is set then the weights will be output to the (binary) file that is named and the
-                     programme will exit. These could be read in later instead of being regenerated. This allows the
-                     ROQ to be generated on a machine with a large amount of RAM, whilst the full parameter
-                     estimation can run on a machine with less RAM.
- --input-weights     (CHAR) A binary file containing all the weights in a defined format. If this is present then the
-                     RQO will not be recalculated
-
- Signal injection parameters:
- --inject-file       a pulsar parameter (par) file containing the parameters of a signal to be injected. If this is
-                     given a signal will be injected
- --inject-output     a filename to which the injected signal will be output if specified
- --fake-data         a list of IFO's for which fake data will be generated e.g. H1,L1 (delimited by commas). Unless
-                     the --fake-psd flag is set the power spectral density for the data will be generated from the
-                     noise models in LALNoiseModels. For Advanced detectors (e.g Advanced LIGO) prefix the name with
-                     an A (e.g. AH1 for an Advanced LIGO detector at Hanford). The noise will be white across the data
-                     bandwidth
- --fake-psd          if you want to generate fake data with specific power spectral densities for each detector giving
-                     in --fake-data then they should be specified here delimited by commas (e.g. for --fake-data H1,L1
-                     then you could use --fake-psd 1e-48,1.5e-48) where values are single-sided PSDs in Hz^-1
- --fake-starts       the start times (in GPS seconds) of the fake data for each detector separated by commas (e.g.
-                     910000000,910021000). If not specified these will all default to 900000000
- --fake-lengths      the length of each fake data set (in seconds) for each detector separated by commas. If not
-                     specified these will all default to 86400 (i.e. 1 day)
- --fake-dt           the data sample rate (in seconds) for the fake data for each detector. If not specified this will
-                     default to 60s
- --scale-snr         give a (multi-detector) SNR value to which you want to scale the injection. This is 1 by default
-
- Legacy code flags:
- --oldChunks        Set if using fixed chunk sizes for dividing the data as in the old code, rather than the
-                    calculating chunks using the change point method
- --source-model     Set if using both 1 and 2 multiples of the frequency and requiring the use of the original source
-                    model parameters from Jones, MNRAS, 402 (2010)
-
- Benchmarking:
- --time-it          Set if wanting to time the various parts of the code. A output file with the "outfile" filename
-                    appended with "_timings" will contain the timings
- --sampleprior      (UINT4) Set this to be a number of samples generated from the prior. The nested sampling will not
-                    be performed
-\end{lstlisting}
+Here we document the various command line options for the code and its use in a variety of situations. The majority of the command
+line options for \lppen, as shown with the \verb|--help| command, are given (in a slightly edited form) in Table~\ref{tab:commands}.
+\begin{footnotesize}
+\begin{longtable}{|p{0.15\textwidth}p{0.8\textwidth}|}
+\caption{A list of command line arguments for the \lppen code.}\label{tab:commands} \\
+\hline
+\multicolumn{2}{|l|}{Usage: \lppenf [options]} \\
+ {\tt --help}            &  Display these commands. \\
+ {\tt --verbose}         &  Display progress information from the code, including details of the nested sampling progress. \\
+ {\tt --detectors}       &  Input all interferometers whose data is to be analysed, e.g.\, {\tt H1,L1} (delimited by commas) for the LIGO Hanford and
+ LIGO Livingston detectors (see the discussion in \S\ref{sec:example2} for the allowed detector names). If generating fake data, described below, these
+                     should not be set, otherwise this is {\bf required}. \\
+ {\tt --par-file}        &  The pulsar's parameter ({\tt .par}) file (see \S\ref{sec:parfile}). {\bf Required}. \\
+ {\tt --cor-file}        &  The pulsar's parameter correlation matrix file (see \S\ref{sec:priorfile}). {\bf Optional}. \\
+ {\tt --harmonics}       &  The signal model frequency harmonics that you want to use (delimited by commas). Currently
+                            this can be either a single value (e.g., the {\bf default} is to assume a 'triaxial' star emitting from the $l=m=2$ mode and use a value
+                            of 2), or {\tt 1,2} for a model with emission at both the rotation frequency and twice the rotation frequency. \\
+ {\tt --input-files}     &  The files containing the pre-processed (heterodyned, or spectrally interpolated) data for each detector and model harmonic specified by
+                            {\tt --detectors} and {\tt --harmonics} delimited by commas (these files must be listed in the same order as passed to
+                            {\tt --detectors} and {\tt --harmonics}, with the files for different harmonics for individual detectors listed together). If this not
+                            set you can generate fake data (see {\tt --fake-data below}), but it is otherwise this is {\bf required}. \\
+ {\tt --outfile}         &  The name for the output data file. This must be a HDF5 file with the extension '.hdf' or '.h5'. {\bf Required}. \\
+ {\tt --output-chunks}   &  Output lists of the stationary chunks into which the data has been split (see \S\ref{sec:splitting}). {\bf Optional}. \\
+ {\tt --chunk-min}       &  The minimum stationary length of data to be used in the likelihood. This {\bf defaults} to 5, e.g., 5 mins for data
+                            sampled at 1/60~Hz. {\bf Optional}. \\
+ {\tt --chunk-max}       &  The maximum stationary length of data to be used in the likelihood. This {\bf defaults} to 0, which is the value for no
+                            maximum length to be applied, except if the {\tt --oldChunks} flag is set, in which case it defaults to 30. If running with the
+                            {\tt --roq} flag it can be worth setting a value here (e.g., 1440) to avoid large amounts of memory being required in training
+                            set generation. {\bf Optional}. \\
+ {\tt --time-bins}       &  Number of time bins over a sidereal day in the antenna response lookup table. This {\bf defaults} to 2880 bins. {\bf Optional}. \\
+ {\tt --prior-file}      &  The file containing the prior ranges for parameters to search over (see \S\ref{sec:priorfile}). {\bf Required}. \\
+ {\tt --ephem-earth}     &  The Earth ephemeris file. If not supplied this will attempt to be found in the path. \\
+ {\tt --ephem-sun}       &  The Sun ephemeris file. If not supplied this will attempt to be found in the path. \\
+ {\tt --ephem-timecorr}  &  The Einstein delay time correction ephemeris file. If not supplied this will attempt to be found in the path. \\
+ {\tt --biaxial}         &  Set this if using the waveform model parameters with two harmonics, and specifically for a biaxial star \citep[see, e.g.,][]{2015MNRAS.453.4399P}. \\
+ {\tt --gaussian-like}   &  Set this if a Gaussian likelihood is to be used. If the input file(s) contains a column specifying
+                            the noise standard deviation of the data then that will be used in the Gaussian likelihood
+                            function, otherwise the noise variance will be calculated from the data. \\
+ {\tt --nonGR}           &  Set this to allow non-GR polarisation modes and/or a variable speed of gravitational waves. \\
+ {\tt --randomise}       &  Set this, with an integer seed, to randomise the data (through permutations of the time stamps) for
+                            use in Monte-Carlo studies. Note that this will not work if using the code to create injections. \\
+ {\tt --truncate-time}   &  Only analyse data up to the given GPS time. {\bf Optional}. \\
+ {\tt --truncate-samples}&  Only analyse data samples up to the number given here. {\bf Optional}. \\
+ {\tt --truncate-fraction}& Only analyse the given fraction of data samples (this must be a value between 0 and 1). {\bf Optional}. \\
+ ~ & ~ \\
+\multicolumn{2}{|l|}{~Nested sampling parameters:} \\
+ {\tt --Nlive}           &  Set the integer number of live points for nested sampling. {\bf Required}. \\
+ {\tt --Nmcmc}           &  Set the length of the MCMC used to find new live points (if not specified an adaptive number of
+                            points is used). \\
+ {\tt --Nmcmcinitial}    &  Set the number of MCMC points to use in the initial resampling of the prior. This defaults to 5000, but
+                            for our analyses this can be set to zero. \\
+ {\tt --tolerance}       &  The tolerance used as the stopping criterion for the nested sampling integrator. This {\bf defaults} to 0.1. \\
+ {\tt --randomseed}      &  A seed for the random number generator. By default, if not supplied, this is set by the system clock. \\
+ ~ & ~ \\
+\multicolumn{2}{|l|}{~MCMC proposal parameters: (see \S\ref{sec:proposals})} \\
+ {\tt --diffev}          &  The (integer) relative weight of using differential evolution of the live points as the proposal. The {\bf default} is 0,
+                            e.g., 0\%. \\
+ {\tt --freqBinJump}     &  The (integer) relative weight of using jumps to adjacent frequency bins as a proposal. The {\bf default} is 0, and this is not
+                            required unless searching over frequency. \\
+ {\tt --ensembleStretch} &  The (integer) relative weight of the ensemble stretch proposal. The {\bf default} is 0. Note that this
+                            proposal greatly increases the parameter autocorrelation lengths, so in general should be avoided. \\
+ {\tt --ensembleWalk}    &  The (integer) relative weight of the ensemble walk proposal. The {\bf default} is 3, e.g., 75\%. \\
+ {\tt --uniformprop}     &  The (integer) relative weight of uniform proposal. The {\bf default} is 1, e.g., 25\%. \\
+ ~ & ~ \\
+\multicolumn{2}{|l|}{~Reduced order quadrature (ROQ) parameters:} \\
+ {\tt --roq}             &  Set this flag to use reduced order quadrature to compute the likelihood. \\
+ {\tt --ntraining}       &  The (integer) number of training models used to generate an orthonormal basis of waveform models. \\
+ {\tt --roq-tolerance}   &  The tolerance used during the basis generation. The {\bf default} is {\tt 1e-11}. \\
+ {\tt --enrich-max}      &  The (integer) number of times to try and ``enrich'' \citep[see, e.g.,][]{2016PhRvD..94d4031S} the basis set using new training
+                            data. The enrichment process stops before this value is reached if three consecutive enrichment steps
+                            produce no new bases. The {\bf default} is 100. \\ 
+ {\tt --roq-uniform}     &  Set this flag to cause training model parameters, for parameters with Gaussian prior distributions, to be drawn from a
+                            uniform distribution spanning $\mu \pm 5 \sigma$. Otherwise, by
+                            default, parameters are drawn from their given prior distributions. \\
+ {\tt --output-weights}  &  Give an output file name to which to output (a binary version of) the weights will be output. If this is set the
+                            programme will exit after outputting the weights. These files could be read in later instead of being regenerated.
+                            This allows the potential for the ROQ to be generated on a machine with a large amount of RAM, whilst the full parameter
+                            estimation can run on a machine with less RAM. \\
+ {\tt --input-weights}   &  A binary file, created using the {\tt --output-weights} command, containing all the weights in a defined format.
+                            If this is present then the ROQ will not be recalculated. \\
+ ~ & ~ \\
+\multicolumn{2}{|l|}{~Signal injection parameters:} \\
+ {\tt --inject-file}     &  A pulsar parameter ({\tt .par}) file containing the parameters of a signal to be injected. If this is
+                           given a signal will be injected. \\
+ {\tt --inject-nonGR}    &  A parameter ({\tt .par}) file containing the values of specific non-GR signal parameters to be injected. \\
+ {\tt --inject-output}   &  A filename to which the injected signal will be output if specified. \\
+ {\tt --inject-only}     &  If this is set, and an {\tt --inject-output} file is set, then do not perform nested sampling on the
+                            created injection, but just exit the code after creation of, and writing out of, the injection. \\
+ {\tt --fake-data}       &  A list of interferometers for which fake data will be generated, e.g., H1,L1 (delimited by commas). Unless
+                            the {\tt --fake-psd} flag is set the power spectral density for the data will be generated from the
+                            noise models in described in \S\ref{sec:example2}. The noise will be white across the data bandwidth. \\
+ {\tt --fake-psd}        &  If wanting to generate fake data with specific power spectral densities for each detector given
+                            by {\tt --fake-data} then they should be specified here delimited by commas (e.g., for {\tt --fake-data H1,L1}
+                            then you could use {\tt --fake-psd 1e-48,1.5e-48}) where values are single-sided PSDs in Hz$^{-1}$. \\
+ {\tt --fake-starts}     &  The start times (in GPS seconds) of the fake data for each detector separated by commas (e.g.,
+                            {\tt 910000000,910021000}). If not specified these will all {\bf default} to 900000000. \\
+ {\tt --fake-lengths}    &  The length of each fake data set (in seconds) for each detector separated by commas. If not
+                            specified these will all {\bf default} to 86400 (i.e., 1 solar day). \\
+ {\tt --fake-dt}         &  The data sample rate (in seconds) for the fake data for each detector. If not specified these will
+                            {\bf default} to 60~s. \\
+ {\tt --scale-snr}       &  This gives a (multi-detector) SNR value to which you want to scale the injection. By {\bf default} this is 1. \\
+ ~ & ~ \\
+\multicolumn{2}{|l|}{~Legacy code flags:} \\
+ {\tt --oldChunks}       &  Set this if using fixed chunk sizes for dividing the data as in the old code, rather than the
+                            calculating chunks using the change point method. \\
+ {\tt --source-model}    &  Set this if using both 1 and 2 multiples of the frequency and requiring the use of the original source
+                            model parameters from \citet{2015MNRAS.453.4399P}. \\
+ ~ & ~ \\
+\multicolumn{2}{|l|}{~Benchmarking:} \\
+ {\tt --time-it}         &  Set this if wanting to time the various parts of the code. A output file with the ``outfile'' filename
+                            appended with ``\_timings'' will contain the timings \\
+ {\tt --sampleprior}     &  Set this to output this (integer) number of samples generated from the prior. The nested sampling will not
+                            be performed. \\
+\hline
+\end{longtable}
+\end{footnotesize}
 
 \subsection{Examples}\label{app:examples}
 
 Here we show a few real examples of using the code for a variety of situations. In all cases there are a minimum of
 three files that must be specified to run the code:
 \begin{enumerate}
- \item one (or more) data files containing a complex time series. These will generally be (although do not have to be) the output
+ \item One, or more, data files containing a complex time series. These will generally be (although do not have to be) the output
  of the heterodyne method described in \citep{2005PhRvD..72j2002D} (and implemented with {\tt lalapps\_heterodyne\_pulsar}), or
  the {\it Spectral Interpolation} method described in \citep{2017CQGra..34a5010D}. Files must be in ascii text format with three, or
- four, whitespace-seperated columns. In either case the first three columns
- specify the data timestamp in GPS seconds, the real part of the data, and the imaginary part of the data, e.g.
- \verb|900000000 1.2564374e-22 -4.5764347e-22|. In the case where a fourth column is present this should give the noise standard
- deviation, and is for use if running with the Gaussian likelihood function. The code will automatically determine if the input
- contains three or four columns. The data does not have to be uniformly sampled and can 
-contain gaps. However,
- if searching for a signal for which there could still be some frequency modulation it is useful for the data to have a large
- enough bandwidth to contain the modulation.
- The file can contain comments if the comment lines start with
- a \verb|%| or \verb|#|. Gzipped versions of these files can also be input.
- \item a pulsar parameter file. This should be an ascii {\sc tempo(2)}-style \verb|.par| file containing information on the
+ four, whitespace-separated columns. In either case the first three columns specify the data timestamp in GPS seconds, the real part of
+ the data, and the imaginary part of the data, e.g., \verb|900000000 1.2564374e-22 -4.5764347e-22|. In the case where a fourth column
+ is present this should give the noise standard deviation, and is for use if running with the Gaussian likelihood function. The code will
+ automatically determine if the input contains three or four columns. The data does not have to be uniformly sampled and can 
+ contain gaps. However, if searching for a signal for which there could still be some frequency modulation it is useful for the data to have a large
+ enough bandwidth to contain the modulation. The file can contain comments if the a line starts with a \verb|%| or \verb|#|. Gzipped versions of these
+ files can also be input.
+ \item A pulsar parameter file. This should be an ascii text {\sc tempo(2)}-style \verb|.par| file containing information on the
  source's parameters, e.g. sky location and frequency, as generated by {\sc tempo}\footnote{http://tempo.sourceforge.net/} or
  {\sc tempo2} \citep{2006MNRAS.369..655H}  from pulsar pulse time-of-arrival observations. An example \verb|.par| file is given below.
- \item a prior distribution file. This should be an ascii file containing information on the prior distributions
- required for any variable parameters that the code needs to sample posterior probability distribtions for. An example
+ \item A prior distribution file. This should be an ascii text file containing information on the prior distributions
+ required for any variable parameters for which the code needs to sample posterior probability distributions. An example
  prior file is given below.
 \end{enumerate}
 
-In the examples below we will assume that the LALsuite software package\footnote{\url{https://www.lsc-group.phys.uwm.edu/daswg/projects/lalsuite.html}} has
+In the examples below we will assume that the LALsuite software package\footnote{\url{https://wiki.ligo.org/DASWG/LALSuite}} has
 been installed and that the executable binaries for \lppen and {\tt lalapps\_nest2pos} are in your path (i.e.\ the directory path containing those
 executables is set in the list of values in your {\tt PATH} environment variable). The code can automatically find solar system ephemeris and timing
 files provided they are in a standard location, although these can also be specified explicitly on the command line.
 
-\subsubsection{An example {\tt .par} file}
+\subsubsection{An example {\tt .par} file}\label{sec:parfile}
 
 The {\tt .par} file input should be the same file that was used when performing the heterodyning (or {\it Spectral Interpolation})
-of the data used to produce the input data time series. A {\sc tempo(2)}-style {\tt .par} file could have the following form, e.g.\
+of the data used to produce the input data time series. A {\sc tempo(2)}-style {\tt .par} file could have the following form, e.g.,
 for a pulsar in a binary system:
 \newsavebox{\Lst}
 \begin{lrbox}{\Lst}
@@ -163,16 +171,16 @@ A1      3.474743
 \end{lrbox}
 \\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
 
-The majority of the parameters that can be in a {\tt .par} file are listed in Table~A1 of \citep{2006MNRAS.372.1549E}.
-Note that the code does not compute effects of dispersion measure (i.e.\ it assumes observations at infinite frequency),
-or atmospheric effects, so it is highly preferable to use a {\tt .par} file for which these parameters have been not
+The majority of the parameters that can be in a {\tt .par} file are listed in Table~A1 of \citet{2006MNRAS.372.1549E}.
+Note that our code does not compute effects of dispersion measure (i.e.\ it assumes observations at infinite frequency),
+or atmospheric effects, so it is preferable to use a {\tt .par} file for which these parameters have been not
 used, or held fixed.
 
-For pulsars in binary systems the code can currently use the following binary system models \citep[see e.g.][for discussion
+For pulsars in binary systems, the code can currently use the following binary system models \citep[see, e.g.,][for discussion
 of some of the models]{1989ApJ...345..434T,2007PhRvD..76d2006P}: {\tt BT}, {\tt BTX},
 {\tt BT1P}, {\tt BT2P}, {\tt ELL1}, {\tt DD}, {\tt DDS}, {\tt MSS}, and {\tt T2} (although not all aspects of the
 {\tt T2} model are implemented). The code can use the TDB or TCB time systems, with the TCB system being the default if not otherwise
-specified (either by supplying the require timing files, as described below, or by setting {\tt UNITS TDB} in the {\tt .par} file).
+specified (either by supplying the require timing files, or by setting ``{\tt UNITS TDB}'' in the {\tt .par} file).
 The code can accept {\tt .par} files calculated using the JPL DE200, DE405, DE414, or DE421 solar system ephemerides, noting
 that it only takes into account the motion of the Earth-Moon system and the Sun, but no other solar system bodies.
 
@@ -180,7 +188,7 @@ The {\tt .par} file can also contain a selection of gravitational wave parameter
 electromagnetically observed pulsar. A full list of the allowed parameter names for a {\tt .par}, and a prior file described below,
 is given in Table~\ref{tab:paramlist}.
 
-\begin{longtable}{l|l}
+\begin{longtable}{p{0.15\textwidth}|p{0.8\textwidth}}
 \caption{A list of parameters allowed in a {\tt .par} file or a prior file. The true-type font versions, in uppercase only,
 are what is allowed in the files. The specified units are for the {\tt .par} file, whereas the prior file
 requires values in SI units.}\label{tab:paramlist} \\
@@ -188,18 +196,16 @@ Parameter & Description \\
 \hline
 \multicolumn{2}{c}{Gravitational wave parameters} \\
 \hline
-{\tt H0}, $h_0$      & gravitational wave amplitude for the $l=m=2$ mode in the source model \\
-{\tt IOTA}, $\iota$  & pulsar inclination angle to the line-of-sight (rads) \\
+{\tt H0}, $h_0$      & gravitational wave amplitude for the $l=m=2$ mode in the source model \citep[see, e.g.,][]{1998PhRvD..58f3001J} \\
+{\tt IOTA}, $\iota$  & pulsar inclination angle to the line-of-sight (rads) ($0^{\circ}$ is gives a source whose rotation axis is pointed directly along the line-of-sight) \\
 {\tt COSIOTA}, $\cos{\iota}$ & cosine of $\iota$ \\
-{\tt PSI}, $\psi$    & polarisation angle of the gravitational waves (rads) \\
+{\tt PSI}, $\psi$    & polarisation angle of the gravitational waves (rads) \citep[see, e.g.,][]{1998PhRvD..58f3001J} \\
 {\tt PHI0}, $\phi_0$ & rotational phase of the pulsar (rads) \\
 {\tt C22}, $C_{22}$  & gravitational wave amplitude for the $l=m=2$ mode in the waveform model \citep[see][]{2015MNRAS.453.4399P} \\
 {\tt C21}, $C_{21}$  & gravitational wave amplitude for the $l=2, m=1$ mode in the waveform model \citep[see][]{2015MNRAS.453.4399P} \\
 {\tt PHI22}, $\Phi_{22}^C$ & gravitational wave phase for the $l=m=2$ mode in the waveform model (rads) \citep[see][]{2015MNRAS.453.4399P} \\
 {\tt PHI21}, $\Phi_{21}^C$ & gravitational wave phase for the $l=2, m=1$ mode in the waveform model (rads) \citep[see][]{2015MNRAS.453.4399P} \\
 {\tt Q22}, $Q_{22}$ & $l=m=2$ mass quadrupole moment (kg\,m$^{2}$) \citep[see e.g.][]{2005PhRvL..95u1101O} \\
-{\tt HPLUS}, $H_+$ &  gravitational wave amplitude for the $l=m=2$ mode in the source model for the $+$-polarisation \\
-{\tt HCROSS}, $H_{\times}$ &  gravitational wave amplitude for the $l=m=2$ mode in the source model for the $\times$-polarisation \\
 {\tt I21}, $I_{21}$ & physical gravitational wave amplitude in source model \citep[see][]{2015MNRAS.453.4399P} \\
 {\tt I31}, $I_{31}$ & physical gravitational wave amplitude in source model \citep[see][]{2015MNRAS.453.4399P} \\
 {\tt LAMBDA}, $\lambda$ & Euler angle in source model \citep[see][]{2015MNRAS.453.4399P} \\
@@ -209,7 +215,7 @@ Parameter & Description \\
 \multicolumn{2}{c}{Signal phase parameters} \\
 \hline
 {\tt F}$X$, $f_X$ & rotational frequency, and frequency derivatives (starting at 0), (Hz$\,s^{-X}$) \\
-{\tt PEPOCH} & the epoch of the frequency \\
+{\tt PEPOCH} & the epoch of the frequency (MJD, defined in the inertial frame of the pulsar, with often this being the solar system barycenter) \\
 \hline
 \multicolumn{2}{c}{Signal positional parameters} \\
 \hline
@@ -229,19 +235,19 @@ Parameter & Description \\
 {\tt PB}, $P_{\text{b}}$ & binary period (days) \\
 {\tt OM}, $\omega_0$ & longitude of periastron (degs) \\
 {\tt T0} & time of periastron (MJD) \\
-{\tt ECC}, $e$ & oribtal eccentricity \\
+{\tt ECC}, $e$ & orbital eccentricity \\
 {\tt EPS1}, $\varepsilon_1$/$\eta$ & $e\sin{\omega_0}$ for {\tt ELL1} model \citep[see Appendix in][]{2001MNRAS.326..274L} \\
 {\tt EPS2}, $\varepsilon_2$/$\kappa$ & $e\cos{\omega_0}$ for {\tt ELL1} model \citep[see Appendix in][]{2001MNRAS.326..274L} \\
 {\tt TASC}, $T_{\text{asc}}$ & time of the ascending node for {\tt ELL1} model \citep[see Appendix in][]{2001MNRAS.326..274L} \\
 {\tt GAMMA}, $\gamma$ & relativistic gravitational redshift and time dilation term in {\tt BT} model (s) \\
-{\tt OMDOT}, $\dot{\omega}_0$ & time derivative of $\omega_0$ (degs\,yr${-1}$) \\
+{\tt OMDOT}, $\dot{\omega}_0$ & time derivative of $\omega_0$ (degs\,yr$^{-1}$) \\
 {\tt XDOT} & time derivative of $a\sin{i}$ (lt\,s\,s$^{-1}$ or $10^{-12}$lt-s\,s$^{-1}$ if $|\dot{a\sin{i}}| > 10^{-7}$)  \\
 {\tt PBDOT}, $\dot{P}_{\text{b}}$ & time derivative of period ($10^{-12}$ if $|\dot{P_{\text{b}}}| > 10^{-7}$) \\
 {\tt EDOT}, $\dot{e}$ & time derivative of eccentricity (s$^{-1}$ or $10^{-12}$\,s$^{-1}$ if $|\dot{e}| > 10^{-7}$) \\
 {\tt EPS1DOT}, $\dot{\varepsilon}_1$ & time derivative of $\varepsilon_1$ (s$^{-1}$ or $10^{-12}$\,s$^{-1}$ if $|\dot{\varepsilon_1}| > 10^{-7}$) \\
 {\tt EPS2DOT}, $\dot{\varepsilon}_2$ & time derivative of $\varepsilon_2$ (s$^{-1}$ or $10^{-12}$\,s$^{-1}$ if $|\dot{\varepsilon_2}| > 10^{-7}$) \\
 {\tt XPBDOT} & time derivative of period minus GR prediction ($10^{-12}$ if $|\dot{P_{\text{b}}}| > 10^{-7}$) \\
-{\tt SINI}, $\sin{i}$ & sine of oribital inclination angle \\
+{\tt SINI}, $\sin{i}$ & sine of orbital inclination angle \\
 {\tt MTOT}, $M$ & total binary system mass (M$_{\odot}$) \\
 {\tt M2}, $m_2$ & binary companion mass (M$_{\odot}$) \\
 {\tt DR}, $d_r$ & relativistic deformation of the orbit \\
@@ -249,15 +255,15 @@ Parameter & Description \\
 {\tt SHAPMAX}, $s_x$ & defined as $-\ln{(1-\sin{i})}$ \\
 % {\tt KIN}, $i$ & inclination angle (Kopeikin term) (degs) \\
 {\tt KOM}, $\Omega$ & longitude of ascending node (Kopeikin term) (degs) \\
-{\tt D\_AOP} & Kopeikin term (arcsec$^{-1}$) \citep[see e.g.\ Section~2.7.1 of][]{2006MNRAS.372.1549E} \\
+{\tt D\_AOP} & Kopeikin term (arcsec$^{-1}$) \citep[see, e.g., Section~2.7.1 of][]{2006MNRAS.372.1549E} \\
 {\tt A1\_}$X$ & projected semi-major axes for multiple orbital components ($X=2,3$ for {\tt BT1P} and {\tt BT2P} models) (lt-s) \\
 {\tt PB\_}$X$ & periods for multiple orbital components ($X=2,3$ for {\tt BT1P} and {\tt BT2P} models) (days) \\
 {\tt OM\_}$X$ & longitudes of periastron for multiple orbital components ($X=2,3$ for {\tt BT1P} and {\tt BT2P} models) (degs) \\
 {\tt T0\_}$X$ & times of periastron for multiple orbital components ($X=2,3$ for {\tt BT1P} and {\tt BT2P} models) (MJD) \\
 {\tt ECC\_}$X$ & eccentricities for multiple orbital components ($X=2,3$ for {\tt BT1P} and {\tt BT2P} models) \\
 {\tt FB}$X$ & orbital frequencies for multiple components (in {\tt BTX} model) (Hz) \\
-{\tt A0}, $A$ & first aberration parameter \citep[see e.g.\ Section~2.7.3 of][]{2006MNRAS.372.1549E} \\
-{\tt B0}, $B$ & second aberration parameter \citep[see e.g.\ Section~2.7.3 of][]{2006MNRAS.372.1549E} \\
+{\tt A0}, $A$ & first aberration parameter \citep[see, e.g., Section~2.7.3 of][]{2006MNRAS.372.1549E} \\
+{\tt B0}, $B$ & second aberration parameter \citep[se, e.g., Section~2.7.3 of][]{2006MNRAS.372.1549E} \\
 \hline
 \multicolumn{2}{c}{Glitch parameters \citep[see][]{2006MNRAS.369..655H,2013MNRAS.429..688Y}} \\
 \hline
@@ -272,14 +278,27 @@ Parameter & Description \\
 \multicolumn{2}{c}{Non-GR parameters} \\
 \hline
 {\tt CGW}, $c_{\text{gw}}$ & speed of gravitational waves as a fraction of the speed of light \\
+{\tt HPLUS}, $H_+$ &  gravitational wave amplitude for the tensor $+$-polarisation \citep[see, e.g.,][for definitions of this and the subsequent
+parameters]{MaxCWpolariations} \\
+{\tt HCROSS}, $H_{\times}$ &  gravitational wave amplitude for the tensor $\times$-polarisation \\
+{\tt PHI0TENSOR}, $\Phi_{\text{t}}$ & tensor mode phase parameter \\
+{\tt PSITENSOR}, $\psi_{\text{t}}$ & tensor mode phase parameter \\
+{\tt HVECTORX}, $H_{\text{x}}$ &  gravitational wave amplitude for the vector x-polarisation \\
+{\tt HVECTORY}, $H_{\text{y}}$ &  gravitational wave amplitude for the vector y-polarisation \\
+{\tt PHI0VECTOR}, $\Phi_{\text{v}}$ & vector mode phase parameter \\
+{\tt PSIVECTOR}, $\psi_{\text{v}}$ & vector mode phase parameter \\
+{\tt HSCALARB}, $H_{\text{x}}$ &  gravitational wave amplitude for the scalar $b$-polarisation \\
+{\tt HSCALARL}, $H_{\text{y}}$ &  gravitational wave amplitude for the scalar $l$-polarisation \\
+{\tt PHI0SCALAR}, $\Phi_{\text{s}}$ & scalar mode phase parameter \\
+{\tt PSISCALAR}, $\psi_{\text{s}}$ & scalar mode phase parameter \\
 \hline
 \hline
 \end{longtable}
 
 
-\subsubsection{Example prior file}
+\subsubsection{Example prior file}\label{sec:priorfile}
 
-The prior functions used by the code are decribed in Section~\ref{sec:priorfuncs}. To implement them in the code requires a prior
+The prior functions used by the code are described in \S\ref{sec:priorfuncs}. To implement them in the code requires a prior
 file specifying the prior function require for each parameter that will be varied. A an example prior file containing all the
 allowed prior types (for descriptive purposed only) is:
 \begin{lstlisting}[frame=single]
@@ -301,15 +320,15 @@ Going through each line we have:
  \item[{\tt{A1}}] this parameter has been assigned a prior uniform in the logarithm of the parameter (\S\ref{sec:loguniform}) using the {\tt loguniform} tag, which
  required two values: a lower limit and an upper limit on the parameter ({\it not} the logarithm of the parameter).
  \item[{\tt{F0:F1}}] this pair of parameters has been assigned a Gaussian mixture model prior (\S\ref{sec:gmmprior}). This prior can be used for any number of
- parameters if given as a colon seperated list in the prior file. Following the {\tt gmm} assigment, a number gives the number of modes for the model. This is then
- followed by a square-bracketed list of lists, with each mode giving a comma separated main list entry containing a sublist of comma separated means for each parameter 
+ parameters if given as a colon separated list in the prior file. Following the {\tt gmm} assignment, a number gives the number of modes for the model. This is then
+ followed by a square-bracketed list of lists, with each mode giving a comma separated main list entry containing a sub-list of comma separated means for each parameter 
  (no additional whitespace is allowed in the lists). The list of means is then followed by a similar list of parameter covariance matrices for each mode (again no
  additional whitespace is allowed). This is then followed by a final bracketed list giving the relative weights for each mode (the weights do not have to be
- normalised to unity, as the code will automatically normalise them). If required this can then be followed by pairs of bracketed, comma separted value, for each
- parameter giving their mimumum and maximum allowed ranges. If these are given then they have to be given for all parameters, not just some subset. These are not
- given in this example.
+ normalised to unity, as the code will automatically normalise them). If required this can then be followed by pairs of bracketed, comma separated values, for each
+ parameter giving their minimum and maximum allowed ranges. If these are given then they have to be given for all parameters, not just some subset. These are not
+ shown in this example.
  \item[{\tt{COSIOTA}}] this single parameter has been assigned a Gaussian mixture model prior (\S\ref{sec:gmmprior}). This shows how to input a Gaussian mixture
- mode for a single parameter, and also shows at the end mimumum and maximum ranges for the parameter have also been input.
+ mode for a single parameter, and also shows at the end minimum and maximum ranges for the parameter have also been input.
 \end{description}
 
 If parameters in the prior file are specified with the {\tt gaussian} tag then a multivariate Gaussian prior may also be used for them if a correlation matrix
@@ -323,14 +342,14 @@ F1    0.5  1
 \end{lstlisting}
 \end{lrbox}
 \\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
-where the whitespace can be tabs of spaces, whilst the prior file contains the means and standard deviations of the parameters as noted above. It is worth noting
-that for fully (anti)correlated parameters correlation coefficients of one can lead to numerical issues during matrix inversion. So, in such cases the
+where the whitespace can be tabs or spaces, whilst the prior file contains the means and standard deviations of the parameters as noted above. It is worth noting
+that, for fully (anti)correlated parameters correlation coefficients of one can lead to numerical issues during matrix inversion. So, in such cases the
 (anti)correlation could be reduced to, say, 99.99\%. However, better solutions to such a degeneracy would be to fix one of the correlated values (i.e.\ do not include
-it in the prior file) and only search over the other, or finding a non-degenerate re-parameterisation.
+it in the prior file) and only searching over the other, or finding a non-degenerate re-parameterisation.
 
 \subsubsection{Example 1: single detector, single harmonic, input data}\label{sec:example1}
 
-One of the simplest cases for running the code is on input data from a single detector and at a single frequncy harmonic (in this
+One of the simplest cases for running the code is on input data from a single detector and at a single frequency harmonic (in this
 case at twice the rotation frequency). Let us assume a search that is just interested in a signal model described by the four parameters
 $h_0$, $\phi_0$, $\cos{\iota}$ and $\psi$, and set a prior file, called {\tt prior.txt}, containing
 \begin{lrbox}{\Lst}
@@ -363,8 +382,8 @@ $ lalapps_pulsar_parameter_estimation_nested --detectors H1 --input-files data_H
 \end{lstlisting}
 where we have set an output HDF5-format file called {\tt nest\_H1.hdf} in which the nested samples will be output. This setup has used 1024 nested sampling
 live points and a tolerance of 0.1 for stopping the code. The {\tt --Nmcmcinitial 0} flag tells the code that the initial live points drawn do not have to
-be resampled.\footnote{This option is present for cases when the initial live points may not be easily sampled from the prior distributions, and therefore
-an MCMC procedure is required to try and evolve them to be from the actual prior. However, for all our priors there are simple ways to draw the initial
+be resampled.\footnote{This option is present for cases when the initial live points may not be easily sampled from their prior distributions, and therefore
+an MCMC procedure is required to try and evolve them to be drawn from the actual prior. However, for all our priors there are simple ways to draw the initial
 live points from the prior, so this resampling is not required, and this input argument can be set to zero.} In this case the solar system ephemeris files
 will be found automatically. If the {\tt EPHEM} or {\tt UNITS} parameters are not explicitly set in the {\tt .par} file then these will default to the
 DE405 ephemeris and the TCB time system. The progress of the above code can be monitored by including the {\tt --verbose} flag, and watching how the
@@ -384,7 +403,7 @@ $ lalapps_nest2pos -p post_H1.hdf nest_H1.hdf
 \\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
 where the {\tt -p} flag give the name of the posterior output file. If the above use of \lppen had been run more than once on the same data and prior file,
 with output names given by e.g.\ {\tt nest\_H1\_01.hdf}...{\tt nest\_H1\_$N$.hdf}, then all these could be listed as input to {\tt lalapps\_nest2pos} to
-combined all the samples and evidence estimates. As well as the posterior samples, this file also contains (as did the {\tt nest\_H1.hdf}),
+combined all the samples and evidence estimates. As well as the posterior samples, this file also contains (as does the {\tt nest\_H1.hdf}),
 the signal model evidence, the noise model evidence, and the information gain (amongst other things).
 
 The posterior samples, and noise and signal model (natural logarithm) evidences, can be extracted using a python function within {\tt lalapps}, via
@@ -397,7 +416,7 @@ $ python
 \end{lrbox}
 \\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
 The {\tt postsamples} variable is an object from which samples from different parameters can be extracted, and plotted as a marginalised posterior
-distribution, e.g.\
+distribution, e.g.,
 \begin{lrbox}{\Lst}
 \begin{lstlisting}
 >>> from matplotlib import pyplot as pl
@@ -412,7 +431,7 @@ distribution, e.g.\
 where here, for the $h_0$ parameter it is contained in {\tt postsamples} as the fully uppercase {\tt 'H0'} value. 
 
 Alternatives to extract the (natural logarithm) evidence values are using the {\tt h5py} python module, or HDF5 command line utilities. For the former one could
-use, e.g.\
+use, e.g.,
 \begin{lrbox}{\Lst}
 \begin{lstlisting}
 >>> import h5py
@@ -440,13 +459,13 @@ $ h5ls -v post_H1.hdf/lalinference/ | grep -A2 evidence
 \\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
 However, note that in this latter example the evidence values are truncated to integer values.
 
-\subsubsection{Example 2: single detector, single harmonic, simulated data}
+\subsubsection{Example 2: single detector, single harmonic, simulated data}\label{sec:example2}
 
 As well as taking real data as an input the code can simulate Gaussian noise, and/or create and add a simulated signal to the data. To create
-a signal to inject into the data requires a {\tt .par} file for the signal parameters. This can be the same, or different, to the file input
+a signal to inject into the data requires a {\tt .par} file for the injected signal parameters. This can be the same, or different, to the file input
 using the {\tt --par-file} flag, but to produce a non-zero signal it must contain at least a \gw amplitude parameter (any parameters not
-included will be assumed to be zero). Any differences between the phase evolution parameters between the two files will be incorporated into the
-signal via Equation~\ref{eq:deltaphi}. Given an injection par file, called, say, {\tt injection.par}, containing
+included will be assumed to be zero). Any differences in the phase evolution parameters between the two files will be incorporated into the
+signal via Equation~\ref{eq:deltaphi}. Given an injection {\tt .par} file, called, say, {\tt injection.par}, containing
 \begin{lrbox}{\Lst}
 \begin{lstlisting}
 PSRJ    J1234+5601
@@ -475,14 +494,13 @@ file for the standard search).\footnote{Other
 named detectors that can be provided are L1 for the LIGO Livingston detector, G1 for the GEO600 detector \citep[from Table~IV of][]{2001PhRvD..63d4023D},
 V1 for the initial Virgo detector, and T1 for the TAMA300 detector \citep[from Table~IV of][]{2001PhRvD..63d4023D}. For the two LIGO detectors
 \citep{aLIGOSRD} and Virgo \citep[see Equation~6 of][]{2012arXiv1202.4031M}, design curve noise levels for their Advanced configurations can be obtained
-by prefixing the names with an `A'.} Setting the noise level from the design sensitivity or a given detector can be overridden by also using the
-{\tt --fake-psd} flag to input the required single sided
-power spectral density value. The simulated data will by default start at a GPS time of 900000000, be sampled at a rate of once per minute, and last for
-one solar day. However, each of these can be set with the appropriate flags: {\tt --fake-starts}, {\tt --fake-lengths}, and {\tt --fake-dt} respectively.
-In this example a value is also set for {\tt --scale-snr}, which means that after the creating of a signal with parameters as given in the {\tt injection.par}
-file, it will be re-scaled so that it has the given SNR - in this case a value of 10. This enables signals to be injected with a known SNR without needing to
-know the noise level a priori. If the {\tt --scale-snr} flag is not set, or has a value of zero, then no re-scaling takes place. In this case the output
-{\tt nest\_H1\_SNR} file would also contain the signal's injected SNR and the recovered SNR, e.g.\
+by prefixing the names with an `A'.} Setting the noise level from the design sensitivity for a given detector can be overridden by also using the
+{\tt --fake-psd} flag to input the required single sided power spectral density value. The simulated data will by default start at a GPS time of 900000000
+(13 Jul 2088, 15:59:46 UTC), be sampled at a rate of once per minute, and last for one solar day. However, each of these can be set with the appropriate flags:
+{\tt --fake-starts}, {\tt --fake-lengths}, and {\tt --fake-dt}, respectively. In this example a value is also set for {\tt --scale-snr}, which means that after the
+creating of a signal with parameters as given in the {\tt injection.par} file, it will be re-scaled so that it has the given SNR - in this case a value of 10. This
+enables signals to be injected with a known SNR without needing to know the noise level a priori. If the {\tt --scale-snr} flag is not set, or has a value of zero,
+then no re-scaling takes place. In this case the output {\tt nest\_H1\_SNR} file would also contain the signal's injected SNR and the recovered SNR, e.g.,
 \begin{lrbox}{\Lst}
 \begin{lstlisting}
 $ cat nest_H1_SNR
@@ -506,15 +524,15 @@ and {\tt data\_L1.txt}, for the two LIGO detectors H1 and L1, one would simply u
 $ lalapps_pulsar_parameter_estimation_nested --detectors H1,L1 --input-files data_H1.txt,data_L1.txt --par-file pulsar.par --prior-file prior.txt --outfile nest_H1L1.hdf --Nmcmcinitial 0 --Nlive 1024 --tolerance 0.1
 \end{lstlisting}
 where the order of listing the detectors with the {\tt --detectors} flag should match the order of listing the data files with the {\tt --input-files} flag.
-No whitespace is allowed between detector values or input file values, and the must be seperated by a comma. In this case the output {\tt nest\_H1L1\_SNR} file
+No whitespace is allowed between detector values or input file values, and they must be separated by a comma. In this case the output {\tt nest\_H1L1\_SNR} file
 will contain the individual detector recovered SNRs and the coherent SNR, whilst the {\tt nest\_H1L1\_Znoise} file will contain both the individual detector
 noise model evidences and the combined noise model evidence.
 
 \subsubsection{Example 4: multiple detectors, two harmonics}
 
 It is simple to extend the analysis to include the two harmonics from the $l=m=2$ mode (with a \gw frequency at twice the rotation rate) and the $l=2$, $m=1$
-harmonic (with a \gw frequency at the rotation rate). To search at these two harmonics requires that the parameters searched over are either the signal, or
-waveform, parameters given in \citet{2015MNRAS.453.4399P}. Using the (simpler and non-degenerate) waveform parameters $C_{21}$, $C_{22}$, $\Phi_{21}^C$ and
+harmonic (with a \gw frequency at the rotation rate). To search at these two harmonics requires that the parameters searched over are either the signal or
+waveform parameters given in \citet{2015MNRAS.453.4399P}. Using the (simpler and non-degenerate) waveform parameters $C_{21}$, $C_{22}$, $\Phi_{21}^C$ and
 $\Phi_{22}^C$, from Equations~\ref{eq:hf} and \ref{eq:h2f}, could lead to the following ({\tt prior.txt}) prior file
 \begin{lrbox}{\Lst}
 \begin{lstlisting}
@@ -533,9 +551,9 @@ Assuming that for each detector (H1 and L1) the data has been heterodyned at bot
 $ lalapps_pulsar_parameter_estimation_nested --detectors H1,L1 --harmonics 1,2 --input-files data_H1_1f.txt,data_H1_2f,data_L1_1f.txt,data_L1_2f.txt --par-file pulsar.par --prior-file prior.txt --outfile nest_H1L1.hdf --Nmcmcinitial 0 --Nlive 1024 --tolerance 0.1
 \end{lstlisting}
 Here the ordering of the input files is important, with the files for each harmonic for a given detector listed together, and in the same order as given by the
-{\tt --harmonics} flag.
+{\tt --harmonics} flag. The noise evidence and SNRs for each harmonic and each detector will be output to the files {\tt nest\_H1L1\_Znoise} and {\tt nest\_H1L1\_SNR}.
 
-\subsubsection{Example 4: single detectors, additional parameters}
+\subsubsection{Example 5: single detectors, additional parameters}
 
 Finally, we show an example when searching over additional phase evolution parameters. We show two options for this: the first is using the standard
 model and likelihood method, and the second performs the same search, but sped-up by using the ROQ likelihood. If one were searching over frequency and
@@ -585,34 +603,122 @@ $ lalapps_pulsar_parameter_estimation_nested --detectors H1 --input-files data_H
 
 To run with ROQ enabled, in the simplest case, requires the user to set a number of training waveforms and tolerance to use the produce a reduced order
 model.\footnote{For now we do not attempt to explain these parameters, which we are leaving to a future publication, other than to say that for broader
-parameter space searches (or searches over frequency derivates for which the epoch is further from the data epoch) more training waveforms are required
-for a given tolerance. For a fixed tolerance if the parameter space is too broad more templates may be required than are computational feasible (due to e.g.\
-memory constraints) to use.} In this example we will use 2500 training waveforms, and a tolerance of $5\ee{-12}$, and assume data that starts at the same
+parameter space searches (or searches over frequency derivatives, for which the epoch is further from the data epoch) more training waveforms are required
+for a given tolerance. For a fixed tolerance, if the parameter space is too broad more templates may be required than are computational feasible (due to, e.g.,
+memory constraints) to use.} In this example we will use 2500 training waveforms, and a tolerance of $5\ee{-12}$, and use data that starts at the same
 epoch as given in the {\tt .par} file. The following commands could be used
 \begin{lstlisting}[frame=single]
 $ lalapps_pulsar_parameter_estimation_nested --detectors H1 --input-files data_H1.txt --par-file pulsar.par --prior-file prior.txt --cor-file pulsar.cor --outfile nest_H1.hdf --Nmcmcinitial 0 --Nlive 1024 --tolerance 0.1 --roq --roq-tolerance 5e-12 --ntraining 2500
 \end{lstlisting}
 
 In this example, for a single run on a random realisation of Gaussian noise lasting one day and sampled at a rate of one per minute, we find that the ROQ
-version runs about 1.6 times faster. Within the given tolerance it reduces the prior parameter space to 32 orthogonal waveform templates, thus reducing the
+version runs about 1.8 times faster. Within the given tolerance it reduces the prior parameter space to 32 orthogonal waveform templates, thus reducing the
 the model and likelihood evaluations from using 1440 to 32 points. Due to various overheads the speed-up we see between the ROQ and regular run is only a factor
 of $\sim 1.8$, rather than the $1440/32 = 45$ factor that might be hoped for. However, more impressive speed-up can be observed for longer data sets. It should be
 noted that this observed speed-up is not a general rule, but is specific to the data and set up we used, but similar speed-ups for similar set ups would not be
 unexpected. We also find that the likelihoods produced by the ROQ method agree very well with that produced using the full likelihood evaluation, with the
 maximum-likelihood-template likelihoods agreeing to within $6\ee{-10}\%$.
 
+\subsubsection{Example 6: single detector, non-GR model}
+
+The standard analysis considers two hypotheses: GR signal and Gaussian noise. On top of these, we can also include non-GR signal hypotheses consisting of all
+possible combinations of tensor, vector and scalar modes: GR+s, GR+v, GR+sv, s, v, sv \citep[see][for definitions of these]{MaxCWpolariations}.\footnote{If the
+orientation of the source is known, we can also make a distinction between GR and a ``free-tensor'' hypothesis, corresponding to a signal model with $+$ and $\times$
+polarisations with unrestricted amplitudes and phases.} For any set of data, we can compute Bayes factors for each of these hypotheses using \lppen and then combine
+them to produce odds for any-signal vs.\ noise and non-GR vs.\ GR.
+
+The \lppen code accepts the {\tt --nonGR} and {\tt --inject-nonGR} arguments, which can be used to search for and inject non-GR signals, respectively. Both options may
+be used as simple flags or with a specific argument. In the former case, the code will use a generic signal model that includes all polarisations mentioned in the prior
+file. For instance, for a single detector (H1 in this case) the most generic search (one including all 5 polarizations freely) would be carried out by calling (without injections):
+\begin{lstlisting}[frame=single]
+lalapps_pulsar_parameter_estimation_nested --par-file pulsar.par --input-files data.txt --outfile output.hdf --prior-file prior.txt --Nlive 1000 --detectors H1 --nonGR
+\end{lstlisting}
+with a prior file like:
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+HPLUS       loguniform  1e-28  1e-21
+HCROSS      loguniform  1e-28  1e-21
+PHI0TENSOR  uniform     0      6.283185307179586
+PSITENSOR   uniform     0      6.283185307179586
+HVECTORX    loguniform  1e-28  1e-21
+HVECTORY    loguniform  1e-28  1e-21
+PHI0VECTOR  uniform     0      6.283185307179586
+PSIVECTOR   uniform     0      6.283185307179586
+HSCALARB    loguniform  1e-28  1e-21
+PHI0SCALAR  uniform     0      6.283185307179586
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+where {\tt HPLUS} and {\tt HCROSS} are the tensor amplitudes, {\tt HVECTORX} and {\tt HVECTORY} are the vector amplitudes and {\tt HSCALARB} is the scalar amplitude
+(we could equivalently use {\tt HSCALARL}, since the breathing and longitudinal modes are degenerate to quadrupolar antennas like LIGO or Virgo); the {\tt PHI0TENSOR},
+{\tt PHI0VECTOR} and {\tt PHI0SCALAR} parameters determine the overall complex phase offset between different ranks, while {\tt PSITENSOR} and {\tt PSIVECTOR} are 
+phase offsets between modes of the same rank. Relevant parameters that do not explicitly show up in the prior file are set to zero; as a result, the same command above
+can be used to search only over, say, vector modes by changing the prior file to read:
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+HVECTORX loguniform 1e-28 1e-21
+HVECTORY loguniform 1e-28 1e-21
+PHI0VECTOR uniform 0 6.283185307179586
+PSIVECTOR uniform 0 6.283185307179586
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+This can be used to produce any of the ``free'' non-GR searches (s, v, t, sv, st, vt, svt). Note that, if any of the prior files are used without the {\tt --nonGR}
+flag, the code will fail, as it will expect GR-specific parameters (like {\tt H0} and {\tt COSIOTA}). A generic non-GR injection may be produced by using the
+{\tt --inject-nonGR} flag with an injection file that gives the values of non-GR parameters desired, e.g.,
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+HPLUS 3e-24
+HVECTORX  4e-24
+PHI0VECTOR 3
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+would produce an injection with `+' and vector-x components of the given strain amplitudes, with no phase offset for plus ({\tt PHI0TENSOR} is 0) and 3 radians for
+vector-x.
+
+The non-GR options also accept an argument that specifies a particular non-GR model; currently accepted options are {\tt G4V} and {\tt EGR}. The former corresponds
+to a vector-only model \citep[proposed in][]{2015arXiv150304866M} that we usually use for testing; this model includes vector x and y modes with a particular
+weighting given by the pulsars inclination as in equations~7 and 8 of \citet{2015PhRvD..91h2002I}. An example of a prior file for a {\tt --nonGR G4V} analysis
+would be:
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+PSI         uniform    -0.785398163397448  0.785398163397448
+IOTA        uniform     0                  6.283185307179586
+H0          loguniform  1e-28              1e-21
+PHI0VECTOR  uniform     0                  6.283185307179586
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+The second option accepted by {\tt --nonGR} and {\tt --inject-nonGR} is {\tt EGR}, which stands for ``enhanced GR''. This corresponds to a model made up of a GR signal
+plus contributions from any non-tensorial modes specified in the prior file. For instance, passing {\tt --nonGR EGR} with a prior like:
+\begin{lrbox}{\Lst}
+\begin{lstlisting}
+PSI         uniform    -0.785398163397448 0.785398163397448
+COSIOTA     uniform    -1                 1
+H0          loguniform  1e-28             1e-21
+PHI0TENSOR  uniform     0                 6.283185307179586
+HVECTORX    loguniform  1e-28             1e-21
+HSCALARB    loguniform  1e-28             1e-21
+PHI0SCALAR  uniform     0                 6.283185307179586
+\end{lstlisting}
+\end{lrbox}
+\\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
+will produce a GR+s search; thus, by appropriately modifying the prior file, the {\tt --nonGR EGR} option can be used to also search for GR+v and GR+sv signals.
+Non-GR injection files are constructed similarly. 
+
 \subsection{The pipeline}
 
-The process of performing searches for known pulsars using does not just used \lppen. It actually requires a whole pipeline of code to: gather the \gw detector
-data and operational segments (``science mode'');  pre-processing the raw data via heterodyning (or spectral interpolation) to give the complex down-sampled
-time series; setting up the required prior distribution files; passing the data and priors to \lppen; converting the output nested samples into posterior samples;
-and, finally, displaying those results (including odds values) in a useful fashion, e.g.\ on a webpage. This process can be performed manually in a step by step
+The process of performing searches for known pulsars does not just use \lppen. It actually requires a whole pipeline of code to: a) gather the \gw detector
+data and operational segments (``science mode''); b) pre-processing the raw data via heterodyning (or spectral interpolation) to give the complex down-sampled
+time series; c) set up the required prior distribution files; d) pass the data and priors to \lppen; e) convert the output nested samples into posterior samples;
+and, finally, f) display those results (including odds values) in a useful fashion, e.g.\ on a webpage. This process can be performed manually in a step by step
 manner, but there also exists a pipeline script called {\tt lalapps\_knope} that gathers together all these operations in a way that can be run on a computer
 cluster running the HTCondor\footnote{\url{https://research.cs.wisc.edu/htcondor/}} job management system.
 
 To run this pipeline requires just a single configuration file to be written in the {\tt INI}\footnote{\url{https://en.wikipedia.org/wiki/INI_file}} format. An
 example configuration file is given below containing comments on the necessary input fields:
-\begin{lstlisting}[frame=single]
+\begin{lstlisting}[frame=single,basicstyle=\tiny\ttfamily]
 # Example configuration file for the full known pulsar search pipeline
 
 ; general inputs for the whole analysis
@@ -649,14 +755,14 @@ coherent_only = False
 num_background = 0
 
 # a list of multiplicative factors of the pulsar's rotation frequency to analyse (e.g. [1., 2.] for analysing both the 1f and 2f modes)
-# This can be a list if either 1 or 2 values, but if it is a list of two values they can currently only [1., 2.] (or [2., 1.]),
+# This can be a list of either 1 or 2 values, but if it is a list of two values they can currently only be [1., 2.] (or [2., 1.]),
 # whereas if there is only one value it can take any positive number.
 freq_factors = [2.0]
 
 # the path for timing and solar system ephemeris file
 ephem_path = /usr/share/lalpulsar
 
-# the directory in which the DAGs are created and run from
+# the directory in which the Condor DAGs are created and run from
 run_dir = /home/user/analysis/dags
 
 # the name of the DAG file to create (if not set this will be generated automatically)
@@ -668,12 +774,12 @@ submit_dag = True
 # this flag sets whether running in autonomous mode
 # If running in autonomous mode then information on the current state of the run for each pulsar must be kept
 # (e.g. a json file must be created for each pulsar containing the end time that has currently been run until,
-# it will also contain the previously used segment list as cache file). If no file is found to exist for a
+# it will also contain the previously used segment list and cache file). If no file is found to exist for a
 # particular pulsar, e.g. that pulsar has newly been added to the pulsar directory, then it will start from
 # scratch for that pulsar (based on the start time in this file). The script (run e.g. with cron once per week)
 # that uses this file for the automation should update the endtime on each run.
 # A script will be required to produce the the cache files for each pulsar.
-autonomous = True
+autonomous = False
 
 # the initial start time of any autonomous run (as starttime will be updated each time the code is run)
 autonomous_initial_start =
@@ -684,13 +790,13 @@ autonomous_initial_start =
 #           |       '-> /segments.txt (science segments file for that pulsar)
 #           |       '-> /data (directory for processed data files)
 #           |               '-> /coarse (directory for coarse heterodyned data)
-#           |               |         '-> /freqfactor (directory for heterodyne at freq factor times rotation frequency - if required)
+#           |               |         '-> /freqfactor (directory for heterodyne at freq factor times rotation frequency)
 #           |               '-> /fine (directory for fine heterodyned data)
-#           |               |       '-> /freqfactor (directory for heterodyne at rotation frequency - if required)
+#           |               |       '-> /freqfactor (directory for heterodyne at rotation frequency)
 #           |               '-> /splinter (directory for spectrally interpolated data)
-#           |                           '-> /freqfactor (directory for heterodyne at rotation frequency - if required)
+#           |                           '-> /freqfactor (directory for heterodyne at rotation frequency)
 #           '-> /splinter (a directory to output files from splinter before moving them into the above structure)
-#           '-> /cache.lcf (a general frame/SFT cache file used by all pulsar if their directory does not containing there own cache)
+#           '-> /cache.lcf (a general frame/SFT cache file used by all pulsar if their directory does not containing their own cache)
 preprocessing_base_dir = {'H1': '/home/username/analysis/H1', 'L1': '/home/username/analysis/L1'}
 
 # path to directory containing pulsar parameter (.par) files, or an individual parameter file
@@ -699,7 +805,7 @@ preprocessing_base_dir = {'H1': '/home/username/analysis/H1', 'L1': '/home/usern
 # the full analysis will be re-run for that pulsar)
 pulsar_param_dir = /home/username/analysis/pulsar
 
-# path to log files
+# path to Condor log files
 log_dir = /home/username/analysis/log
 
 # set to true if running on software/hardware injections
@@ -731,9 +837,6 @@ type = {'H1': 'H1_HOFT_C00', 'L1': 'L1_HOFT_C00'}
 # a string to match in the URL paths returned
 match = localhost
 
-; Placeholder for information about Max's pulsar database (this could be used instead of requiring local copies of .par files)
-[pulsar_database]
-
 ; inputs for running a science segment finding job
 [segmentfind]
 # path to segment database query script, or a dictionary of pre-found segment files (one entry for each detector) if not wanting to use segment finding script e.g. {'H1': '/home/username/analysis/H1segments.txt'}
@@ -759,19 +862,19 @@ heterodyne_exec = /usr/bin/lalapps_heterodyne_pulsar
 # path to directory containing pulsar parameter file (.par) updates, or an individual parameter file
 # pulsar_update_dir = /home/username/analysis/pulsar_update # DONT USE FINE HETERODYNE UPDATES - JUST REDO WHOLE HETERODYNE SO THAT THERE AREN'T MULTIPLE PAR FILES/HETERODYNE FILES
 
-# low-pass filter (9th order Butterworth) knee frequency
+# low-pass filter (9th order Butterworth) knee frequency (Hz)
 filter_knee = 0.25
 
-# the frame data sample rate (for the coarse heterodyne)
+# the frame data sample rate (for the coarse heterodyne) (Hz)
 coarse_sample_rate = 16384
 
-# the re-sampling rate for the coarse heterodyne
+# the re-sampling rate for the coarse heterodyne (Hz)
 coarse_resample_rate = 1
 
 # a dictionary of frame channel names; one for each detector
 channels = {'H1': 'H1:GDS-CALIB_STRAIN', 'L1': 'L1:GDS-CALIB_STRAIN'}
 
-# the fine heterodyne re-sampling rate (the sample rate is taken from coarse_resample_rate)
+# the fine heterodyne re-sampling rate (the sample rate is taken from coarse_resample_rate) (Hz)
 fine_resample_rate = 1/60
 
 # the standard deviation threshold for removing outliers
@@ -817,7 +920,7 @@ pe_exec = /usr/bin/lalapps_pulsar_parameter_estimation_nested
 # the base output directory for the nested samples (directories for each detector/joint analysis will be created)
 pe_output_dir = /home/username/analyses/nested_samples
 
-# a pre-made prior file for the analysis (if this is not set then the prior file will be generated for each source based in the par file and/or pre-processed data) - this has priority over any other options in this configuration file
+# a pre-made prior file for the analysis (if this is not set then the prior file will be generated for each source based on the par file and/or other information) - this has priority over any other options in this configuration file
 premade_prior_file =
 
 # a set of prior options in dictionary form e.g.
@@ -852,7 +955,7 @@ amplitude_prior_obstimes =
 # go through the pulsar parameter file and use the errors to set Gaussian priors in the prior file (also create a correlation coefficient file for these, setting everything to be uncorrelated except the extremely highly correlated binary parameters)
 use_parameter_errors = False
 
-# the number of parallel runs for a given
+# the number of parallel lalapps_pulsar_parameter_estimation_nested runs for a given pulsar/detector combination
 n_runs = 5
 
 # the number of live points for each run
@@ -881,10 +984,6 @@ gaussian_like = False
 
 # flag to set whether the model under consideration is a biaxial model
 biaxial = False
-
-; placeholder tags to remind me to implement marginalisation over phase and amplitude calibration uncertainties (for each detector independently)
-; cal_marg_amp = {'H1': 10., 'L1': 12.} # 1-sigma percentage amplitude uncertainty
-; cal_marg_phase = {'H1': 0.2, 'L1': 0.2} # 1-sigma phase uncertainty (rads)
 
 # path to lalapps_nest2pos for nested sample -> posterior conversion
 n2p_exec = /usr/bin/lalapps_nest2pos
@@ -921,10 +1020,10 @@ roq_ntraining = 2500
 # set the maximum data chunk length for when using ROQ
 roq_chunkmax = 1440
 
-# set the tolerance to producing the ROQ bases
+# set the tolerance for producing the ROQ bases
 roq_tolerance = 5e-12
 
-# set if wanting the bases produced over a uniform parameter space even for (phase) parameters with Gaussian priors
+# set if wanting the bases produced over a uniform parameter space even for parameters with Gaussian priors
 roq_uniform = False
 
 ; inputs for creating results pages
@@ -972,7 +1071,6 @@ subtract_truths = False
 show_priors = True
 
 # set whether to copy par file, prior files, heterodyne files, and posterior files into results page directory
-# (useful on e.g. ARCCA where scratch space files get removed after 60 days)
 copy_all_files = True
 \end{lstlisting}
 

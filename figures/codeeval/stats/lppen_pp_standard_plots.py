@@ -81,7 +81,7 @@ for k, tf in enumerate([tar, utar]):
         d = json.load(fp)
     
         # get injection credible intervals for joint analysis
-        if d['Injected SNR'][detectors[-1]] > snrlim and k == 0:
+        if d['Injected SNR'][detectors[-1]] > snrlim and k == 1:
           injcreds.append(d['Injection credible intervals'][detectors[-1]])
     
         # injected and recovered SNRs
@@ -174,10 +174,10 @@ for i, ax in enumerate(axs.flatten()):
   ax.plot([0., 1.], [0., 1.], color='darkred', ls='--', lw=0.5)
   ax.set_xlim([0., 1.])
   ax.set_ylim([0., 1.])
-  ax.text(0.85, 0.1, hlabels[i])
+  ax.text(0.85, 0.1, labels[i])
   
   if i > 1:
-    ax.set_xlabel('Credible interval (%s)' % labels[i])
+    ax.set_xlabel('Credible interval')
   else:
     ax.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
   if not i%2:

@@ -21,11 +21,11 @@ Gaussian noise), whilst also giving posterior probability distributions for the 
 This code, called \lppenf (or \lppen for short through the rest of this document), makes use of the nested sampling
 algorithm provided within the \lalinf software library \citep{2015PhRvD..91d2003V}. As such this document will not
 give a detailed description of how that algorithm works, but will provide some information on the specific proposals
-that can be used within the algorithm. This method has previously been briefly described in \citet{2012JPhCS.363a2041P}.
+distributions that can be used within the algorithm. This method has previously been briefly described in \citet{2012JPhCS.363a2041P}.
 
 The code can also be used to perform parameter estimation and model selection for signals for any generic
 metric theory of gravity, however its use for this will be discussed in detail in a separate paper \citep{MaxCWpolariations}. When
-searching over parameters that vary the phase evolution there is potential to speed up the code through
+searching over parameters that vary the phase evolution there is potential to speed up the analysis through
 efficient likelihood evaluation via the {\it reduced order quadrature} method \citep[see, e.g.,][]{2014PhRvX...4c1006F,2015PhRvL.114g1104C},
 but again that will be discussed in more detail in a future paper.
 
@@ -46,17 +46,16 @@ sum
 where $L_i$ is the likelihood and $w_i = p(\vec{\theta}|M,I) \Delta\vec{\theta}$ is the ``prior weight''
 (i.e.\ the fraction of the prior occupied by point $i$).
 
-As a default the signal model evidence is compared to the
-evidence that the data consists of Gaussian noise to form the odds for the two models
-\begin{equation}\label{eq:oddsratio}
-\mathcal{O} = \frac{p(d|M,I)}{p(d|\text{noise},I)}\frac{p(M|I)}{p(\text{noise}|I)} =
-\frac{\mathcal{Z}_M}{\mathcal{Z}_{\text{noise}}},
-\end{equation}
+By default the signal model evidence is compared to the evidence that the data consists of Gaussian noise to form the odds for the two models
+\begin{align}\label{eq:oddsratio}
+\mathcal{O} &= \frac{p(d|M,I)}{p(d|\text{noise},I)}\frac{p(M|I)}{p(\text{noise}|I)} \nonumber \\
+&= \frac{\mathcal{Z}_M}{\mathcal{Z}_{\text{noise}}},
+\end{align}
 where on the right hand side we have explicitly set the prior odds for the two models to
 $p(M|I)/p(\text{noise}|I) = 1$.
 
-Other than this evidence value and odds ratio the code will also output all of the samples accumulated during
-the nested sampling process. These samples will not be drawn from the posterior probability distribution as in
+Other than this evidence value and odds ratio the code also returns the samples accumulated during
+the nested sampling process. These samples are not drawn from the posterior probability distribution as in
 an MCMC method, but they can be resampled to generate a subset of samples that are drawn from the posterior
 distribution. This resampling (performed using the {\tt lalapps\_nest2pos} {\tt python} script within
 {\tt lalapps}\footnote{\url{https://wiki.ligo.org/DASWG/LALSuite}}) uses the
@@ -67,8 +66,8 @@ accepted with the probability
 P_{\text{accept}} = \frac{L_i w_i}{(L_iw_i)_{\rm max}}.
 \end{equation}
 
-In our case the data $d$ in the above equations is the heterodyned, low-pass filtered and down-sampled data
-for a detector, or set of detectors, each giving a single data stream or two data streams depending on
+In our case the data $d$ above is the heterodyned, low-pass filtered and down-sampled data
+from a detector, or set of detectors, each giving a single data stream or two data streams depending on
 whether the heterodyne was performed at one or both potential signal frequencies near the rotation frequency
 and/or twice the rotation frequency. Here we will use $\mathbf{B}$ to represent a vector of these heterodyned
 data values, for which a single time sample is often referred to using the jargon term $B_k$ (``{\it B of k}''), although we will

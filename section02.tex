@@ -55,7 +55,7 @@ iH_{\times}F_{\times}(\psi,t)e^{i\Phi_{0}} \right),
 where $H_+$ and $H_{\times}$ are the amplitude components for the `$+$' and `$\times$' polarisations, and $\Phi_0$ is the signal's initial phase.
 
 To calculate the $\Delta\phi_{\mathcal{K}}$ values using up to the $(n-1)^{\text{th}}$ frequency derivative, and try to avoid numerical overflow issues when dealing
-with large phases, the following equation is used
+with large phases, we use
 \begin{widetext}
 \begin{equation}\label{eq:deltaphi}
 \Delta\phi_{\mathcal{K}}(t) = 2\pi \mathcal{K} \sum_{k=1}^n \left( \frac{\left(f^{(k-1)}_{{\text{true}}} - f^{(k-1)}_{{\text{het}}}\right)}{k!}(t+\delta t_{\text{het}})^k + \frac{f^{(k-1)}_{{\text{true}}}}{k!} 
@@ -103,7 +103,7 @@ would be required.
 
 \subsection{The likelihood functions}\label{sec:likelihood}
 
-Our code can make use of two different likelihood functions. The default likelihood function is a
+Our code can make use of two different likelihood functions. The default is a
 Student's {\it t}-likelihood function in which it is assumed that the standard deviation of the noise in the
 data is unknown, but can be marginalised over. A Gaussian likelihood function can also be used, for
 which the code can either take in estimates of the noise standard deviation at each data point, or calculate
@@ -152,14 +152,13 @@ p(\mathbf{B}|\vec{\theta}) &= \prod_{i=1}^{N_{\text{dets}}} \prod_{j=1}^{N_{\tex
 \end{align}
 \end{widetext}
 where $L_{i,j}$ is the length of each dataset and $\mathcal{B}_{i,j,k} = -\ln{(2\pi\sigma_{i,j,k}^2)}$. Note
-that the normal square root on the normalisation factor is not there because the exponential is already the
-product of the real and imaginary data components.
+that normalisation factor reflects the fact that exponential is already the product of the real and imaginary data components.
 
 \subsubsection{The null likelihood}\label{sec:nulllike}
 
 As we will most often want to perform model comparison for the signal model against one for which the data just contains
 noise (the null hypothesis in this case) we can define the null likelihoods for both of the above likelihoods
-by setting $y(\vec{\theta}) = 0$, so that we have
+by setting $y(\vec{\theta}) = 0$, giving
 \begin{align}\label{eq:nulllike}
 \ln{p(\mathbf{B}|y=0)} &= \sum_{i=1}^{N_{\text{dets}}} \sum_{j=1}^{N_{\text{s}}}
 \sum_{k=1}^{M_{i,j}} \Bigg( \mathcal{A}_{i,j,k} - \nonumber \\
@@ -167,13 +166,13 @@ by setting $y(\vec{\theta}) = 0$, so that we have
 \left\{\sum_{n=n_{i,j,0}}^{n_{i,j,0}+(m_{i,j,k}-1)} |B_{i,j,n}|^2\right\}}
 \Bigg),
 \end{align}
-and
+for the Student's {\it t}-likelihood, and
 \begin{equation}
 \ln{p(\mathbf{B}|y=0)} = \sum_{i=1}^{N_{\text{dets}}} \sum_{j=1}^{N_{\text{s}}}
 \sum_{k=1}^{L_{i,j}} \left(\mathcal{B}_{i,j,k} -
 \left[\frac{|B_{i,j,k}|^2}{2\sigma_{i,j,k}^2 } \right] \right)
 \end{equation}
-for the Students-{\it t} and Gaussian likelihoods respectively.
+for and Gaussian likelihood.
 
 If we were only interested in comparing models calculated using equivalent likelihood functions we could in
 general ignore the factors that do not depend on the data or the model, as they would cancel in any odds
@@ -258,7 +257,7 @@ by the prior.
 
 A parameter can be given a prior with a Gaussian distribution, defined by its mean, $\mu_x$, and standard deviation, $\sigma_x$, i.e.\
 \begin{equation}
- p(x|I) = \frac{1}{\sqrt{2\pi\sigma_x^2}}\exp{\left(-\frac{(x-\mu_x)^2}{2\sigma_x^2}\right)}.
+ p(x|I) = \frac{1}{\sqrt{2\pi\sigma_x^2}}\exp{\left[-\frac{(x-\mu_x)^2}{2\sigma_x^2}\right]}.
 \end{equation}
 
 A histogram of a set of samples produced by the code when drawing from a Gaussian prior distribution are shown in Figure~\ref{fig:priorgaussian},
@@ -416,8 +415,7 @@ for which values above zero favour there being a change point in the data. We co
 split the data into two chunks at the change point value $i$ with the largest evidence. However, in practice this leads to
 data drawn from a single Gaussian distribution actually being split far too often, and also there being a dependence on the
 data length. So, instead, we empirically calculate an odds threshold above which the value of Equation~\ref{eq:cpodds} must be to
-impose a split in the data.\footnote{A different approach would be to apply different priors to each hypothesis. These are most
-probably fairly straightforward to work out (i.e. something using the number of change point positions tried), although we have just taken
+impose a split in the data.\footnote{A different approach would be to apply different priors to each hypothesis, although we have just taken
 the empirical approach.} The empirical threshold we use is worked out by finding the 99\% upper limit on the value of
 Equation~\ref{eq:cpodds} when data is purely drawn from a single Gaussian distribution (i.e. it gives a 1\% false alarm probability)
 as a function of the data length $N$. The results of doing this for 30\,000 instances of data for a range of $n$ values, and three
@@ -440,7 +438,7 @@ or the split would give a segment smaller than $n_{\text{min}}$.
 
 \subsection{Signal-to-noise ratio calculation}\label{sec:snr}
 
-Whether a signal is found or not, the code will output a signal-to-noise ratio (SNR). The calculated SNR uses the set of signal
+Whether a signal is found or not, the code will generate a signal-to-noise ratio (SNR). The calculated SNR uses the set of signal
 parameters, $\vec{\theta}_{\text{ML}}$, that give the maximum value for the likelihood, which are then used to create the best-fit
 complex signal template $y(\vec{\theta}_{\text{ML}})$. We then use calculations of the
 noise standard deviation for each data chunk after removal of a running median from the data (the splitting and running median are
@@ -455,7 +453,9 @@ by $L_{i,j}$ and $y(\vec{\theta}_{\text{ML}})_{i,j,n}$ is replace by $y(\vec{\th
 
 A plot of the residual between the recovered single-detector and joint detector SNRs and their true values versus the true signal SNRs,
 as calculated from Equation~\ref{eq:snr}, for a set of simulated signals (described in \S\ref{sec:simsignal}) are shown in Figure~\ref{fig:snrplot}.
-The standard deviation of the resisduals is found to be one, with a mean around zero, and does not appear to change as a function of SNR.
+The standard deviation of the resisduals is found to be one, with a mean around zero, and does not appear to change as a function of SNR (except at the
+lowest SNRs, where the noise in the data will generally give rise to a maximum likelihood model with a larger amplitude than the true signal, and this
+an overestimate of the SNR).
 
 \begin{figure}[!phtb]
 \begin{center}
@@ -499,7 +499,7 @@ that the prior odds ($p(M_1|I)/p(M_2|I)$) between the two models are set to be e
 
 The third odds makes use of a compound model in the denominator with all evidences for all permutations of Gaussian noise or incoherent signal being used.
 If we have the set of single detector signal and Gaussian noise models $M_i = \{\text{S}_i, \text{N}_i\}$, and the set of (potentially
-multi-frequency-band) data for each detector $\{d_1, \ldots, d_{N_{\text{dets}}}\}$, then\footnote{we use the notation
+multi-frequency-band) data for each detector $\{d_1, \ldots, d_{N_{\text{dets}}}\}$, then\footnote{We use the notation
 $\sum_{m_1, \ldots, m_{N_{\text{dets}}}\in\{M_1, \ldots, M_{N_{\text{dets}}}\}}$ as the nested summation $\sum_{m_1 \in M_1}\ldots\sum_{m_{N_{\text{dets}}}\in M_{N_{\text{dets}}}}$.}
 \begin{widetext}
 \begin{equation}\label{eq:cohvincoh2}

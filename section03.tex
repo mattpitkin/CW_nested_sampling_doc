@@ -61,8 +61,8 @@ only updated on iterations of the algorithm that are a factor of 10\% of the num
 
 The length of each MCMC run can be chosen by the user, but by default it is automatically set within the code. To do this,
 at the same rate as the cache is updated, the autocorrelation length of the parameters is calculated. A random sample from the current
-live points in chosen, and evolved via the MCMC, and the autocorrelation length of each parameter is calculated, $\vec{{\text{acl}}}$. The number
-of MCMC iterations, $n_{\text{MCMC}}$, is then chosen as $n_{\text{MCMC}} = \text{min}(\text{max}(\vec{\text{acl}}), 5000)$, where 5000 is
+live points in chosen, and evolved via the MCMC, and the autocorrelation length of each parameter, $\vec{{\text{acl}}}$, is calculated. The number
+of MCMC iterations, $n_{\text{MCMC}}$, is then chosen as $n_{\text{MCMC}} = \text{min}[\text{max}(\vec{\text{acl}}), 5000]$, where 5000 is
 a hardcoded maximum length.
 
 \subsubsection{Testing the proposals}\label{sec:proposaltesting}

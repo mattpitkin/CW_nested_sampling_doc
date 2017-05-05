@@ -1,12 +1,97 @@
 \section{Fast likelihood evaluation}\label{app:fle}
 
-In \S\ref{sec:fastlike} we stated that the likelihood can be evaluated quickly in cases where the $\Delta\phi$ values in Equations~\ref{eq:hf}, \ref{eq:h2f}
-and \ref{eq:hnongr} are zero, i.e., no phase evolution parameters are required. This can be done by pre-summing over data and combinations of the time-varying
-antenna response functions, after which only coefficients of these pre-summed terms need to be calculated. Here we will explicitly write out the derivation
-of these coefficients for the case of a signal in GR, for which the antenna pattern functions for the `+' and `$\times$' polarisation components are given by
-\citep{1998PhRvD..58f3001J}
-\begin{align}\label{eq:antenna2}
-F_+(t,\psi) &= \sin{\zeta}\left[a(t)\cos{2\psi} + b(t)\sin{2\psi}\right], \nonumber \\
-F_{\times}(t,\psi) &= \sin{\zeta}\left[b(t)\cos{2\psi} - a(t)\sin{2\psi}\right],
+In \S\ref{sec:fastlike} we stated that the likelihood can be evaluated quickly in cases where the $\Delta\phi_{\mathcal{K}}$ values in Equations~\ref{eq:hf}, \ref{eq:h2f}
+and \ref{eq:hnongr} are zero, i.e., no phase evolution parameters are required. This can be done by pre-summing over data, $B$, and combinations of the time-varying
+antenna response function, after which only coefficients of these pre-summed terms need to be calculated. Here we will explicitly write out the derivation
+of these coefficients for the case of a signal in GR, for which the antenna pattern functions for the `$+$' and `$\times$' components are given by Equation~\ref{eq:antenna}.
+
+Assuming a signal in GR, we start with a model of the form
+\begin{align}\label{eq:appmodel}
+h(t) =& C_+ F_+(\psi,t)e^{i\Phi_{lm}} + iC_{\times}F_{\times}(\psi,t)e^{i\Phi_{lm}}, \nonumber \\
+=& C_+ F_+(\psi,t)\cos{\Phi_{lm}} - C_{\times}F_{\times}(\psi,t)\sin{\Phi_{lm}} + i\left(C_+ F_+(\psi,t)\sin{\Phi_{lm}}+ C_{\times}F_{\times}(\psi,t)\cos{\Phi_{lm}} \right), \nonumber \\
+=& C_{R,+}F_+(\psi,t) + C_{R,\times}F_{\times}(\psi,t) + i\left(C_{I,+}F_+(\psi,t) + C_{I,\times}F_{\times}(\psi,t) \right),
 \end{align}
-where $\zeta$ is the angle between the interferomter arms (which we will take as $90^{\circ}$ here, and $a(t)$ and $b(t)$ are the time varying components.
+where, setting $\zeta = 90^{\circ}$ in Equation~\ref{eq:antenna}, the antenna pattern functions are
+\begin{align}\label{eq:antennanew}
+F_+(\psi,t) &=a(t)\cos{2\psi} + b(t)\sin{2\psi}, \nonumber \\
+F_{\times}(\psi,t) &= b(t)\cos{2\psi} - a(t)\sin{2\psi},
+\end{align}
+and we have set the real and imaginary model amplitude coefficients for the two polarisations to be $C_{R,+} =
+C_+\cos{\Phi_{lm}}$, $C_{R,\times} = -C_{\times}\sin{\Phi_{lm}}$, $C_{I,+} =
+C_+\sin{\Phi_{lm}}$, $C_{I,\times} = C_{\times}\cos{\Phi_{lm}}$.\footnote{For our GR signal model emitting at twice
+the rotation frequency, given by Equation~\ref{eq:h2f}, we would have $C_+ = -\frac{C_{22}}{2}\left(1+\cos{}^2{\iota}\right)$ and $C_{\times} = C_{22}\cos{\iota}$.}
+If we just take the likelihood (either the Student's $t$-likelihood of Equation~\ref{eq:stlikelihood}, or the
+Gaussian likelihood of Equation~\ref{eq:gausslikelihood})\footnote{If using the Gaussian likelihood there is a slight difference to what is 
+described here to take account of the data noise standard deviation, $\sigma$, 
+such that we require the substitutions $B_i \rightarrow B_i/\sigma_i$, $a(t_i) \rightarrow a(t_i)/\sigma_i$ and $b(t_i) \rightarrow b(t_i)/\sigma_i$.} for a single detector,
+data stream, and data chunk (see \S\ref{sec:likelihood}) then we see that it contains the summation over time
+\begin{equation}
+L = \sum_{i=1}^N \left|B(t_i) - h(t_i)\right|^2 = \sum_{i=1}^N \left[ \left(\Re{[B(t_i)]} - \Re{[h(t_i)]}\right)^2 + \left(\Im{[B(t_i)]} - \Im{[h(t_i)]}\right)^2 \right].
+\end{equation}
+We can expand this out to give
+\begin{equation}\label{eq:likepart}
+L = \sum B_R^2 + \sum B_I^2 + \sum h_R^2 + \sum h_I^2 - 2\sum\left(B_R h_R + B_I h_I \right),
+\end{equation}
+where for convenience we have removed the summation subscripts and explicit time dependence, and used $R$ and $I$ subscripts to represent the real and imaginary components respectively. We are now interested in the summations contain parts of the model function $h$. If we take the summation over the square of the real part of the model we get
+\begin{align}\label{eq:exlikepart}
+\sum h_R^2 =& \sum \left(C_{R,+} F_+ + C_{R,\times} F_{\times} \right)^2, \nonumber \\
+ = & \sum \left(C_{R,+}^2 F_+^2 + C_{R,\times}^2 F_{\times}^2 + 2C_{R,+}C_{R,\times}\right), \nonumber \\
+ = & C_{R,+}^2 \left(a^2 \cos{}^2{2\psi} + b^2 \sin{}^2{2\psi} + 2ab\sin{2\psi}\cos{2\psi}\right) + \nonumber \\
+ & C_{R,\times}^2 \left(b^2 \cos{}^2{2\psi} + a^2\sin{}^2{2\psi} - 2ab\sin{2\psi}\cos{2\psi} \right) + \nonumber \\
+ & 2C_{R,+}C_{R,\times}\left( (b^2 - a^2)\sin{2\psi}\cos{2\psi} + ab(\cos{}^2{2\psi} - \sin{}^2{2\psi}) \right),
+\end{align}
+where the summation is now implicit in the $a$ and $b$ terms, i.e., $a^2 = \sum a(t)^2$, $b^2 = \sum b(t)^2$, and $ab = \sum a(t)b(t)$, which are the only time varying components
+and can be pre-computed. If we now say
+\begin{equation}
+\sum h_R^2 = K_{a^2}^Ra^2 + K_{b^2}^Rb^2 + K_{2ab}^R2ab,
+\end{equation}
+where the $K^R$s are the coefficients of $a^2$, $b^2$ and $2ab$, we find them to be
+\begin{align}
+K_{a^2}^R & = C_{R,+}^2 \cos{}^2{2\psi} + C_{R,\times}^2\sin{}^2{2\psi} - 2C_{R,+}C_{R,\times}\sin{2\psi}\cos{2\psi}, \nonumber \\
+K_{b^2}^R & = C_{R,+}^2 \sin{}^2{2\psi} + C_{R,\times}^2\cos{}^2{2\psi} + 2C_{R,+}C_{R,\times}\sin{2\psi}\cos{2\psi}, \nonumber \\
+K_{2ab}^R & = C_{R,+}C_{R,\times}\left(\cos{}^2{2\psi} - \sin{}^2{2\psi} \right) + \sin{2\psi}\cos{2\psi}\left(C_{R,+}^2 - C_{R,\times}^2\right).
+\end{align}
+Factorising these out we find that
+\begin{align}\label{eq:realcoeffs}
+K_{a}^R &= C_{R,+}\cos{2\psi} - C_{R,\times}\sin{2\psi}, \nonumber \\
+K_{b}^R &= C_{R,+}\sin{2\psi} + C_{R,\times}\cos{2\psi},
+\end{align}
+where $K_{a^2}^R = \left(K_{a}^R\right)^2$, $K_{b^2}^R = \left(K_{b}^R\right)^2$, and $K_{2ab}^R = K_{a}^RK_{b}^R$.
+It is easy to see from above that things will be identical for the imaginary components and the equations hold just
+by swapping $R$ for $I$.
+It is worth noting that the coefficients given in Equation~\ref{eq:realcoeffs} take a slightly different form than
+the antenna pattern functions given in Equation~\ref{eq:antennanew}, and this difference is present in the model
+in the \lppen code, but should not be unexpected.
+
+We can also see that the coefficients given in Equation~\ref{eq:realcoeffs} are those required in the components of
+Equation~\ref{eq:exlikepart} that sum over the product of the data and model. For the real part we have
+\begin{align}
+\sum B_Rh_R &= \sum B_R\left(C_{R,+}F_+ + C_{R,\times}F_{\times} \right), \nonumber \\
+ &=\sum B_R\left( C_{R,+}\left(a\cos{2\psi}+b\sin{2\psi}\right) + C_{R,\times}\left(b\cos{2\psi} - a\sin{2\psi} \right) \right), \nonumber \\
+ &= d^a_R\left(C_{R,+}\cos{2\psi} - C_{R,\times}\sin{2\psi}\right) + d^b_R\left(C_{R,+}\sin{2\psi} + C_{R,\times}\cos{2\psi} \right),
+\end{align}
+where we have set $d^a_R = \sum B_R a$ and $d^b_R = \sum B_R b$. We have therefore see that the coefficients
+of $d^a_R$ and $d^b_R$ and indeed $K_a^R$ and $K_b^R$ respectively, i.e.,
+\begin{equation}
+\sum d_Rh_R = d^a_RK_a^R + d^b_RK_b^R.
+\end{equation}
+Again, this holds for the imaginary parts by just swapping $R$ for $I$.
+
+The same process can be applied for likelihood evaluations for the non-GR polarisation modes. For the `x' and `y'
+modes the antenna patterns can be defined as \citep[Equations~32 and 33 of][]{2015PhRvD..91h2002I}
+\begin{align}
+F_{\text{x}}(\psi,t) &= A_{\text{x}}(t)\cos{\psi} + A_{\text{y}}\sin{\psi}, \nonumber \\
+F_{\text{y}}(\psi,t) &= A_{\text{y}}(t)\cos{\psi} - A_{\text{x}}\sin{\psi}.
+\end{align}
+In this case we find, in an identical fashion to above, that the required coefficients of $A_{\text{x}}$ and $A_{\text{y}}$ are
+\begin{align}\label{eq:realcoeffsxy}
+K_{A_{\text{x}}}^{R/I} &= C_{R/I,\text{x}}\cos{\psi} - C_{R/I,\text{y}}\sin{\psi}, \nonumber \\
+K_{A_{\text{y}}}^{R/I} &= C_{R/I,\text{y}}\cos{\psi} + C_{R/I,\text{x}}\sin{\psi},
+\end{align}
+where $C_{R/I,\text{x}/\text{y}}$ are the real/imaginary signal amplitude components for the two modes.
+Finally, for the breathing and longitudinal modes, where the antenna patterns are defined as \citep[Equations~34 and 35 of][]{2015PhRvD..91h2002I}
+\begin{align}
+F_{b}(t) &= A_{b}(t), \nonumber \\
+F_{l}(t) &= A_{l}(t),
+\end{align}
+and there is not $\psi$ dependence, the coefficients of $A_{b}$ and $A_l$ are just the real/imaginary signal amplitude coefficients $C_{R/I,b/l}$ for the modes.

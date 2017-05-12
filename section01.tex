@@ -5,11 +5,13 @@ stage that pre-processes the calibrated \gw detector data by removing a signal's
 evolution (based on the observed solution from electromagnetic observations), whilst also low-pass filtering and
 down-sampling (via averaging) the heterodyned data \citep{2005PhRvD..72j2002D}; and, a parameter estimation stage that takes the
 processed data and uses it to estimate posterior probability distributions of the unknown signal parameters
-\citep[e.g.\ using a Markov chain Monte Carlo (MCMC)][]{2010ApJ...713..671A}. This method has been variously
+\citep[e.g., using a Markov chain Monte Carlo (MCMC)][]{2010ApJ...713..671A}. This method has been variously
 called the {\it Time Domain Method}, the {\it Heterodyne Method}, the {\it Bayesian Method}, the {\it Glasgow
 Method}, or some combination of these names. Up to now this method has only been used to set upper limits
 on signal amplitudes, but has included no explicit criteria for deciding on signal detection/significance. A further
-limitation has been that the MCMC method used was not designed to be efficient and required a lot of tuning. It also
+limitation has been that the MCMC method used was inefficient\footnote{MCMC methods are not intrinsically inefficient for
+searches such as our, but the particulat implementation we had used was not specically designed to be efficient at sampling the
+posterior spaces.} and required a lot of tuning. It also
 did not straightforwardly have the ability to perform a search on the data over small ranges in the phase
 evolution parameters (e.g.\ required if the
 \gw signal does not well match the known pulsar's phase evolution). For these reasons the parameter
@@ -22,6 +24,9 @@ This code, called \lppenf (or \lppen for short through the rest of this document
 algorithm provided within the \lalinf software library \citep{2015PhRvD..91d2003V}. As such this document will not
 give a detailed description of how that algorithm works, but will provide some information on the specific proposals
 distributions that can be used within the algorithm. This method has previously been briefly described in \citet{2012JPhCS.363a2041P}.
+A previous code, called \lppef (or \lppe for short), used in, e.g., \citet{2010ApJ...713..671A}, could perform posterior evaluation
+using two methods: an MCMC method, or, by gridding up the parameter space and explicitly evaluating the posterior at each
+grid point. In \S\ref{sec:codeeval} we show comparisons of the various methods mainly to check \lppen for consistency.
 
 The code can also be used to perform parameter estimation and model selection for signals for any generic
 metric theory of gravity, however its use for this will be discussed in detail in a separate paper \citep{MaxCWpolariations}. When
@@ -37,16 +42,16 @@ evidence, $\mathcal{Z}$, for a given model, $M$, defined by a set of parameters,
 \mathcal{Z}_M = p(d|M,I) = \int^{\vec{\theta}} p(d|\vec{\theta},M,I)p(\vec{\theta}|M,I) {\rm d}\vec{\theta},
 \end{equation}
 where $p(d|\vec{\theta},M,I)$ is the likelihood function for the data $d$ given the
-model and its set of defining parameters and $p(\vec{\theta}|M,I)$ is the prior probability distribution on
-$\vec{\theta}$. During nested sampling this integral is evaluated by transforming it into the one dimensional
+model and its set of defining parameters, $p(\vec{\theta}|M,I)$ is the prior probability distribution on
+$\vec{\theta}$, and $I$ represents any additional prior assumptions. During nested sampling this integral is evaluated by transforming it into the one dimensional
 sum
 \begin{equation}\label{eq:nestedsampev}
-\mathcal{Z}_M = \sum_i^N L_i w_i,
+\mathcal{Z}_M = \sum_i^N p(d|\vec{\theta}_i,M,I) w_i,
 \end{equation}
-where $L_i$ is the likelihood and $w_i = p(\vec{\theta}|M,I) \Delta\vec{\theta}$ is the ``prior weight''
+where $w_i = p(\vec{\theta}_i|M,I) \Delta\vec{\theta}_i$ is the ``prior weight''
 (i.e.\ the fraction of the prior occupied by point $i$).
 
-By default the signal model evidence is compared to the evidence that the data consists of Gaussian noise to form the odds for the two models
+By default the signal model evidence is compared to the evidence that the data consists of only Gaussian noise to form the odds for the two models
 \begin{align}\label{eq:oddsratio}
 \mathcal{O} &= \frac{p(d|M,I)}{p(d|\text{noise},I)}\frac{p(M|I)}{p(\text{noise}|I)} \nonumber \\
 &= \frac{\mathcal{Z}_M}{\mathcal{Z}_{\text{noise}}},
@@ -57,8 +62,8 @@ $p(M|I)/p(\text{noise}|I) = 1$.
 Other than this evidence value and odds ratio the code also returns the samples accumulated during
 the nested sampling process. These samples are not drawn from the posterior probability distribution as in
 an MCMC method, but they can be resampled to generate a subset of samples that are drawn from the posterior
-distribution. This resampling (performed using the {\tt lalapps\_nest2pos} {\tt python} script within
-{\tt lalapps}\footnote{\url{https://wiki.ligo.org/DASWG/LALSuite}}) uses the
+distribution. This resampling \citep[performed using the {\tt lalapps\_nest2pos} {\tt python} script within
+{\tt lalapps}][]{lalsuite} uses the
 value of $L_i w_i$ for each point, normalised by $(L_iw_i)_{\rm max}$, to give values proportional to the
 posterior probability, and then accepts a point with a probability given by its value, i.e.\ a point is
 accepted with the probability

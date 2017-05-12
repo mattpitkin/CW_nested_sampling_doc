@@ -3,7 +3,7 @@
 Here we will describe the core parts of the code defining the signal model and the probability functions used
 for the inference. These assume that the data comprises a number of calibrated narrow-band complex-heteroyned time
 series'. These time series data streams can be from different detectors, and/or at different heterodyne
-frequencies. For example you could have a pair times series from both the LIGO Hanford (H1) and LIGO
+frequencies. For example you could have a pair of times series from both the LIGO Hanford (H1) and LIGO
 Livingston (L1) detectors, with one produced with a heterodyne at twice the rotation frequency of a known
 pulsar and the other produced with a heterodyne at the rotation frequency.
 
@@ -498,17 +498,13 @@ line-robust statistic defined in][]{2014PhRvD..89f4023K}. In both these cases it
 that the prior odds ($p(M_1|I)/p(M_2|I)$) between the two models are set to be equal and therefore are not explicitly given.
 
 The third odds makes use of a compound model in the denominator with all evidences for all permutations of Gaussian noise or incoherent signal being used.
-If we have the set of single detector signal and Gaussian noise models $M_i = \{\text{S}_i, \text{N}_i\}$, and the set of (potentially
-multi-frequency-band) data for each detector $\{d_1, \ldots, d_{N_{\text{dets}}}\}$, then\footnote{We use the notation
-$\sum_{m_1, \ldots, m_{N_{\text{dets}}}\in\{M_1, \ldots, M_{N_{\text{dets}}}\}}$ as the nested summation $\sum_{m_1 \in M_1}\ldots\sum_{m_{N_{\text{dets}}}\in M_{N_{\text{dets}}}}$.}
-\begin{widetext}
+If we have the set of single detector signal and Gaussian noise models $M_j = \{\text{S}_j, \text{N}_j\}$, then \citep[see, e.g., Equation~50 of][]{MaxCWpolariations}
 \begin{equation}\label{eq:cohvincoh2}
- \mathcal{O}_{\text{S}/\text{I}} = \frac{\mathcal{Z}_{\text{S}}p(\text{S}|I)}{\sum_{m_1, \ldots, m_{N_{\text{dets}}}\in\{M_1, \ldots, M_{N_{\text{dets}}} \} } 
-p(m_1,\ldots,m_{N_{\text{dets}}}|I)\prod_{j=1}^{N_{\text{dets}}} \mathcal{Z}_{m_j}},
+ \mathcal{O}_{\text{S}/\text{I}} = \frac{\mathcal{Z}_{\text{S}}p(\text{S}|I)}{\prod_{j=1}^{N_{\text{dets}}}\left[ Z_{\text{S}_j}p(\text{S}_j|I) + Z_{\text{N}_j}p(\text{N}_j|I) \right]},
 \end{equation}
-\end{widetext}
-where $p(\text{S}|I)$ is the prior on the coherent signal model and $p(m_1,\ldots,m_{N_{\text{dets}}}|I)$ are the priors for each sub-hypothesis in the
-compound incoherent-{\it or}-noise model. As there are two possible models for data in each detector, signal or noise, the number of sub-hypotheses
+where $p(\text{S}|I)$ is the prior on the coherent signal model, and $p(\text{S/N}_j|I)$ are the priors for the signal/noise hypotheses for each individual detector.
+As there are two possible models for data in each detector, signal or noise, the number of logical {\it or} combined sub-hypotheses \citep[see, e.g., the four sub-hypotheses
+used in Equation~A6 of][where the priors in the denominator are the combinations that would be given from expanding out equation~\ref{eq:cohvincoh2}]{2017arXiv170107709T}
 in the compound model is just given by $2^{N_{\text{dets}}}$. In \citet{2017arXiv170107709T}, and later in this 
 document, we have assigned the equal probabilities to the coherent signal prior
 and to each of the sub-hypothesis priors in the denominator, so that they cancel out. However, other priors could be used.

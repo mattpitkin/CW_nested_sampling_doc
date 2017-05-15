@@ -13,6 +13,7 @@ import numpy as np
 import tarfile
 import subprocess as sp
 import itertools
+import argparse
 
 from scipy.stats import kstest
 
@@ -31,6 +32,21 @@ mplparams = { \
       'font.size': 15 }
 
 mpl.rcParams.update(mplparams)
+
+plotall = True # make all plots
+
+parser = argparse.ArgumentParser( )
+parser.add_argument("--plot-pp", dest="pp", action="store_true", default=False, help="Plot the P-P plots")
+parser.add_argument("--snr", dest="snr", action="store_true", default=False, help="Plot the SNR plots")
+parser.add_argument("--odds", dest="odds", action="store_true", default=False, help="Plot the odds ratio plots")
+parser.add_argument("--snr-odds", dest="snrodds", action="store_true", default=False, help="Plot the SNR vs odds ratio plots")
+parser.add_argument("--snr-odds2", dest="snrodds2", action="store_true", default=False, help="Plot the larger SNR vs odds plots")
+
+# parse input options
+opts = parser.parse_args()
+
+if opts.pp or opts.snr or opts.odds or opts.snrodds or opts.snrodds2:
+  plotall = False
 
 # tarball containing (coherent) data
 tarball = 'pp_standard.tar.gz' # analysis with values uniform in SNR (uniform in cos(iota), but not h0)
@@ -146,187 +162,195 @@ for k, tf in enumerate([htar, htar1]):
 htar.close() # close tarball
 htar1.close()
 
-fig, axs = pl.subplots(2,2, figsize=(9,9))
+if plotall or opts.pp:
+  fig, axs = pl.subplots(2,2, figsize=(9,9))
 
-nlightning = 100
+  nlightning = 100
 
-# loop over parameters and produce p-p plots
-for i, ax in enumerate(axs.flatten()):
-  parcreds = np.array([inj[pars[i]] for inj in injcreds])/100.
-  parcreds.sort() # sort into order
+  # loop over parameters and produce p-p plots
+  for i, ax in enumerate(axs.flatten()):
+    parcreds = np.array([inj[pars[i]] for inj in injcreds])/100.
+    parcreds.sort() # sort into order
 
-  # add "lightning"
-  for j in range(nlightning):
-    #x = np.random.randint(1, 101, len(parcreds))
-    x = np.random.rand(len(parcreds))
-    x.sort()
-    nb, binedges = np.histogram(x, bins=len(x), normed=True)
-    cn = np.cumsum(nb)/len(x)
-    ax.step(binedges[:-1], cn, color='g', alpha=0.02)
+    # add "lightning"
+    for j in range(nlightning):
+      #x = np.random.randint(1, 101, len(parcreds))
+      x = np.random.rand(len(parcreds))
+      x.sort()
+      nb, binedges = np.histogram(x, bins=len(x), normed=True)
+      cn = np.cumsum(nb)/len(x)
+      ax.step(binedges[:-1], cn, color='g', alpha=0.02)
 
-  # perform K-S test (conparing to uniform distribution)
-  D, pv = kstest(parcreds, lambda y: y)
+    # perform K-S test (conparing to uniform distribution)
+    D, pv = kstest(parcreds, lambda y: y)
 
-  # create p-p plot histogram
-  nb, binedges = np.histogram(parcreds, bins=len(parcreds), normed=True)
-  cn = np.cumsum(nb)/len(parcreds)
-  ax.step(binedges[:-1], cn, color='k', label='KS $p$-value: %.2f' % pv)
-  ax.plot([0., 1.], [0., 1.], color='darkred', ls='--', lw=0.5)
-  ax.set_xlim([0., 1.])
-  ax.set_ylim([0., 1.])
-  ax.text(0.85, 0.1, labels[i])
+    # create p-p plot histogram
+    nb, binedges = np.histogram(parcreds, bins=len(parcreds), normed=True)
+    cn = np.cumsum(nb)/len(parcreds)
+    ax.step(binedges[:-1], cn, color='k', label='KS $p$-value: %.2f' % pv)
+    ax.plot([0., 1.], [0., 1.], color='darkred', ls='--', lw=0.5)
+    ax.set_xlim([0., 1.])
+    ax.set_ylim([0., 1.])
+    ax.text(0.85, 0.1, labels[i])
+    
+    if i > 1:
+      ax.set_xlabel('Credible interval')
+    else:
+      ax.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
+    if not i%2:
+      ax.set_ylabel('Fraction of true values within CI')
+    else:
+      ax.tick_params(axis='y', which='both', left='off', right='off', labelleft='off')
+
+    ax.legend()
+    
+  fig.tight_layout()
+
+  # output P-P plots
+  ppdir = os.path.join(os.getcwd(), 'pp_standard')
+  if not os.path.isdir(ppdir):
+    os.makedirs(ppdir)
+  fig.savefig(os.path.join(ppdir, 'pp_plots_standard.png'), dpi=300)
+  fig.savefig(os.path.join(ppdir, 'pp_plots_standard.pdf'))
+
+  p = sp.Popen('pdftops -eps %s' % os.path.join(ppdir, 'pp_plots_standard.pdf'), shell=True)
+  p.communicate()
+
+  caption = r"""\label{fig:pp_standard}
+  The cumulative fraction of true parameter values (from simulated signals) found within
+  a particular credible interval.
+  """
+
+  fp = open(os.path.join(ppdir, 'caption.tex'), 'w')
+  fp.write(caption)
+  fp.close()
+
+  # produce larger p-p plots
+  pl.clf()
+
+  fig, axs = pl.subplots(3,2, figsize=(8,12))
+
+  # loop over parameters and produce p-p plots
+  for i, ax in enumerate(axs.flatten()):
+    parcreds = np.array([inj[hpars[i]] for inj in hinjcreds])/100.
+    parcreds.sort() # sort into order
+
+    # add "lightning"
+    for j in range(nlightning):
+      #x = np.random.randint(1, 101, len(parcreds))
+      x = np.random.rand(len(parcreds))
+      x.sort()
+      nb, binedges = np.histogram(x, bins=len(x), normed=True)
+      cn = np.cumsum(nb)/len(x)
+      ax.step(binedges[:-1], cn, color='g', alpha=0.02)
+
+    # perform K-S test (comparing to uniform distribution)
+    D, pv = kstest(parcreds, lambda y: y)
+
+    # create p-p plot histogram
+    nb, binedges = np.histogram(parcreds, bins=len(parcreds), normed=True)
+    cn = np.cumsum(nb)/len(parcreds)
+    ax.step(binedges[:-1], cn, color='k', label='KS $p$-value: %.2f' % pv)
+    ax.plot([0., 1.], [0., 1.], color='darkred', ls='--', lw=0.5)
+    ax.set_xlim([0., 1.])
+    ax.set_ylim([0., 1.])
+    ax.text(0.85, 0.1, hlabels[i])
+
+    if i > 3:
+      ax.set_xlabel('Credible interval')
+    else:
+      ax.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
+    if not i%2:
+      ax.set_ylabel('Fraction of true values within CI')
+    else:
+      ax.tick_params(axis='y', which='both', left='off', right='off', labelleft='off')
+
+    ax.legend(loc='upper left')
+
+  fig.tight_layout()
+
+  # output P-P plots
+  ppdir = os.path.join(os.getcwd(), 'pp_extra')
+  if not os.path.isdir(ppdir):
+    os.makedirs(ppdir)
+  fig.savefig(os.path.join(ppdir, 'pp_plots_extra.png'), dpi=300)
+  fig.savefig(os.path.join(ppdir, 'pp_plots_extra.pdf'))
+
+  p = sp.Popen('pdftops -eps %s' % os.path.join(ppdir, 'pp_plots_extra.pdf'), shell=True)
+  p.communicate()
+
+  caption = r"""\label{fig:pp_extra}
+    The cumulative fraction of true parameter values (from simulated signals) found within
+  a particular credible interval.
+  """
+
+  fp = open(os.path.join(ppdir, 'caption.tex'), 'w')
+  fp.write(caption)
+  fp.close()
+  pl.clf()
   
-  if i > 1:
-    ax.set_xlabel('Credible interval')
-  else:
-    ax.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
-  if not i%2:
-    ax.set_ylabel('Fraction of true values within CI')
-  else:
-    ax.tick_params(axis='y', which='both', left='off', right='off', labelleft='off')
-
-  ax.legend()
-  
-fig.tight_layout()
-
-# output P-P plots
-ppdir = os.path.join(os.getcwd(), 'pp_standard')
-if not os.path.isdir(ppdir):
-  os.makedirs(ppdir)
-fig.savefig(os.path.join(ppdir, 'pp_plots_standard.png'), dpi=300)
-fig.savefig(os.path.join(ppdir, 'pp_plots_standard.pdf'))
-
-p = sp.Popen('pdftops -eps %s' % os.path.join(ppdir, 'pp_plots_standard.pdf'), shell=True)
-p.communicate()
-
-caption = r"""\label{fig:pp_standard}
-The cumulative fraction of true parameter values (from simulated signals) found within
-a particular credible interval.
-"""
-
-fp = open(os.path.join(ppdir, 'caption.tex'), 'w')
-fp.write(caption)
-fp.close()
-
-# produce larger p-p plots
-pl.clf()
-
-fig, axs = pl.subplots(3,2, figsize=(8,12))
-
-# loop over parameters and produce p-p plots
-for i, ax in enumerate(axs.flatten()):
-  parcreds = np.array([inj[hpars[i]] for inj in hinjcreds])/100.
-  parcreds.sort() # sort into order
-
-  # add "lightning"
-  for j in range(nlightning):
-    #x = np.random.randint(1, 101, len(parcreds))
-    x = np.random.rand(len(parcreds))
-    x.sort()
-    nb, binedges = np.histogram(x, bins=len(x), normed=True)
-    cn = np.cumsum(nb)/len(x)
-    ax.step(binedges[:-1], cn, color='g', alpha=0.02)
-
-  # perform K-S test (comparing to uniform distribution)
-  D, pv = kstest(parcreds, lambda y: y)
-
-  # create p-p plot histogram
-  nb, binedges = np.histogram(parcreds, bins=len(parcreds), normed=True)
-  cn = np.cumsum(nb)/len(parcreds)
-  ax.step(binedges[:-1], cn, color='k', label='KS $p$-value: %.2f' % pv)
-  ax.plot([0., 1.], [0., 1.], color='darkred', ls='--', lw=0.5)
-  ax.set_xlim([0., 1.])
-  ax.set_ylim([0., 1.])
-  ax.text(0.85, 0.1, hlabels[i])
-
-  if i > 3:
-    ax.set_xlabel('Credible interval')
-  else:
-    ax.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
-  if not i%2:
-    ax.set_ylabel('Fraction of true values within CI')
-  else:
-    ax.tick_params(axis='y', which='both', left='off', right='off', labelleft='off')
-
-  ax.legend(loc='upper left')
-
-fig.tight_layout()
-
-# output P-P plots
-ppdir = os.path.join(os.getcwd(), 'pp_extra')
-if not os.path.isdir(ppdir):
-  os.makedirs(ppdir)
-fig.savefig(os.path.join(ppdir, 'pp_plots_extra.png'), dpi=300)
-fig.savefig(os.path.join(ppdir, 'pp_plots_extra.pdf'))
-
-p = sp.Popen('pdftops -eps %s' % os.path.join(ppdir, 'pp_plots_extra.pdf'), shell=True)
-p.communicate()
-
-caption = r"""\label{fig:pp_extra}
-The cumulative fraction of true parameter values (from simulated signals) found within
-a particular credible interval.
-"""
-
-fp = open(os.path.join(ppdir, 'caption.tex'), 'w')
-fp.write(caption)
-fp.close()
+  if opts.pp:
+    sys.exit(0)
 
 
 #################################################
 # Create a plot of injected SNR versus recovered SNR for each detector
-pl.clf()
-fig = pl.figure(figsize=(8,5))
-gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1], wspace=0.0)
-ax1 = pl.subplot(gs[0])
-ax2 = pl.subplot(gs[1])
-msizes = [4, 4, 2]
-labels = [detectors[0], detectors[1], 'Coherent']
-for i, det in enumerate(detectors):
-  res = np.array([isv[det] for isv in injsnrs])-np.array([rsv[det] for rsv in recsnrs])
-  sigmas = np.std(res)
-  ax1.plot([isv[det] for isv in injsnrs], res, color=dcolors[i], ls='none', marker='o', ms=msizes[i], alpha=0.2, label=labels[i])
-  ax2.hist(res, bins=20, histtype='step', orientation='horizontal', edgecolor=dcolors[i], label=r'$\sigma = %.1f$' % sigmas, normed=True)
-  ax2.hist(res, bins=20, histtype='stepfilled', orientation='horizontal', facecolor=dcolors[i], alpha=0.1, edgecolor='none', normed=True)
+if plotall or opts.snr:
+  fig = pl.figure(figsize=(8,5))
+  gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1], wspace=0.0)
+  ax1 = pl.subplot(gs[0])
+  ax2 = pl.subplot(gs[1])
+  msizes = [4, 4, 2]
+  labels = [detectors[0], detectors[1], 'Coherent']
+  for i, det in enumerate(detectors):
+    res = np.array([isv[det] for isv in injsnrs])-np.array([rsv[det] for rsv in recsnrs])
+    sigmas = np.std(res)
+    ax1.plot([isv[det] for isv in injsnrs], res, color=dcolors[i], ls='none', marker='o', ms=msizes[i], alpha=0.2, label=labels[i])
+    ax2.hist(res, bins=20, histtype='step', orientation='horizontal', edgecolor=dcolors[i], label=r'$\sigma = %.1f$' % sigmas, normed=True)
+    ax2.hist(res, bins=20, histtype='stepfilled', orientation='horizontal', facecolor=dcolors[i], alpha=0.1, edgecolor='none', normed=True)
 
-# make sure axes start at zero
-xlims = ax.get_xlim()
-ylims = ax.get_ylim()
-ax1.set_xlim([0., 30.])
-ax1.set_ylim([-5., 5.])
-ax2.set_ylim([-5., 5.])
+  # make sure axes start at zero
+  xlims = ax.get_xlim()
+  ylims = ax.get_ylim()
+  ax1.set_xlim([0., 30.])
+  ax1.set_ylim([-5., 5.])
+  ax2.set_ylim([-5., 5.])
 
-ax1.set_xlabel(r'$\rho_{\rm inj}$')
-ax1.set_ylabel(r'$\rho_{\rm inj} - \rho_{\rm rec}$')
+  ax1.set_xlabel(r'$\rho_{\rm inj}$')
+  ax1.set_ylabel(r'$\rho_{\rm inj} - \rho_{\rm rec}$')
 
-ax1.legend(loc='upper left')
+  ax1.legend(loc='upper left')
 
-ax2.xaxis.set_visible(False)
-ax2.legend(loc='upper right')
-ax2.set_yticklabels([])
-ax2.get_yaxis().set_tick_params(which='both', direction='out')
+  ax2.xaxis.set_visible(False)
+  ax2.legend(loc='upper right')
+  ax2.set_yticklabels([])
+  ax2.get_yaxis().set_tick_params(which='both', direction='out')
 
-fig.tight_layout()
+  fig.tight_layout()
 
-# output snr plots
-ppdir = os.path.join(os.getcwd(), 'snrs')
-if not os.path.isdir(ppdir):
-  os.makedirs(ppdir)
-fig.savefig(os.path.join(ppdir, 'snr_plot.png'), dpi=300)
-fig.savefig(os.path.join(ppdir, 'snr_plot.pdf'))
+  # output snr plots
+  ppdir = os.path.join(os.getcwd(), 'snrs')
+  if not os.path.isdir(ppdir):
+    os.makedirs(ppdir)
+  fig.savefig(os.path.join(ppdir, 'snr_plot.png'), dpi=300)
+  fig.savefig(os.path.join(ppdir, 'snr_plot.pdf'))
 
-p = sp.Popen('pdftops -eps %s' % os.path.join(ppdir, 'snr_plot.pdf'), shell=True)
-p.communicate()
+  p = sp.Popen('pdftops -eps %s' % os.path.join(ppdir, 'snr_plot.pdf'), shell=True)
+  p.communicate()
 
-caption = r"""\label{fig:snrplot}
-The injected signal signal-to-noise ratios plotted against the recovered signal-to-noise ratios (Equation~\ref{eq:snr}),
-where the recovered values where calculated from the maximum likelihood signal template.
-"""
+  caption = r"""\label{fig:snrplot}
+  The injected signal signal-to-noise ratios plotted against the recovered signal-to-noise ratios (Equation~\ref{eq:snr}),
+  where the recovered values where calculated from the maximum likelihood signal template.
+  """
 
-fp = open(os.path.join(ppdir, 'caption.tex'), 'w')
-fp.write(caption)
-fp.close()
+  fp = open(os.path.join(ppdir, 'caption.tex'), 'w')
+  fp.write(caption)
+  fp.close()
 
-pl.clf()
+  pl.clf()
+  
+  if opts.snr:
+    sys.exit(0)
 
 
 #################################################
@@ -395,12 +419,6 @@ for se, ne in zip(hsigev, hnoiseev):
   lbcins.append(se[detectors[-1]] - incoherentcombs)
   lbcis.append(se[detectors[-1]] - idd)
 
-pl.clf()
-
-fig = pl.figure(figsize=(10,8))
-
-fig, axs = pl.subplots(2, 1, figsize=(10,8))
-
 # on left plot just plot coherent results and incoherent ones with log(O_S/I) greater than range of plot. 
 cohO = np.array(cohO)/np.log(10.)
 bcins = np.array(bcins)/np.log(10.)
@@ -414,241 +432,258 @@ lbcins = np.array(lbcins)/np.log(10.)
 lbcis = np.array(lbcis)/np.log(10.)
 
 cohsnrs = np.array([isv[detectors[-1]] for isv in injsnrs])
-hb = axs[0].scatter(cohO, bcins, c=cohsnrs, s=cohsnrs, alpha=0.5)
-#hb = axs[0].hexbin(cohO, bcins, gridsize=75, C=[isv[detectors[-1]] for isv in injsnrs], alpha=0.9)
 
-# set color bar
-axcb = fig.add_axes([0.82, 0.52, 0.01, 0.3]) 
-cb = pl.colorbar(hb, cax=axcb)
-cb.set_label(r'$\rho_{\rm coh}$')
-cb.ax.yaxis.set_label_position('left')
+if plotall or opts.odds:
+  fig, axs = pl.subplots(2, 1, figsize=(10,8))
 
-xlims = axs[0].get_xlim()
-ylims = axs[0].get_ylim()
+  hb = axs[0].scatter(cohO, bcins, c=cohsnrs, s=cohsnrs, alpha=0.5)
+  #hb = axs[0].hexbin(cohO, bcins, gridsize=75, C=[isv[detectors[-1]] for isv in injsnrs], alpha=0.9)
 
-axs[0].plot(icohO, ibcins, 'ko', ms=5, alpha=0.15)
-axs[0].set_ylim(ylims)
+  # set color bar
+  axcb = fig.add_axes([0.82, 0.52, 0.01, 0.3]) 
+  cb = pl.colorbar(hb, cax=axcb)
+  cb.set_label(r'$\rho_{\rm coh}$')
+  cb.ax.yaxis.set_label_position('left')
 
-axty = axs[0].twiny()
-axtx = axs[0].twinx()
+  xlims = axs[0].get_xlim()
+  ylims = axs[0].get_ylim()
 
-axs[0].tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
-axs[0].tick_params(axis='y', which='both', left='off', right='off', labelleft='off')
-axs[0].xaxis.grid(False)
-axs[0].yaxis.grid(False)
+  axs[0].plot(icohO, ibcins, 'ko', ms=5, alpha=0.15)
+  axs[0].set_ylim(ylims)
 
-axtx.set_ylim(10**np.array(ylims))
-axtx.set_yscale('log', nonposx='clip')
+  axty = axs[0].twiny()
+  axtx = axs[0].twinx()
 
-axty.xaxis.set_ticks_position('bottom')
-axty.tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off')
-axtx.yaxis.set_ticks_position('left')
+  axs[0].tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
+  axs[0].tick_params(axis='y', which='both', left='off', right='off', labelleft='off')
+  axs[0].xaxis.grid(False)
+  axs[0].yaxis.grid(False)
 
-axtx.set_ylabel(r'$\mathcal{O}_{{\rm S}/{\rm I}}$')
-axty.xaxis.set_label_position('bottom')
-axtx.yaxis.set_label_position('left')
+  axtx.set_ylim(10**np.array(ylims))
+  axtx.set_yscale('log', nonposx='clip')
 
-# on right plot show both coherent and incoherent over full ranges
-axs[1].scatter(cohO, bcins, c=cohsnrs, s=cohsnrs, alpha=0.5)
+  axty.xaxis.set_ticks_position('bottom')
+  axty.tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off')
+  axtx.yaxis.set_ticks_position('left')
 
-# overplot incoherent signal values
-axs[1].plot(icohO, ibcins, 'ko', ms=5, alpha=0.15, label='Incoherent')
+  axtx.set_ylabel(r'$\mathcal{O}_{{\rm S}/{\rm I}}$')
+  axty.xaxis.set_label_position('bottom')
+  axtx.yaxis.set_label_position('left')
 
-axs[1].set_xlabel(r'$\mathcal{O}_{{\rm S}/{\rm N}}$')
-axs[1].set_ylabel(r'$\mathcal{O}_{{\rm S}/{\rm I}}$')
+  # on right plot show both coherent and incoherent over full ranges
+  axs[1].scatter(cohO, bcins, c=cohsnrs, s=cohsnrs, alpha=0.5)
 
-axs[1].legend(loc='best')
+  # overplot incoherent signal values
+  axs[1].plot(icohO, ibcins, 'ko', ms=5, alpha=0.15, label='Incoherent')
 
-# re-set top plot x-axis to match bottom plot
-xlims = axs[1].get_xlim()
-axty.set_xlim(xlims)
+  axs[1].set_xlabel(r'$\mathcal{O}_{{\rm S}/{\rm N}}$')
+  axs[1].set_ylabel(r'$\mathcal{O}_{{\rm S}/{\rm I}}$')
 
-fig.canvas.draw()
-# change y labels to be of the form 10^{N}
-xlabels = []
-for ticklabel in axs[1].get_xticklabels():
-  xl = ticklabel.get_text()
-  xl = '{' + xl.replace("$", "") + '}'
-  xlabels.append(r'$10^{%s}$' % xl)
-axs[1].set_xticklabels(xlabels)
+  axs[1].legend(loc='best')
 
-ylabels = []
-for ticklabel in axs[1].get_yticklabels():
-  xl = ticklabel.get_text()
-  xl = '{' + xl.replace("$", "") + '}'
-  ylabels.append(r'$10^{%s}$' % xl)
-axs[1].set_yticklabels(ylabels)
+  # re-set top plot x-axis to match bottom plot
+  xlims = axs[1].get_xlim()
+  axty.set_xlim(xlims)
 
-pl.subplots_adjust(hspace=0.05, wspace=0.15)
+  fig.canvas.draw()
+  # change y labels to be of the form 10^{N}
+  xlabels = []
+  for ticklabel in axs[1].get_xticklabels():
+    xl = ticklabel.get_text()
+    xl = '{' + xl.replace("$", "") + '}'
+    xlabels.append(r'$10^{%s}$' % xl)
+  axs[1].set_xticklabels(xlabels)
 
-#fig.tight_layout()
+  ylabels = []
+  for ticklabel in axs[1].get_yticklabels():
+    xl = ticklabel.get_text()
+    xl = '{' + xl.replace("$", "") + '}'
+    ylabels.append(r'$10^{%s}$' % xl)
+  axs[1].set_yticklabels(ylabels)
 
-# output odds plots
-ppdir = os.path.join(os.getcwd(), 'odds')
-if not os.path.isdir(ppdir):
-  os.makedirs(ppdir)
-fig.savefig(os.path.join(ppdir, 'odds_plot.png'), dpi=300)
-fig.savefig(os.path.join(ppdir, 'odds_plot.pdf'))
+  pl.subplots_adjust(hspace=0.05, wspace=0.15)
 
-p = sp.Popen('pdftops -eps %s' % os.path.join(ppdir, 'odds_plot.pdf'), shell=True)
-p.communicate()
+  #fig.tight_layout()
 
-caption = r"""\label{fig:oddsplot}
-The coherent signal versus incoherent signal {\it or} noise odds ($\mathcal{O}_{{\rm S/I}_{\rm simple}}$ given
-in Equation~\ref{eq:cohvincoh2}) plotted against the coherent signal versus noise odds ($\mathcal{O}_{\rm S/N}$ given
-in Equation~\ref{eq:sigvsnoise}), for simulated signals injected as if into the two LIGO Hanford and Livingston
-detectors. Half the simulations were created with coherent signals between the two detectors (hexagonal-binned histogram
-points in the upper plots, and red points in the lower plot), whilst the other half where incoherent between the
-two detectors (black points in both plots). The upper plot is a zoomed in version of the lower plot, with hexagonal
-histogram bins coloured to show the coherent signal SNR.
-"""
+  # output odds plots
+  ppdir = os.path.join(os.getcwd(), 'odds')
+  if not os.path.isdir(ppdir):
+    os.makedirs(ppdir)
+  fig.savefig(os.path.join(ppdir, 'odds_plot.png'), dpi=300)
+  fig.savefig(os.path.join(ppdir, 'odds_plot.pdf'))
 
-fp = open(os.path.join(ppdir, 'caption.tex'), 'w')
-fp.write(caption)
-fp.close()
+  p = sp.Popen('pdftops -eps %s' % os.path.join(ppdir, 'odds_plot.pdf'), shell=True)
+  p.communicate()
+
+  caption = r"""\label{fig:oddsplot}
+  The coherent signal versus incoherent signal {\it or} noise odds ($\mathcal{O}_{{\rm S/I}_{\rm simple}}$ given
+  in Equation~\ref{eq:cohvincoh2}) plotted against the coherent signal versus noise odds ($\mathcal{O}_{\rm S/N}$ given
+  in Equation~\ref{eq:sigvsnoise}), for simulated signals injected as if into the two LIGO Hanford and Livingston
+  detectors. Half the simulations were created with coherent signals between the two detectors (hexagonal-binned histogram
+  points in the upper plots, and red points in the lower plot), whilst the other half where incoherent between the
+  two detectors (black points in both plots). The upper plot is a zoomed in version of the lower plot, with hexagonal
+  histogram bins coloured to show the coherent signal SNR.
+  """
+
+  fp = open(os.path.join(ppdir, 'caption.tex'), 'w')
+  fp.write(caption)
+  fp.close()
+  
+  pl.clf()
+  if opts.odds:
+    sys.exit(0)
 
 # plot SNR vs bcins
-ppdir = os.path.join(os.getcwd(), 'snr_vs_odds')
-pl.clf()
-fig = pl.figure(figsize=(6,5))
-ax = pl.gca()
+if plotall or opts.snrodds:
+  ppdir = os.path.join(os.getcwd(), 'snr_vs_odds')
 
-ax.plot(cohsnrs, bcis, 'o', ms=3, color='orange', alpha=0.1, label=r'$\mathcal{O}_{{\rm S/I}_{\rm simple}}$')
-ax.plot(cohsnrs, bcins, '*', ms=3, color='blue', alpha=0.1, label=r'$\mathcal{O}_{\rm S/I}$')
-ax.plot(cohsnrs, cohO, 'o', ms=3, color='green', alpha=0.1, label=r'$\mathcal{O}_{\rm S/N}$')
-ax.set_ylim([-5., 12.])
+  fig = pl.figure(figsize=(6,5))
+  ax = pl.gca()
 
-# get fits to the log(O^S_N) distribution as a function of SNR^2
-f = np.polyfit(cohsnrs, cohO, 2)
-csnrs = np.linspace(0.01, 30., 80)
-ax.plot(csnrs, f[2] + f[1]*csnrs + f[0]*csnrs**2, 'g-', lw=2)
+  ax.plot(cohsnrs, bcis, 'o', ms=3, color='orange', alpha=0.1, label=r'$\mathcal{O}_{{\rm S/I}_{\rm simple}}$')
+  ax.plot(cohsnrs, bcins, '*', ms=3, color='blue', alpha=0.1, label=r'$\mathcal{O}_{\rm S/I}$')
+  ax.plot(cohsnrs, cohO, 'o', ms=3, color='green', alpha=0.1, label=r'$\mathcal{O}_{\rm S/N}$')
+  ax.set_ylim([-5., 12.])
 
-# get fits to the max of O^S_Isimple (note: not the log) as a function of SNR
-dsnr = 0.25 # steps in SNR
-nsnrs = np.arange(1.5, 30, dsnr)
-maxbcis = np.zeros(len(nsnrs))
-snrvals = np.zeros(len(nsnrs))
-for i, nsnr in enumerate(nsnrs):
-  isnr = np.argmax(bcis[(cohsnrs >= nsnr) & (cohsnrs < nsnr+dsnr)])
-  maxbcis[i] = bcis[(cohsnrs >= nsnr) & (cohsnrs < nsnr+dsnr)][isnr]
-  snrvals[i] = cohsnrs[(cohsnrs >= nsnr) & (cohsnrs < nsnr+dsnr)][isnr]
+  # get fits to the log(O^S_N) distribution as a function of SNR^2
+  f = np.polyfit(cohsnrs, cohO, 2)
+  csnrs = np.linspace(0.01, 30., 80)
+  ax.plot(csnrs, f[2] + f[1]*csnrs + f[0]*csnrs**2, 'g-', lw=2)
 
-f = np.polyfit(np.log10(snrvals), maxbcis, 1)
-ax.plot(csnrs[csnrs>1.5], f[1] + np.log10(csnrs[csnrs>1.5])*f[0], '-', color='orange', lw=2)
+  # get fits to the max of O^S_Isimple (note: not the log) as a function of SNR
+  dsnr = 0.25 # steps in SNR
+  nsnrs = np.arange(1.5, 30, dsnr)
+  maxbcis = np.zeros(len(nsnrs))
+  snrvals = np.zeros(len(nsnrs))
+  for i, nsnr in enumerate(nsnrs):
+    isnr = np.argmax(bcis[(cohsnrs >= nsnr) & (cohsnrs < nsnr+dsnr)])
+    maxbcis[i] = bcis[(cohsnrs >= nsnr) & (cohsnrs < nsnr+dsnr)][isnr]
+    snrvals[i] = cohsnrs[(cohsnrs >= nsnr) & (cohsnrs < nsnr+dsnr)][isnr]
 
-ax.set_xlabel(r'$\rho_{\rm coh}$')
-ax.set_ylabel(r'$\mathcal{O}$')
-ax.legend(loc='best')
-ax.set_xlim([0., 30.])
+  f = np.polyfit(np.log10(snrvals), maxbcis, 1)
+  ax.plot(csnrs[csnrs>1.5], f[1] + np.log10(csnrs[csnrs>1.5])*f[0], '-', color='orange', lw=2)
 
-fig.canvas.draw()
-# change y labels to be of the form 10^{N}
-ylabels = []
-for ticklabel in ax.get_yticklabels():
-  xl = ticklabel.get_text()
-  xl = '{' + xl.replace("$", "") + '}'
-  ylabels.append(r'$10^{%s}$' % xl)
-ax.set_yticklabels(ylabels)
+  ax.set_xlabel(r'$\rho_{\rm coh}$')
+  ax.set_ylabel(r'$\mathcal{O}$')
+  leg = ax.legend(loc='best')
 
-fig.tight_layout()
+  # change legend markers to lose transparency
+  for lh in leg.legendHandles: lh._legmarker.set_alpha(1)
 
-# output snr plots
-if not os.path.isdir(ppdir):
-  os.makedirs(ppdir)
-fig.savefig(os.path.join(ppdir, 'snr_v_odds_plot.png'), dpi=300)
-fig.savefig(os.path.join(ppdir, 'snr_v_odds_plot.pdf'))
+  ax.set_xlim([0., 30.])
 
-p = sp.Popen('pdftops -eps %s' % os.path.join(ppdir, 'snr_v_odds_plot.pdf'), shell=True)
-p.communicate()
+  fig.canvas.draw()
+  # change y labels to be of the form 10^{N}
+  ylabels = []
+  for ticklabel in ax.get_yticklabels():
+    xl = ticklabel.get_text()
+    xl = '{' + xl.replace("$", "") + '}'
+    ylabels.append(r'$10^{%s}$' % xl)
+  ax.set_yticklabels(ylabels)
 
-caption = r"""\label{fig:snrvsodds}
-Various odds values plotted as a function of the injected coherent signal-to-noise ratio ($\rho_{\text coh}$).
-Shown are the (simple) coherent signal versus incoherent signal odds ($\mathcal{O}_{{\rm S/I}_{\rm simple}}$ given
-in Equation~\ref{eq:cohvincoh1}), more complete coherent signal versus incoherent signal {\it or} noise odds
-($\mathcal{O}_{\rm S/I}$ given in Equation~\ref{eq:cohvincoh2}), and coherent signal versus Gaussian noise odds
-($\mathcal{O}_{\rm S/N}$ given in Equation~\ref{eq:sigvsnoise}). Also shown are lines with a quadratic fit
-to the $\mathcal{O}_{\rm S/N}$ values, to show the $\log{\mathcal{O}_{\rm S/N}} \propto \rho_{\text{coh}}^2$ relation,
-and a fit to show the $\mathcal{O}_{{\rm S/I}_{\rm simple}} \propto \rho_{\text{coh}}$ relation.
-"""
+  fig.tight_layout()
 
-fp = open(os.path.join(ppdir, 'caption.tex'), 'w')
-fp.write(caption)
-fp.close()
+  # output snr plots
+  if not os.path.isdir(ppdir):
+    os.makedirs(ppdir)
+  fig.savefig(os.path.join(ppdir, 'snr_v_odds_plot.png'), dpi=300)
+  fig.savefig(os.path.join(ppdir, 'snr_v_odds_plot.pdf'))
 
+  p = sp.Popen('pdftops -eps %s' % os.path.join(ppdir, 'snr_v_odds_plot.pdf'), shell=True)
+  p.communicate()
 
-# plot standard search SNR vs coherent odds with the larger parameter space ones overlaid
-ppdir = os.path.join(os.getcwd(), 'snr_vs_odds_larger')
-pl.clf()
+  caption = r"""\label{fig:snrvsodds}
+  Various odds values plotted as a function of the injected coherent signal-to-noise ratio ($\rho_{\text coh}$).
+  Shown are the (simple) coherent signal versus incoherent signal odds ($\mathcal{O}_{{\rm S/I}_{\rm simple}}$ given
+  in Equation~\ref{eq:cohvincoh1}), more complete coherent signal versus incoherent signal {\it or} noise odds
+  ($\mathcal{O}_{\rm S/I}$ given in Equation~\ref{eq:cohvincoh2}), and coherent signal versus Gaussian noise odds
+  ($\mathcal{O}_{\rm S/N}$ given in Equation~\ref{eq:sigvsnoise}). Also shown are lines with a quadratic fit
+  to the $\mathcal{O}_{\rm S/N}$ values, to show the $\log{\mathcal{O}_{\rm S/N}} \propto \rho_{\text{coh}}^2$ relation,
+  and a fit to show the $\mathcal{O}_{{\rm S/I}_{\rm simple}} \propto \rho_{\text{coh}}$ relation.
+  """
 
-fig, axs = pl.subplots(1, 2, sharey=True, figsize=(11,8))
+  fp = open(os.path.join(ppdir, 'caption.tex'), 'w')
+  fp.write(caption)
+  fp.close()
+  pl.clf()
+  
+  if opts.snrodds:
+    sys.exit(0)
 
-hcohsnrs = np.array([isv[detectors[-1]] for isv in hinjsnrs])
+if plotall or opts.snrodds2:
 
-axs[0].plot(cohsnrs, bcins, 'o', ms=4, color='blue', alpha=0.05)
-axs[0].plot(cohsnrs, cohO, 'o', ms=4, color='green', alpha=0.05)
+  # plot standard search SNR vs coherent odds with the larger parameter space ones overlaid
+  ppdir = os.path.join(os.getcwd(), 'snr_vs_odds_larger')
 
-axs[0].plot(hcohsnrs, lbcins, '.', ms=6, color='darkblue', label=r'$\mathcal{O}_{\rm S/I}$')
-axs[0].plot(hcohsnrs, lcohO, '.', ms=5, color='yellowgreen', label=r'$\mathcal{O}_{\rm S/N}$')
+  fig, axs = pl.subplots(1, 2, sharey=True, figsize=(11,8))
 
-axs[0].set_xlabel(r'$\rho_{\rm coh}$')
-axs[0].set_ylabel(r'$\mathcal{O}$')
+  hcohsnrs = np.array([isv[detectors[-1]] for isv in hinjsnrs])
 
-ylims = axs[0].get_ylim()
-axs[0].set_ylim([-55, 25])
-axs[0].set_xlim([0., 50.])
+  axs[0].plot(cohsnrs, bcins, 'o', ms=4, color='blue', alpha=0.05)
+  axs[0].plot(cohsnrs, cohO, 'o', ms=4, color='green', alpha=0.05)
 
-axs[0].legend(loc='best')
+  axs[0].plot(hcohsnrs, lbcins, '.', ms=6, color='darkblue', label=r'$\mathcal{O}_{\rm S/I}$')
+  axs[0].plot(hcohsnrs, lcohO, '.', ms=5, color='yellowgreen', label=r'$\mathcal{O}_{\rm S/N}$')
 
-#axs[1].plot(cohO, bcins, 'ro', ms=3, alpha=0.2)
-#hb = axs[1].hexbin(lcohO, lbcins, gridsize=75, C=[isv[detectors[-1]] for isv in hinjsnrs], alpha=0.9)
-hb = axs[1].scatter(lcohO, lbcins, c=hcohsnrs, s=hcohsnrs, alpha=0.8)
-axs[1].plot(cohO, bcins, 'bo', ms=4, alpha=0.05)
+  axs[0].set_xlabel(r'$\rho_{\rm coh}$')
+  axs[0].set_ylabel(r'$\mathcal{O}$')
 
-cbaxes = fig.add_axes([0.85, 0.15, 0.015, 0.55]) 
-cb = pl.colorbar(hb, cax=cbaxes) 
-cb.set_label(r'$\rho_{\rm coh}$')
-cb.ax.yaxis.set_label_position('left')
+  ylims = axs[0].get_ylim()
+  axs[0].set_ylim([-55, 25])
+  axs[0].set_xlim([0., 50.])
 
-axs[1].set_xlabel(r'$\mathcal{O}_{\rm S/N}$')
-axs[1].set_ylabel(r'$\mathcal{O}_{\rm S/I}$')
+  axs[0].legend(loc='best')
 
-#fig.tight_layout()
-fig.canvas.draw()
-# change y labels to be of the form 10^{N}
-ylabels = []
-for ticklabel in axs[0].get_yticklabels():
-  xl = ticklabel.get_text()
-  xl = '{' + xl.replace("$", "") + '}'
-  ylabels.append(r'$10^{%s}$' % xl)
-axs[0].set_yticklabels(ylabels)
+  #axs[1].plot(cohO, bcins, 'ro', ms=3, alpha=0.2)
+  #hb = axs[1].hexbin(lcohO, lbcins, gridsize=75, C=[isv[detectors[-1]] for isv in hinjsnrs], alpha=0.9)
+  hb = axs[1].scatter(lcohO, lbcins, c=hcohsnrs, s=hcohsnrs, alpha=0.8)
+  axs[1].plot(cohO, bcins, 'bo', ms=4, alpha=0.05)
 
-xlabels = []
-for ticklabel in axs[1].get_xticklabels():
-  xl = ticklabel.get_text()
-  xl = '{' + xl.replace("$", "") + '}'
-  xlabels.append(r'$10^{%s}$' % xl)
-axs[1].set_xticklabels(xlabels)
+  cbaxes = fig.add_axes([0.85, 0.15, 0.015, 0.55]) 
+  cb = pl.colorbar(hb, cax=cbaxes) 
+  cb.set_label(r'$\rho_{\rm coh}$')
+  cb.ax.yaxis.set_label_position('left')
 
-pl.subplots_adjust(wspace=0.11)
+  axs[1].set_xlabel(r'$\mathcal{O}_{\rm S/N}$')
+  axs[1].set_ylabel(r'$\mathcal{O}_{\rm S/I}$')
 
-if not os.path.isdir(ppdir):
-  os.makedirs(ppdir)
-fig.savefig(os.path.join(ppdir, 'snr_v_odds_larger_plot.png'), dpi=300)
-fig.savefig(os.path.join(ppdir, 'snr_v_odds_larger_plot.pdf'))
+  #fig.tight_layout()
+  fig.canvas.draw()
+  # change y labels to be of the form 10^{N}
+  ylabels = []
+  for ticklabel in axs[0].get_yticklabels():
+    xl = ticklabel.get_text()
+    xl = '{' + xl.replace("$", "") + '}'
+    ylabels.append(r'$10^{%s}$' % xl)
+  axs[0].set_yticklabels(ylabels)
 
-p = sp.Popen('pdftops -eps %s' % os.path.join(ppdir, 'snr_v_odds_larger_plot.pdf'), shell=True)
-p.communicate()
+  xlabels = []
+  for ticklabel in axs[1].get_xticklabels():
+    xl = ticklabel.get_text()
+    xl = '{' + xl.replace("$", "") + '}'
+    xlabels.append(r'$10^{%s}$' % xl)
+  axs[1].set_xticklabels(xlabels)
 
-caption = r"""\label{fig:snrvsodds_larger}
-Plots showing odds values for a range of simulated signals for searches over the seven parameters of $h_0$, $\phi_0$,
-$\cos{\iota}$, $\psi$, $f_0$, $\dot{f}$, and $\alpha$. The solid points in the left panel shows two odds values
-($\mathcal{O}_{\rm S/I}$ and $\mathcal{O}_{\rm S/N}$) plotted as a function of the injected coherent signal-to-noise ratio
-($\rho_{\text coh}$). Also shown, underplotted as shaded circles, are the value for the four parameter search seen in
-Figure~\ref{fig:snrvsodds}. The right plot shows $\mathcal{O}_{\rm S/I}$ as a function of $\mathcal{O}_{\rm S/N}$, with
-the colour of each point giving the coherent SNR. Also shown, as the light blue circles, are the values for the four
-parameter search seen in Figure~\ref{fig:oddsplot}.
-"""
+  pl.subplots_adjust(wspace=0.11)
 
-fp = open(os.path.join(ppdir, 'caption.tex'), 'w')
-fp.write(caption)
-fp.close()
+  if not os.path.isdir(ppdir):
+    os.makedirs(ppdir)
+  fig.savefig(os.path.join(ppdir, 'snr_v_odds_larger_plot.png'), dpi=300)
+  fig.savefig(os.path.join(ppdir, 'snr_v_odds_larger_plot.pdf'))
+
+  p = sp.Popen('pdftops -eps %s' % os.path.join(ppdir, 'snr_v_odds_larger_plot.pdf'), shell=True)
+  p.communicate()
+
+  caption = r"""\label{fig:snrvsodds_larger}
+  Plots showing odds values for a range of simulated signals for searches over the seven parameters of $h_0$, $\phi_0$,
+  $\cos{\iota}$, $\psi$, $f_0$, $\dot{f}$, and $\alpha$. The solid points in the left panel shows two odds values
+  ($\mathcal{O}_{\rm S/I}$ and $\mathcal{O}_{\rm S/N}$) plotted as a function of the injected coherent signal-to-noise ratio
+  ($\rho_{\text coh}$). Also shown, underplotted as shaded circles, are the value for the four parameter search seen in
+  Figure~\ref{fig:snrvsodds}. The right plot shows $\mathcal{O}_{\rm S/I}$ as a function of $\mathcal{O}_{\rm S/N}$, with
+  the colour of each point giving the coherent SNR. Also shown, as the light blue circles, are the values for the four
+  parameter search seen in Figure~\ref{fig:oddsplot}.
+  """
+
+  fp = open(os.path.join(ppdir, 'caption.tex'), 'w')
+  fp.write(caption)
+  fp.close()

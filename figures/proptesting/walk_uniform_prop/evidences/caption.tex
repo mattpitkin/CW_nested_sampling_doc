@@ -1,7 +1,10 @@
 \label{fig:walkunipropevs}
 A set of violin plots showing the distributions of estimates of the evidence
 $\mathcal{Z}$ (as returned by our code) compared to the true evidence $\mathcal{Z}_{\rm true}$ (as
-calculated using Equation~\ref{eq:kldiv}) as a function of the prior range,
+calculated using Equation~\ref{eq:testgaussev}) as a function of the prior range,
 or information gain, when using the ensemble walk and uniform proposal
-distributions. The different colour plots represent different numbers
-of live points used.
+distributions (75\% and 25\% of the time, respectively). The different colour plots represent different numbers
+of live points used. The error bars show the expected spread of the log evidence ratios (calculated using
+$\sqrt{H/N_{\text{live}}}$, where $H$ is the information gain from Equation~\ref{eq:kldiv}) if the average estimated
+evidence match the true evidence. Offsets around the different prior range values are just used to avoid overlaps of the
+distributions.

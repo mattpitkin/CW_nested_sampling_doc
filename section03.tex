@@ -7,7 +7,7 @@ of some of the concepts we will discuss below.
 
 One main point about the nested sampling algorithm is that it starts by randomly drawing a certain number of samples (the number of
 which we call the number of live points, $N_{\text{live}}$, which will be the constant number of ``active'', or ``live'', samples),  
-where a sample is a vector containing a value for each parameter $\vec{\theta}$, from the prior distribution (see \S\ref{sec:priorfuncs}).
+where a sample is a vector, $\vec{\theta}$, containing a value for each parameter drawn from their respective prior distributions (see \S\ref{sec:priorfuncs}).
 The samples must be independent draws. For each of these samples the likelihood will be calculated and the sample $\vec{\theta}_{\text{min}}$
 corresponding to the minimum likelihood, $L_{\text{min}} = p(\mathbf{B}|\vec{\theta}_{\text{min}})$, will be noted. As the algorithm
 progresses the number of live points stays the
@@ -57,7 +57,8 @@ proposals, that can be used in different proportions:
  This proposal has not been tested and, by default, is not used at all.
 \end{description}
 The cache of samples mentioned above, and used by the nested sampling algorithm, is the set of live points, but this cache is
-only updated on iterations of the algorithm that are a factor of 10\% of the number of live points.
+only updated on iterations of the algorithm that are a factor of 10\% of the number of live points (e.g., for 1000 live points
+the cache is updated after every 100 new iterations).
 
 The length of each MCMC run can be chosen by the user, but by default it is automatically set within the code. To do this,
 at the same rate as the cache is updated, the autocorrelation length of the parameters is calculated. A random sample from the current
@@ -113,7 +114,8 @@ In the first test we check how just using the ensemble walk proposal (which is {
 estimating the evidence, upper limit, and posterior distribution. Figure~\ref{fig:walkpropevs} shows a variety of information, but it
 primarily shows the distribution of the ratio of evidences output from our code, $\mathcal{Z}$, to the true evidence calculated via
 Equation~\ref{eq:testgaussev} as a function of the value of the upper prior bound $B$ (or equivalently on the top axis the
-information gain, in nats, calculated via Equation~\ref{eq:kldiv}). This is shown for the range of different numbers of live points used.
+information gain, in \href{https://en.wikipedia.org/wiki/Nat_(unit)}{natural units of information} (nats), calculated via Equation~\ref{eq:kldiv}).
+This is shown for the range of different numbers of live points used.
 It is clear that as the information gain increases (i.e.\ the posterior is constrained within a successively smaller part of the
 prior range) we are systematically more biased towards overestimating the evidence. It can also be seen that the bias increases with
 increasing number of live points. Linear fits (in $\ln{(\mathcal{Z}/\mathcal{Z}_{\text{true}})}$ and $H$, the information gain) for different numbers
@@ -170,11 +172,13 @@ lower numbers of live points the distributions appear to be consistent, however,
 inconsistent a large amount of the time. This is most likely due to differences in distributions showing up more obviously when there are more
 posterior samples to use.
 
-The systematic biases in evidence values and upper limits may not be major problem, but does point towards there being some issue with the
+The systematic biases in evidence values and upper limits may not be a major problem\footnote{The evidence biases at the level seen are unlikely to sway model comparisons as
+they will most likely show up when one model is very highly favoured over another. The observed biases in the upper limits are at a level that is currently less
+than expected uncertainties due to instrumental calibration.}, but does point towards there being some issue with the
 implementation of the ensemble walk proposal.
 
-In the second test we have check what happens with the code's current default proposal settings: using the ensemble walk proposal 75\%
-of the time and the uniform proposal 25\% of the time. It should be noted that this default is not an accident, and came about from tests
+In the second test we have checked what happens with the code's current default proposal settings: using the ensemble walk proposal 75\%
+of the time and the uniform proposal 25\% of the time. It should be noted that this default is not arbitrary, but came about from tests
 similar to these when just using the ensemble walk proposal.
 
 Figure~\ref{fig:walkunipropevs} shows the evidence distributions equivalent to those in Figure~\ref{fig:walkpropevs}. However, what can
@@ -214,9 +218,8 @@ to give a new set of samples that does represent the posterior distribution. Dur
 independent nested sampling runs (weighting each based on their calculated evidences) to recalculate the evidence and generate posterior samples.
 
 What is described above is not a core function of the \lppen code, but is an integral part to generating results with it, and has been used to
-produce posterior distributions discussing earlier in the section, and later in this document. Due to the probabilistic
-way that posterior samples are generated there will only be a finite number of samples, and the number of samples is dependent on the number
-of live points used when running nested sampling. The actual dependence of the number of posterior samples on $N_{\text{live}}$ can be seen in
+produce posterior distributions discussing earlier in the section, and later in this document. The number of posterior samples generated by the code is
+dependent on the number of live points used when running nested sampling. The actual dependence of the number of posterior samples on $N_{\text{live}}$ can be seen in
 Figure~\ref{fig:numposts} (this uses the simulations discussed in \S\ref{sec:reseval}). It can be seen empirically, that the mean number of posterior
 samples goes roughly as $\langle N_{\text{post}} \rangle \approx 2.4N_{\text{live}}$, although there is a lower tail extending to $N_{\text{post}} \approx
 0.01N_{\text{live}}^{1.14}$.
@@ -256,7 +259,7 @@ fit to the natural logarithm of the median run time, $R/\mathcal{T}_L$, we get t
 \end{align}
 This relation should be considered as a rough lower limit to the run time for any particular likelihood function. Above, we saw that for our standard likelihood
 function the nested sampling algorithm was roughly three times quicker per likelihood evaluation than the simple test function. In both cases the internal MCMC, which
-draws new samples within the algorithm, required very similar small lengths to give uncorrelated samples, so there most be other internal bottlenecks that make the
+draws new samples within the algorithm, required very similar small lengths to give uncorrelated samples, so there must be other internal bottlenecks that make the
 simpler likelihood relatively slower. However, in general, longer MCMC chains will be required to give uncorrelated samples, so the number of likelihood evaluations
 will increase.
 

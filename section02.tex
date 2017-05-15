@@ -2,9 +2,9 @@
 
 Here we will describe the core parts of the code defining the signal model and the probability functions used
 for the inference. These assume that the data comprises a number of calibrated narrow-band complex-heteroyned time
-series'. These time series data streams can be from different detectors, and/or at different heterodyne
+series. These time series data streams can be from different detectors, and/or at different heterodyne
 frequencies. For example you could have a pair of times series from both the LIGO Hanford (H1) and LIGO
-Livingston (L1) detectors, with one produced with a heterodyne at twice the rotation frequency of a known
+Livingston (L1) detectors, with each pair containing one produced with a heterodyne at twice the rotation frequency of a known
 pulsar and the other produced with a heterodyne at the rotation frequency.
 
 \subsection{The signal model}\label{sec:model}
@@ -25,8 +25,8 @@ B'(t) = d(t)e^{-i\Phi_{i,\text{het}}(t)},
 where $\Phi_{i,\text{het}}(t)$ is the phase evolution for a given data stream $i$, and we produce $B(t)$ by
 low-pass filtering and resampling (via averaging) values of $B'(t)$.
 
-Under the standard assumption that the general theory of relativity (GR) is correct the code uses the form of
-the signal model defined in \citet{2015arXiv150105832J}, which, when heterodyned and assuming low-pass
+Under the standard assumption that the general theory of relativity (GR) is correct, the code uses the most general form of
+the signal model defined in Equations~51--54 of \citet{2015arXiv150105832J}, which, when heterodyned and assuming low-pass
 filtering, gives a signal at a pulsar's rotation frequency (where $\Phi_{1,{\text{het}}}(t) = \phi(t)$) of
 \begin{widetext}
 \begin{equation}\label{eq:hf}
@@ -54,7 +54,7 @@ iH_{\times}F_{\times}(\psi,t)e^{i\Phi_{0}} \right),
 \end{equation}
 where $H_+$ and $H_{\times}$ are the amplitude components for the `$+$' and `$\times$' polarisations, and $\Phi_0$ is the signal's initial phase.
 
-To calculate the $\Delta\phi_{\mathcal{K}}$ values using up to the $(n-1)^{\text{th}}$ frequency derivative, and try to avoid numerical overflow issues when dealing
+To calculate the $\Delta\phi_{\mathcal{K}}$ values using up to the $(n-1)^{\text{th}}$ frequency derivative, and to avoid numerical overflow issues when dealing
 with large phases, we use
 \begin{widetext}
 \begin{equation}\label{eq:deltaphi}
@@ -62,8 +62,9 @@ with large phases, we use
 \sum_{i=0}^{i<k} \left(\begin{array}{c}k \\ i\end{array} \right) (\delta t_{\text{true}}-\delta t_{\text{het}})^{k-i} (t+\delta t_{\text{het}})^i \right),
 \end{equation}
 \end{widetext}
-where $f^{(n)}$ is the $n^{\text{th}}$ frequency derivative (for both the `true' and `het' values these will be those prior to scaling with $\mathcal{K}$ for
-a given signal model), and $\delta t$ is the combination of any solar system barycentring and binary system barycentring time delays.
+where $f^{(n)}$ is the $n^{\text{th}}$ frequency derivative (for both the `true' and `het' the frequency/frequency dervitative values used here
+are those prior to scaling by $\mathcal{K}$ for a given signal model), and $\delta t$ is the combination of any solar system barycentring and binary system barycentring
+time delays.
 
 By default the code assumes emission just from the $l=m=2$ mode, i.e.\ there is only a signal at twice the
 rotation frequency. In this case $C_{22}$ and $\Phi_{22}^C$ can be related to the more familiar physical
@@ -216,7 +217,7 @@ binary system mass; and, the companion mass in a binary system.
 There are also other hardcoded priors for waveform amplitudes in two particular cases when searching for emission at both once
 and twice the rotation frequency: if searching for a signal from a biaxial star then the two waveform amplitudes, $C_{21}$ and $C_{22}$,
 must either both be positive or both be negative; if using the source model then the two amplitudes $I_{21}$ and $I_{31}$, must
-have $I_{31} \geqslant I_{21}$.
+have $I_{31} \geqslant I_{21}$ \citep[see, e.g.,][]{2015MNRAS.453.4399P}.
 
 \subsubsection{Uniform prior}\label{sec:uniformprior}
 
@@ -380,8 +381,8 @@ a uniform prior with arbitrary upper cut-off used in, e.g., \citet{2014ApJ...785
 
 The Student's $t$-likelihood function (\S\ref{sec:stlikelihood}) requires us to have an idea about the timescales on which the data is
 stationary, i.e.\ periods when the noise in the data is best described as being drawn from a single
-Gaussian distribution. We therefore use a scheme similar to the BayesianBlocks change point algorithm
-\citep{1998ApJ...504..405S}, or BlockNormal \gw burst finding algorithm \citep{2004CQGra..21S1705M}, to find points at which the statistics of the
+Gaussian distribution. We therefore use a scheme similar to the {\it BayesianBlocks} change point algorithm
+\citep{1998ApJ...504..405S}, or {\it BlockNormal} \gw burst finding algorithm \citep{2004CQGra..21S1705M}, to find points at which the statistics of the
 noise changes. This is done with a top-down iterative {\it divide and conquer} approach \citep{2000physics...9033S}.
 
 We start by taking a full complex time series data set for a detector and subtracting a running median from both
@@ -389,7 +390,7 @@ the real and imaginary components. This
 subtraction is performed to try and remove the effect of any very strong signals in the data, as we want to
 assess the properties of the noise rather than any signal.\footnote{In reality this is only likely to be a current issue for strong
 simulated signals injected into the data, as real signals will most likely have a low signal-to-noise ratio in short stretches of data.} The running median is calculated over a running window
-of 30 data points (or a minimum of 15 points at the start are end of the data), but not accounting for gaps in the data.
+of 30 data points (or a minimum of 15 points at the start or end of the data), but not accounting for gaps in the data.
 For the standard data sample rate of
 1 per 60 seconds, this means that half an hour of data is used, over which time the detector antenna patterns will not change
 too drastically (unless there is a gap in the data). However, it should be noted that if using much more slowly sampled data set
@@ -453,9 +454,9 @@ by $L_{i,j}$ and $y(\vec{\theta}_{\text{ML}})_{i,j,n}$ is replace by $y(\vec{\th
 
 A plot of the residual between the recovered single-detector and joint detector SNRs and their true values versus the true signal SNRs,
 as calculated from Equation~\ref{eq:snr}, for a set of simulated signals (described in \S\ref{sec:simsignal}) are shown in Figure~\ref{fig:snrplot}.
-The standard deviation of the resisduals is found to be one, with a mean around zero, and does not appear to change as a function of SNR (except at the
-lowest SNRs, where the noise in the data will generally give rise to a maximum likelihood model with a larger amplitude than the true signal, and this
-an overestimate of the SNR).
+The standard deviation of the resisduals is found to be one, with a mean around zero, and the distribution does not appear to change as a function of SNR (except at the
+lowest SNRs, where the noise in the data will generally give rise to a maximum likelihood model with a larger amplitude than the true signal, and thus
+an overestimate of the recovered SNR).
 
 \begin{figure}[!phtb]
 \begin{center}
@@ -512,5 +513,5 @@ and to each of the sub-hypothesis priors in the denominator, so that they cancel
 It is also worth noting that in all the above cases the models (and sub-hypotheses) are mutually exclusive. This may not at first seem obvious, as,
 for example, the Gaussian noise model is contained within the signal model provided the prior on the signal amplitude allowed a value of zero. But, as noted in
 \citet{2012PhRvD..85h2003L, MaxCWpolariations}, within the signal noise hypothesis having an amplitude of exactly zero (as in the Gaussian
-noise hypothesis) occupies an infinitesimally thin slice of the parameter space, and therefore has no weight. The same can be said for the a coherent
-signal within the incoherent signal model.
+noise hypothesis) occupies an infinitesimally thin slice of the parameter space, and therefore has no weight. The same can be said for the situation of a coherent
+signal model within the incoherent signal model.

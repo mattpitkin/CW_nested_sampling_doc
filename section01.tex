@@ -1,5 +1,10 @@
 \section{Overview}
 
+There are a variety of sources of \gws that are potentially observable using the current ground-based \gw detectors \citep{2015CQGra..32g4001L,2015CQGra..32b4001A}.
+These include transient signals, such as those already observed from the merger of binary black hole systems \citep{2016PhRvL.116f1102A,2016PhRvL.116x1103A}, and also
+continuous quasi-monochromatic signals, such as expected from assymetrically deformed rotating neutron stars \citep[see, e.g., Section~III of][]{2004PhRvD..69h2004A}.
+Here we will describe a code used in searches for continuous \gw signals, in particular signals from sources that are seen as pulsars via electromagnetic observations.
+
 One of the primary methods used in searches for \gws from known pulsars is based on two stages: a heterodyne
 stage that pre-processes the calibrated \gw detector data by removing a signal's expected intrinsic phase
 evolution (based on the observed solution from electromagnetic observations), whilst also low-pass filtering and
@@ -11,20 +16,21 @@ Method}, or some combination of these names. Up to now this method has only been
 on signal amplitudes, but has included no explicit criteria for deciding on signal detection/significance. A further
 limitation has been that the MCMC method used was inefficient\footnote{MCMC methods are not intrinsically inefficient for
 searches such as our, but the particulat implementation we had used was not specically designed to be efficient at sampling the
-posterior spaces.} and required a lot of tuning. It also
+given posterior volumes.} and required a lot of tuning. It also
 did not straightforwardly have the ability to perform a search on the data over small ranges in the phase
-evolution parameters (e.g.\ required if the
-\gw signal does not well match the known pulsar's phase evolution). For these reasons the parameter
-estimation code has been re-written to use the nested sampling algorithm \citep{Skilling:2006}, in particular
-a method based on that described in \citet{Veitch:2010}. This allows us to evaluate the {\it evidence} or {\it
+evolution parameters, which is required if the \gw signal does not well match the known pulsar's phase evolution. A nested sampling
+algorithm \citep{Skilling:2006}, in particular a method based on that described in \citet{Veitch:2010}, has been provided within
+the \lalinf software library \citep{2015PhRvD..91d2003V} in \citet{lalsuite}. This has been used for parameter estimation and model
+selection for both modelled transient sources, such as the observed black hole mergers \citep{2016PhRvL.116x1102A}, and unmodelled transient signal
+searches \citep{2015arXiv151105955L}. Due to the above reasons, and to make use of the existing and well used library functions, the code has been
+re-written to use the available nested sampling algorithm. This allows us to evaluate the {\it evidence} or {\it
 marginal likelihood} for the signal model and compare it to other model evidences (i.e.\ the data is consistent with being just
 Gaussian noise), whilst also giving posterior probability distributions for the signal parameters.
 
-This code, called \lppenf (or \lppen for short through the rest of this document), makes use of the nested sampling
-algorithm provided within the \lalinf software library \citep{2015PhRvD..91d2003V}. As such this document will not
-give a detailed description of how that algorithm works, but will provide some information on the specific proposals
+This code is called \lppenf (or \lppen for short through the rest of this document). For more detailed descriptions of how the algorithm works we refer
+to \citet{Veitch:2010} and \citep{2015PhRvD..91d2003V}, whilst here we will provide some information on the specific proposals
 distributions that can be used within the algorithm. This method has previously been briefly described in \citet{2012JPhCS.363a2041P}.
-A previous code, called \lppef (or \lppe for short), used in, e.g., \citet{2010ApJ...713..671A}, could perform posterior evaluation
+The previous code, called \lppef (or \lppe for short), used in, e.g., \citet{2010ApJ...713..671A}, could perform posterior evaluation
 using two methods: an MCMC method, or, by gridding up the parameter space and explicitly evaluating the posterior at each
 grid point. In \S\ref{sec:codeeval} we show comparisons of the various methods mainly to check \lppen for consistency.
 
@@ -34,7 +40,7 @@ searching over parameters that vary the phase evolution there is potential to sp
 efficient likelihood evaluation via the {\it reduced order quadrature} method \citep[see, e.g.,][]{2014PhRvX...4c1006F,2015PhRvL.114g1104C},
 but again that will be discussed in more detail in a future paper.
 
-\subsection{General knowledge}\label{sec:general}
+\subsection{Background knowledge}\label{sec:general}
 
 The code calculates the Bayesian evidence, or {\it marginal likelihood}, for a particular signal model. The
 evidence, $\mathcal{Z}$, for a given model, $M$, defined by a set of parameters, $\vec{\theta}$, is given by

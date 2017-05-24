@@ -24,7 +24,7 @@ If we just take the likelihood (either the Student's $t$-likelihood of Equation~
 Gaussian likelihood of Equation~\ref{eq:gausslikelihood})\footnote{If using the Gaussian likelihood there is a slight difference to what is 
 described here to take account of the data noise standard deviation, $\sigma$, 
 such that we require the substitutions $B_i \rightarrow B_i/\sigma_i$, $a(t_i) \rightarrow a(t_i)/\sigma_i$ and $b(t_i) \rightarrow b(t_i)/\sigma_i$.} for a single detector,
-data stream, and data chunk (see \S\ref{sec:likelihood}) then we see that it contains the summation over time
+data stream, and data chunk (see \S\ref{sec:likelihood}) then we see that it contains the summation over time samples
 \begin{equation}
 L = \sum_{i=1}^N \left|B(t_i) - h(t_i)\right|^2 = \sum_{i=1}^N \left[ \left(\Re{[B(t_i)]} - \Re{[h(t_i)]}\right)^2 + \left(\Im{[B(t_i)]} - \Im{[h(t_i)]}\right)^2 \right].
 \end{equation}
@@ -59,7 +59,7 @@ K_{b}^R &= C_{R,+}\sin{2\psi} + C_{R,\times}\cos{2\psi},
 where $K_{a^2}^R = \left(K_{a}^R\right)^2$, $K_{b^2}^R = \left(K_{b}^R\right)^2$, and $K_{2ab}^R = K_{a}^RK_{b}^R$.
 It is easy to see from above that things will be identical for the imaginary components and the equations hold just
 by swapping $R$ for $I$.
-It is worth noting that the coefficients given in Equation~\ref{eq:realcoeffs} take a slightly different form than
+It is worth noting that the coefficients given in Equation~\ref{eq:realcoeffs} take the opposite form (covariant vs.\ contravariant rotation) than
 the antenna pattern functions given in Equation~\ref{eq:antennanew}, and this difference is present in the model
 in the \lppen code, but should not be unexpected.
 
@@ -70,8 +70,8 @@ Equation~\ref{eq:exlikepart} that sum over the product of the data and model. Fo
  &=\sum B_R\left( C_{R,+}\left(a\cos{2\psi}+b\sin{2\psi}\right) + C_{R,\times}\left(b\cos{2\psi} - a\sin{2\psi} \right) \right), \nonumber \\
  &= d^a_R\left(C_{R,+}\cos{2\psi} - C_{R,\times}\sin{2\psi}\right) + d^b_R\left(C_{R,+}\sin{2\psi} + C_{R,\times}\cos{2\psi} \right),
 \end{align}
-where we have set $d^a_R = \sum B_R a$ and $d^b_R = \sum B_R b$. We have therefore see that the coefficients
-of $d^a_R$ and $d^b_R$ and indeed $K_a^R$ and $K_b^R$ respectively, i.e.,
+where we have set $d^a_R = \sum B_R a$ and $d^b_R = \sum B_R b$. We can therefore see that the coefficients
+of $d^a_R$ and $d^b_R$ are indeed $K_a^R$ and $K_b^R$ respectively, i.e.,
 \begin{equation}
 \sum d_Rh_R = d^a_RK_a^R + d^b_RK_b^R.
 \end{equation}

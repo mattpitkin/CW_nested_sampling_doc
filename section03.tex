@@ -1,6 +1,6 @@
 \section{Nested sampling setup}
 
-Here we will briefly describe some of the core functions used for the Nested Sampling algorithm within our code. We will
+Here we will briefly describe some of the core functions used for the Nested Sampling algorithm \citep{Skilling:2006} within our code. We will
 not describe nested sampling itself, over-and-above the very brief summary given in \S\ref{sec:general}, but instead refer
 the reader to \citet{Veitch:2010}. We also refer the reader to \citet{2015PhRvD..91d2003V} for a more thorough description
 of some of the concepts we will discuss below.
@@ -52,7 +52,7 @@ proposals, that can be used in different proportions:
  \item[Differential evolution] This is similar to the stretch proposal in that it uses two samples randomly drawn from the sample
  cache. By default this proposal is not used at all.
  \item[Uniform proposal] This proposal just draws points from their full prior for parameters that have a uniform prior specified.
- This proposal is used 25\% of the time by default.
+ Other parameters are not evolved. This proposal is used 25\% of the time by default.
  \item[Frequency jump] This proposal tries jumping between Fourier frequency bins if frequency is one of the required parameters.
  This proposal has not been tested and, by default, is not used at all.
 \end{description}
@@ -69,7 +69,7 @@ a hardcoded maximum length.
 \subsubsection{Testing the proposals}\label{sec:proposaltesting}
 
 We would like to test whether some of the above proposals lead to accurate calculations of the evidence integral as given in Equation~\ref{eq:evidence}.
-It is especially interesting to do this over ranges of prior volumes that are initially similar to the posterior volume, but then diverge to be
+It is especially interesting to do this for a variety of prior volumes, starting of with volumes similar to the posterior volume, but then diverging to be
 much larger than the posterior volume (or in other words, as the information gain, $H$, or Kullback-Leibler divergence, increases). To do this our
 code has the option of setting a one-dimensional Gaussian distribution as the likelihood function, using a flat prior bounded between $A$ and $B$,
 and working out the evidence. Analytically the evidence is given by
@@ -110,7 +110,7 @@ We have then set a range of upper bounds, $B$, from $10^{-23}$ to $10^{-13}$ inc
 live points from $2^9$ to $2^{13}$ increasing by powers of two each time. For each combination of upper bound and number of live points we have
 run the code on the test Gaussian likelihood 100 times to see the statistical spread of the output.
 
-In the first test we check how just using the ensemble walk proposal (which is {\it not} the default configuration described above) fairs at
+In the first test we check how using only the ensemble walk proposal (which is {\it not} the default configuration described above) fairs at
 estimating the evidence, upper limit, and posterior distribution. Figure~\ref{fig:walkpropevs} shows a variety of information, but it
 primarily shows the distribution of the ratio of evidences output from our code, $\mathcal{Z}$, to the true evidence calculated via
 Equation~\ref{eq:testgaussev} as a function of the value of the upper prior bound $B$ (or equivalently on the top axis the
@@ -120,8 +120,8 @@ It is clear that as the information gain increases (i.e.\ the posterior is const
 prior range) we are systematically more biased towards overestimating the evidence. It can also be seen that the bias increases with
 increasing number of live points. Linear fits (in $\ln{(\mathcal{Z}/\mathcal{Z}_{\text{true}})}$ and $H$, the information gain) for different numbers
 of live points are shown in Table~\ref{tab:klvsz}. It is interesting to note that the statistical spread of values (if ignoring the
-systematic offset) are consistent with the expected range given by the error bars, and calculated using $\sqrt{H/N_{\text{live}}}$, where here
-$H$ is the mean of the {\it information gain} (in nats) returned by the nested sampling algorithm for each run.
+systematic offset) are consistent with the expected range given by the error bars, and calculated using $\sqrt{\langle H \rangle/N_{\text{live}}}$ \citep{Skilling:2006}, where here
+$\langle H \rangle$ is the mean of the {\it information gain} (in nats) returned by the nested sampling algorithm for each run.
 
 \begin{table}[h]
 \caption{Linear coefficients in fits of $\ln{(\mathcal{Z}/\mathcal{Z}_{\text{true}})} = mH + c$ from the results
@@ -218,7 +218,7 @@ to give a new set of samples that does represent the posterior distribution. Dur
 independent nested sampling runs (weighting each based on their calculated evidences) to recalculate the evidence and generate posterior samples.
 
 What is described above is not a core function of the \lppen code, but is an integral part to generating results with it, and has been used to
-produce posterior distributions discussing earlier in the section, and later in this document. The number of posterior samples generated by the code is
+produce the posterior distributions discussed earlier in the section, and later in this document. The number of posterior samples generated by the code is
 dependent on the number of live points used when running nested sampling. The actual dependence of the number of posterior samples on $N_{\text{live}}$ can be seen in
 Figure~\ref{fig:numposts} (this uses the simulations discussed in \S\ref{sec:reseval}). It can be seen empirically, that the mean number of posterior
 samples goes roughly as $\langle N_{\text{post}} \rangle \approx 2.4N_{\text{live}}$, although there is a lower tail extending to $N_{\text{post}} \approx

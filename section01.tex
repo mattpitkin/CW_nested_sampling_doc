@@ -28,22 +28,22 @@ marginal likelihood} for the signal model and compare it to other model evidence
 Gaussian noise), whilst also giving posterior probability distributions for the signal parameters.
 
 This code is called \lppenf (or \lppen for short through the rest of this document). For more detailed descriptions of how the algorithm works we refer
-to \citet{Veitch:2010} and \citep{2015PhRvD..91d2003V}, whilst here we will provide some information on the specific proposals
+to \citet{Veitch:2010} and \citep{2015PhRvD..91d2003V}, whilst here we will provide some information on the specific proposal
 distributions that can be used within the algorithm. This method has previously been briefly described in \citet{2012JPhCS.363a2041P}.
 The previous code, called \lppef (or \lppe for short), used in, e.g., \citet{2010ApJ...713..671A}, could perform posterior evaluation
 using two methods: an MCMC method, or, by gridding up the parameter space and explicitly evaluating the posterior at each
 grid point. In \S\ref{sec:codeeval} we show comparisons of the various methods mainly to check \lppen for consistency.
 
 The code can also be used to perform parameter estimation and model selection for signals for any generic
-metric theory of gravity, however its use for this will be discussed in detail in a separate paper \citep{MaxCWpolariations}. When
+metric theory of gravity, however its use for this is discussed in more detail in a separate paper \citep{MaxCWpolariations}. When
 searching over parameters that vary the phase evolution there is potential to speed up the analysis through
 efficient likelihood evaluation via the {\it reduced order quadrature} method \citep[see, e.g.,][]{2014PhRvX...4c1006F,2015PhRvL.114g1104C},
 but again that will be discussed in more detail in a future paper.
 
 \subsection{Background knowledge}\label{sec:general}
 
-The code calculates the Bayesian evidence, or {\it marginal likelihood}, for a particular signal model. The
-evidence, $\mathcal{Z}$, for a given model, $M$, defined by a set of parameters, $\vec{\theta}$, is given by
+The code calculates the Bayesian evidence, or {\it marginal likelihood}, for a particular signal model under
+a set of assumptions. The evidence, $\mathcal{Z}$, for a given model, $M$, defined by a set of parameters, $\vec{\theta}$, is given by
 \begin{equation}\label{eq:evidence}
 \mathcal{Z}_M = p(d|M,I) = \int^{\vec{\theta}} p(d|\vec{\theta},M,I)p(\vec{\theta}|M,I) {\rm d}\vec{\theta},
 \end{equation}
@@ -65,7 +65,7 @@ By default the signal model evidence is compared to the evidence that the data c
 where on the right hand side we have explicitly set the prior odds for the two models to
 $p(M|I)/p(\text{noise}|I) = 1$.
 
-Other than this evidence value and odds ratio the code also returns the samples accumulated during
+Other than this evidence value and odds, the code also returns the samples accumulated during
 the nested sampling process. These samples are not drawn from the posterior probability distribution as in
 an MCMC method, but they can be resampled to generate a subset of samples that are drawn from the posterior
 distribution. This resampling \citep[performed using the {\tt lalapps\_nest2pos} {\tt python} script within
@@ -77,10 +77,10 @@ accepted with the probability
 P_{\text{accept}} = \frac{L_i w_i}{(L_iw_i)_{\rm max}}.
 \end{equation}
 
-In our case the data $d$ above is the heterodyned, low-pass filtered and down-sampled data
+In our case the data $d$ in equation~\ref{eq:oddsratio} is the heterodyned, low-pass filtered and down-sampled data
 from a detector, or set of detectors, each giving a single data stream or two data streams depending on
 whether the heterodyne was performed at one or both potential signal frequencies near the rotation frequency
 and/or twice the rotation frequency. Here we will use $\mathbf{B}$ to represent a vector of these heterodyned
-data values, for which a single time sample is often referred to using the jargon term $B_k \equiv B(t_k)$ (``{\it B of k}''), although we will
+data values \citep{2005PhRvD..72j2002D}, for which a single time sample is often referred to using the jargon term $B_k \equiv B(t_k)$ (``{\it B of k}''), although we will
 not consistently use $k$ as the time index for the data. Throughout this document if we refer to ``heterodyned'' data we mean
 data that has been processed, or simulated as if processed, by this method.

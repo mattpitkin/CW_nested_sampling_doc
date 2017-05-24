@@ -1,5 +1,14 @@
 \section{Evaluating the code}\label{sec:codeeval}
 
+Here we will evaluate the code in a variety of ways. We compare a selection of posterior probability distributions generated using \lppen,
+over a range of signal parameters, with those produced using a previous code. We also use a selection of many simulated signals to show how the
+odds comparing a signal model and a noise only model change with signal-to-noise ratio, along with comparing coherent verses incoherent signals
+(for coherent simulated signal and incoherent simulations). The simulations also allow us to evaluate the posterior probability distributions
+produced by the code using what is colloquially known as 
+\href{https://en.wikipedia.org/wiki/P\%E2\%80\%93P\_plot}{``P-P plots''} (see \S\ref{sec:ppplots})
+
+\subsection{Code comparison}
+
 In this section we will show how the posterior parameter distributions that we can generate from the output
 of our nested sampling code compare to evaluating them with a previous implementation of the analysis code
 \citep[\lppef, or for the rest of this document shortened to \lppe, used in, e.g.,][]{2014ApJ...785..119A} using a (generally inefficient) MCMC algorithm
@@ -8,13 +17,6 @@ and over a grid in parameters.\footnote{For the MCMC examples in this section, w
 the grid sampling used has been $N_{h_0}\times N_{\phi_0} \times N_{\cos{\iota}} \times N_{\psi} = 80\times40\times40\times40$.} We will show comparisons of the codes in two different regimes: no signal is present in the data, and an obvious signal is
 present in the data. We do this using simulated data both containing purely Gaussian noise and containing simulated signals
 added to Gaussian noise.
-
-Using a selection of many simulated signals we also show how the odds comparing a signal model and a noise only model change with
-signal-to-noise ratio, along with comparing coherent verses incoherent signals (for coherent simulated signal and incoherent simulations).
-The simulations also allow us to evaluate the posterior probability distributions produced by the code using what is colloquially known,
-in ground-based \gw parameter estimate circles at least, as ``P-P plots'' (see \S\ref{sec:ppplots})
-
-\subsection{Code comparison}
 
 In each of the tests below we will be running our code (\lppen) using the default proposal distributions discussed in \S\ref{sec:proposals}
 and with the number of live points fixed to be 2048. We will also assume a source at a fixed sky position and that the signal model is purely
@@ -239,7 +241,8 @@ described in this document using \lppe \citep[see, e.g., Appendix~B of][]{2007Ph
 
 Here we have used \lppen to perform parameter estimation on the parameters $\vec{\theta} = \{h_0, \cos{\iota}, \psi, \phi_{0}\}$ for two hardware injections added
 to intial LIGO data from the sixth science run (S6).\footnote{$\phi_0$ is being used here as opposed to $\Phi_{22}^C$ as we are not having to compare to the previous
-code.} These are two out of the thirteen total continuous wave injections and were called ``Pulsar03'' and ``Pulsar05''
+code.}\footnote{S6 data is publically available at \url{https://losc.ligo.org} \citep{2015JPhCS.610a2021V}.} These are two out of the thirteen total continuous wave
+injections and were called ``Pulsar03'' and ``Pulsar05''
 respectively. The data have been heterodyned with the known phase evolution of the signals. The extracted posterior distributions can be seen in
 Figures~\ref{fig:hwinj03} and \ref{fig:hwinj05} and are in very good agreement with the injection parameters.\footnote{For these hardware injections
 exact agreement between the expected injection parameters and those recovered, or between detectors, is not entirely expected. This is due to the
@@ -265,14 +268,16 @@ would imply a very high significance in distinguishing the coherent signal model
 \end{center}
 \end{figure}
 
-Several thousand simulated signals have been added to the LIGO sixth science run (S6) dataset \citep[see Section~IV of][]{2016PhRvD..94l4010W}.
-Here we have used \lppen to perform parameter estimation on the parameters $\vec{\theta} = \{h_0, \cos{\iota}, \psi, \phi_{0}, f, \dot{f}, \alpha, \delta\}$.
-In this case, as for the binary signal discussed in \S\ref{sec:simsignal}, we have purposely heterodyned the signal using values of $f$ and $\dot{f}$ offset
-from their known rotational values by $\Delta f = 5\ee{-8}$\,Hz and $\Delta \dot{f} = -4\ee{-15}$\,Hz\,s$^{-1}$. We have used the whole of the S6 dataset,
+Several thousand simulated signals have been added to the LIGO sixth science run dataset \citep[see Section~IV of][]{2016PhRvD..94l4010W}.
+For one particular signal (chosen for its moderate SNR over the run) we have used \lppen to perform parameter estimation on the parameters
+$\vec{\theta} = \{h_0, \cos{\iota}, \psi, \phi_{0}, f, \dot{f}, \alpha, \delta\}$. In this case, as for the binary signal discussed in \S\ref{sec:simsignal}, we
+have purposely heterodyned the signal using values of $f$ and $\dot{f}$ offset
+from their known rotational values by $\Delta f = 5\ee{-8}$\,Hz and $\Delta \dot{f} = -4\ee{-15}$\,Hz\,s$^{-1}$.\footnote{The frequency offset is approximately
+two Fourier frequency bins away from the actual signal frequency.} We have used the whole of the S6 dataset,
 spanning almost 1.3\,yr, with roughly 50\% duty factors for both H1 and L1. The code was run using the ROQ mode for each individual detector and a joint
 detector analysis. Gaussian priors were used on the frequency and sky location parameters. The recovered marginalised posterior distributions can be seen
 in Figure~\ref{fig:s6sw_inj}, where all parameters are observed to be correctly recovered at their true values, even $f$ and $\dot{f}$ which we offset (it is
-hard to see in the plots, but these values are constrained well within their allowed prior ranges). The signal was recovered with SNR of roughly 29 and 21 in
+hard to see in the plots, but these values are constrained well within their allowed prior ranges). This signal was recovered with SNR of roughly 29 and 21 in
 H1 and L1 individually, and with a coherent SNR of 35. The odds values are $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{N}}\right) = 251$ and $\log{}_{10}\left(\mathcal{O}_{\text{S}/\text{I}}\right) = 9.5$ showing that the signal is very significantly distinguished from the noise model.
 
 \begin{figure*}[!phtb]
@@ -287,8 +292,7 @@ H1 and L1 individually, and with a coherent SNR of 35. The odds values are $\log
 In this section we will assess the outputs of \lppen using a range of simulated signals. We have created two sets of 2000 signal parameters with which to
 inject simulated signals into Gaussian noise (with the same standard deviation of $1\ee{-22}$) for the H1 and L1 detectors. Both sets have been generated
 with $\phi_0$, $\psi$ and $\cos{\iota}$ drawn from uniform distributions over their minimal allowed ranges \citep[Table~1 of][]{2015MNRAS.453.4399P},
-but the first set
-calculates $h_0$ such that the coherent SNR (Equation~\ref{eq:snr}) is drawn uniformly between 0 and 20; the second set draws the $h_0$ uniformly between
+but for the first set $h_0$ is calculated such that the coherent SNR (Equation~\ref{eq:snr}) is drawn uniformly between 0 and 20; the second set draws the $h_0$ uniformly between
 0 and $3.25\ee{-22}$, such that the maximum coherent SNR (given the known noise level) is $\sim 55$. This latter set is used to evaluate the posterior
 distributions as described below in \S\ref{sec:ppplots}, whilst both sets are used to evaluate odds distributions. The sources' sky locations are drawn
 uniformly from over the sky-sphere. For these analyses each
@@ -300,7 +304,8 @@ in \S\ref{sec:proposals}, and with the samples from both runs being combined to 
 
 Another set of 2000 simulations has been created that again create simulated signals and add them to Gaussian noise for the H1 and L1 detectors. In this
 case the total SNR shared between the detectors has be drawn from a uniform distribution between 0 and 30, however, the signals have been purposely created
-to be incoherent between detectors. The parameters $\phi_0$, $\psi$ and $\cos{\iota}$ are drawn from their minimal allowed ranges, but are different for
+to be incoherent between detectors to simulate instrumental noise features. The parameters $\phi_0$, $\psi$ and $\cos{\iota}$ are drawn from their minimal allowed ranges,
+but are different for
 the signals input into the two detectors, whilst the sky positions are also independent for both detectors. The signal rotational frequency and frequency
 derivative are also offset between detectors, such that the offsets are drawn from Gaussian distributions of ($1\sigma$) width $1/2048$\,Hz and $1\ee{-10}$\,Hz$\,s^{-1}$
 respectively. The length of the data is the same as in the previous case, but it is assumed that the data for both detectors was heterodyned using the
@@ -335,12 +340,13 @@ $\alpha$ (rads) & $\pi$ & $0.0007272$ ($10^{\text{s}}$) \\
 \subsubsection{Evaluating the posterior distributions}\label{sec:ppplots}
 
 In \citet{2014PhRvD..89h4060S} a method was developed for evaluating whether sky location credible intervals for compact binary coalescence \gw signals, produced
-from posterior distribution output by \lalinf codes \citep{2015PhRvD..91d2003V}, behaved self-consistently. The approach uses injected signal, with parameters
+from posterior distribution output by \lalinf codes \citep{2015PhRvD..91d2003V}, behaved self-consistently. The approach uses injected signals, with parameters
 drawn from the prior distributions used when reconstructing them\footnote{In this case the amplitudes of the simulations are not drawn from the full prior range,
 but are drawn from a flat distribution within that range, so are valid for this comparison.}, and sees if the credible intervals effectively behave as frequentist
 confidence intervals, i.e.\ do 50\% of the known parameter values fall within some pre-specified definition (like the minimal credible region, or credible
 region bounded by the lower extent of the prior) of the 50\% credible region. This can test whether the underlying \lalinf parameter sampling is working as
-expected, or if there are biases to wider, or narrower, credible regions. The method, and the ``P-P plots'' it produces through evaluation over a range of credible
+expected, or if there are biases to wider, or narrower, credible regions. The method, and the \href{https://en.wikipedia.org/wiki/P\%E2\%80\%93P\_plot}{``P-P plots''}
+it produces through evaluation over a range of credible
 intervals, has now become commonly used to assess the \lalinf parameter estimation codes \citep{2015PhRvD..91d2003V} as a way of highlighting any problems.
 
 We have used this method here to evaluate our parameter posteriors produced from the simulations described above for which the amplitudes were drawn from
@@ -397,14 +403,15 @@ up or down, and can affect where they intersect. However, the general shape of t
 \end{figure}
 
 In Figure~\ref{fig:oddsplot} there are two panels showing $\mathcal{O}_{\text{S}/\text{I}}$ as a function of $\mathcal{O}_{\text{S}/\text{N}}$. In the upper
-panel the colours of points show the signal's coherent SNR. The plateauing of $\mathcal{O}_{\text{S}/\text{I}}$ is just that seen in Figure~\ref{fig:snrvsodds}. The
+panel (showing the coherent simulations) the colours of points show the signal's coherent SNR. The plateauing of $\mathcal{O}_{\text{S}/\text{I}}$ is just that seen in Figure~\ref{fig:snrvsodds}. The
 bottom panel shows a zoomed out version, with the incoherent signals as dark circles (these are also seen in the lower left of the upper panel). Here we see that for incoherent signals
 the value of $\mathcal{O}_{\text{S}/\text{I}}$ between the coherent and incoherent signals diverges quite quickly, with $\log{}_{10}{\mathcal{O}_{\text{S}/\text{I}}}$
 falling off roughly linearly with $\log{}_{10}{\mathcal{O}_{\text{S}/\text{N}}}$. This shows that, hopefully, for reasonable strength signals the value of
 $\mathcal{O}_{\text{S}/\text{I}}$ will be useful for distinguishing a coherent from an incoherent (and therefore not astrophysical) signal.\footnote{The caveats
 to this are that the way we created our incoherent signals may not well match true signals caused by instrumental (non-astrophysical) effects in \gw detectors.
 However, we hope our simulations are extreme, in a conservative way, in that one detector is actually containing an unadulterated signal, and is therefore
-potentially producing a far larger $\mathcal{O}_{\text{S}/\text{N}}$ value than might be expected.}
+potentially producing a far larger $\mathcal{O}_{\text{S}/\text{N}}$ value than might be expected whereas an instrumental feature would generally not match
+our signal template, even in a single detector.}
 
 \begin{figure*}[phtb]
 \begin{center}
@@ -420,7 +427,7 @@ earlier simulations plotted underneath. It is obvious that, for these injections
 is more scatter in $\mathcal{O}_{\text{S}/\text{I}}$ than seen before. This can be interpreted as finding spikes in $f_0\operatorname{-}\dot{f}$-space, that
 are not related to the signal, in individual detectors, which are therefore not coherent. For higher SNRs ($\gtrsim 10$) the $\mathcal{O}_{\text{S}/\text{I}}$
 value for
-this more complex search does tend to give higher values than for the simpler search. A hand-wavy explanation for this {\it could be} that a truly coherent signal
+this more complex search does tend to give higher values than for the simpler search (shown in Figure~\ref{fig:snrvsodds_larger} as the lighter circles). A hand-wavy explanation for this {\it could be} that a truly coherent signal
 found (at large enough SNR) within this larger space is more convincing (more parameters have to match up) than in the simpler case, and this outweighs any
 prior Occam factor. The right panel of Figure~\ref{fig:snrvsodds_larger} shows similar information.
 

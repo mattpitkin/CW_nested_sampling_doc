@@ -86,7 +86,8 @@ line options for \lppen, as shown with the \verb|--help| command, are given (in 
 \multicolumn{2}{|l|}{~Signal injection parameters:} \\
  {\tt --inject-file}     &  A pulsar parameter ({\tt .par}) file containing the parameters of a signal to be injected. If this is
                            given a signal will be injected. \\
- {\tt --inject-nonGR}    &  A parameter ({\tt .par}) file containing the values of specific non-GR signal parameters to be injected. \\
+ {\tt --inject-nonGR}    &  A parameter ({\tt .par}) file containing the values of specific non-GR signal parameters to be injected (this is an alternative to {\tt --inject-file}, so
+ both should not be passed at the same time). \\
  {\tt --inject-output}   &  A filename to which the injected signal will be output if specified. \\
  {\tt --inject-only}     &  If this is set, and an {\tt --inject-output} file is set, then do not perform nested sampling on the
                             created injection, but just exit the code after creation of, and writing out of, the injection. \\
@@ -629,7 +630,7 @@ them to produce odds for any-signal vs.\ noise and non-GR vs.\ GR.
 
 The \lppen code accepts the {\tt --nonGR} and {\tt --inject-nonGR} arguments, which can be used to search for and inject non-GR signals, respectively. Both options may
 be used as simple flags or with a specific argument. In the former case, the code will use a generic signal model that includes all polarisations mentioned in the prior
-file. For instance, for a single detector (H1 in this case) the most generic search (one including all 5 polarizations freely) would be carried out by calling (without injections):
+file. For instance, for a single detector (H1 in this case) the most generic search (one including all 5 non-degenerate polarisations freely) would be carried out by calling (without injections):
 \begin{lstlisting}[frame=single]
 lalapps_pulsar_parameter_estimation_nested --par-file pulsar.par --input-files data.txt --outfile output.hdf --prior-file prior.txt --Nlive 1000 --detectors H1 --nonGR
 \end{lstlisting}
@@ -691,7 +692,7 @@ PHI0VECTOR  uniform     0                  6.283185307179586
 \end{lrbox}
 \\[5pt] \indent \fbox{\usebox{\Lst}} \\[5pt]
 The second option accepted by {\tt --nonGR} and {\tt --inject-nonGR} is {\tt EGR}, which stands for ``enhanced GR''. This corresponds to a model made up of a GR signal
-plus contributions from any non-tensorial modes specified in the prior file. For instance, passing {\tt --nonGR EGR} with a prior like:
+(parametersied in the usual way by $h_0$, $\cos{\iota}$, $\phi_0$ and $\psi$) plus contributions from any non-tensorial modes specified in the prior file. For instance, passing {\tt --nonGR EGR} with a prior like:
 \begin{lrbox}{\Lst}
 \begin{lstlisting}
 PSI         uniform    -0.785398163397448 0.785398163397448

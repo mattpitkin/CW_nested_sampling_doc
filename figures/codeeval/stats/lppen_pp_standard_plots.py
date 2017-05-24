@@ -636,8 +636,8 @@ if plotall or opts.snrodds2:
 
   #axs[1].plot(cohO, bcins, 'ro', ms=3, alpha=0.2)
   #hb = axs[1].hexbin(lcohO, lbcins, gridsize=75, C=[isv[detectors[-1]] for isv in hinjsnrs], alpha=0.9)
-  hb = axs[1].scatter(lcohO, lbcins, c=hcohsnrs, s=hcohsnrs, alpha=0.8)
-  axs[1].plot(cohO, bcins, 'bo', ms=4, alpha=0.05)
+  axs[1].plot(cohO, bcins, 'bo', ms=4, alpha=0.05, zorder=0)
+  hb = axs[1].scatter(lcohO, lbcins, c=hcohsnrs, s=hcohsnrs, alpha=0.8, zorder=1)
 
   cbaxes = fig.add_axes([0.85, 0.15, 0.015, 0.55]) 
   cb = pl.colorbar(hb, cax=cbaxes) 
@@ -676,11 +676,11 @@ if plotall or opts.snrodds2:
 
   caption = r"""\label{fig:snrvsodds_larger}
   Plots showing odds values for a range of simulated signals for searches over the seven parameters of $h_0$, $\phi_0$,
-  $\cos{\iota}$, $\psi$, $f_0$, $\dot{f}$, and $\alpha$. The solid points in the left panel shows two odds values
+  $\cos{\iota}$, $\psi$, $f_0$, $\dot{f}$, and $\alpha$. The solid points in the left panel show two odds values
   ($\mathcal{O}_{\rm S/I}$ and $\mathcal{O}_{\rm S/N}$) plotted as a function of the injected coherent signal-to-noise ratio
-  ($\rho_{\text coh}$). Also shown, underplotted as shaded circles, are the value for the four parameter search seen in
+  ($\rho_{\text coh}$). Also shown, underplotted as light blue shaded circles, are the values for the four parameter search seen in
   Figure~\ref{fig:snrvsodds}. The right plot shows $\mathcal{O}_{\rm S/I}$ as a function of $\mathcal{O}_{\rm S/N}$, with
-  the colour of each point giving the coherent SNR. Also shown, as the light blue circles, are the values for the four
+  the colour of each point giving the coherent SNR. Again, also shown, as the light blue circles, are the values for the four
   parameter search seen in Figure~\ref{fig:oddsplot}.
   """
 

@@ -300,15 +300,15 @@ parameters]{MaxCWpolariations} \\
 \subsubsection{Example prior file}\label{sec:priorfile}
 
 The prior functions used by the code are described in \S\ref{sec:priorfuncs}. To implement them in the code requires a prior
-file specifying the prior function require for each parameter that will be varied. A an example prior file containing all the
-allowed prior types (for descriptive purposed only) is:
+file specifying the prior function required for each parameter that will be varied. An example prior file containing all the
+allowed prior types (for descriptive purposes only) is:
 \begin{lstlisting}[frame=single]
 H0      fermidirac 4.316e-24 9.1625
 PHI0    uniform    0.0       3.141593
 PSI     gaussian   0.6764    0.16532
 A1      loguniform 1e-3      1e6
 F0:F1   gmm        2  [[123.4,-1e-9],[123.4,-1.5e-9]] [[[1e-16,1e-18],[1e-18,1e-10]],[[1e-16,1e-18],[1e-18,1e-10]]] [0.5,1]
-COSIOTA gmm        2  [[1.5896]]  [[[0.0219]]]  [1.0]  [[1.5519]]  [[[0.0219]]]  [1.0] [-1,1]
+COSIOTA gmm        2  [[1.5896,1.5519]]  [[[0.0219]],[0.0219]]  [1.0,1.0] [-1,1]
 \end{lstlisting}
 The units required for parameters in a prior file are all SI units, whereas for the {\tt .par} file they often follow a different
 convention (see Table~\ref{tab:paramlist}).
